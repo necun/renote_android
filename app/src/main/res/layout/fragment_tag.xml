@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ui.presentation.home.dialogs.TagFragment">
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ic_white_top_rounded_bg"
+        android:paddingHorizontal="@dimen/view_padding_20"
+        android:paddingTop="@dimen/view_padding_20"
+        android:paddingBottom="@dimen/view_padding_30">
+
+
+        <ImageView
+            android:id="@+id/close_iv"
+            android:layout_width="@dimen/iconSize"
+            android:layout_height="@dimen/iconSize"
+            android:layout_gravity="center_horizontal"
+            android:contentDescription="@string/content_description"
+            android:src="@drawable/ic_close"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+
+            />
+
+        <LinearLayout
+            android:id="@+id/title_ll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_5dp"
+            android:layout_marginBottom="@dimen/margin_20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/close_iv">
+
+            <ImageView
+                android:id="@+id/tag_iv"
+                android:layout_width="@dimen/iconSize"
+                android:layout_height="@dimen/iconSize"
+                android:layout_gravity="center_horizontal"
+                android:contentDescription="@string/content_description"
+                android:padding="@dimen/view_padding_6"
+                android:src="@drawable/ic_tag" />
+
+            <TextView
+                android:id="@+id/title_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/new_tag"
+                android:textColor="@color/dark_grey"
+                android:textSize="@dimen/big_title"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="6dp"
+            android:layout_marginVertical="@dimen/view_margin_30"
+            android:background="@drawable/ic_search_bg"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/title_ll">
+
+            <EditText
+                android:id="@+id/textEditing"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginHorizontal="@dimen/view_margin_10"
+                android:layout_toStartOf="@id/create_tag_ll"
+                android:autofillHints="name"
+                android:background="@android:color/transparent"
+                android:hint="@string/enter_name"
+                android:inputType="text"
+                android:textColor="@color/dark_grey"
+                android:textColorHint="@color/light_grey"
+                android:textSize="@dimen/content"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:id="@+id/create_tag_ll"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/dimen_45dp"
+                android:layout_alignParentEnd="true"
+                android:background="@drawable/ic_create_green_right_rounded_bg"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="@dimen/view_padding_6"
+
+                >
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:gravity="center"
+                    android:layout_gravity="center"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/plus_iv"
+                        android:layout_width="@dimen/iconSize"
+                        android:layout_height="@dimen/iconSize"
+                        android:layout_gravity="center_vertical"
+                        android:contentDescription="@string/content_description"
+                        android:padding="@dimen/view_padding_6"
+                        android:src="@drawable/ic_create_tag" />
+
+                    <TextView
+                        android:id="@+id/action_name_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:text="@string/create"
+                        android:textColor="@color/white" />
+
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </RelativeLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

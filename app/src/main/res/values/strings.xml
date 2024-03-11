@@ -1,0 +1,56 @@
+<resources>
+    <string name="take_photo">Take Photo</string>
+    <string name="start_capture">Start Capture</string>
+    <string name="stop_capture">Stop Capture</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+
+    <string name="default_web_client_id">177174074358-vqvh06ldupef3jfmniq6gariprq148gs.apps.googleusercontent.com</string>
+    <string name="app_name">cameraxapp</string>
+    <string name="company_name">ReNoteAI</string>
+    <string name="signuptxt">Sign-up</string>
+    <string name="outlook_login">Sign in with Microsoft Account</string>
+    <string name="google_login">Sign in with Google Account</string>
+    <string name="apple_login">Sign in with Apple</string>
+    <string name="sign_up_btn_txt">Sign-Up</string>
+    <string name="sign_up_with_email_btn">Sign-Up with Email</string>
+    <string name="already_have_an_account">Already have an account?  Sign in</string>
+    <string name="email_hint">Email</string>
+    <string name="password_hint">Password</string>
+    <string name="verify">Verify</string>
+    <string name="otp">Enter the OTP</string>
+    <string name="sign_in_page_heading">Sign In with your Credentials</string>
+    <string name="remember_me">Remember me</string>
+    <string name="forgot_password">Forgot Password</string>
+    <string name="text_login">Login</string>
+    <string name="otp_content">We have sent theOTP verification code to your email address. Enter the code below</string>
+    <string name="confirm_password_hint">Confirm Password</string>
+    <string name="forget_password">Forget password 🔑</string>
+    <string name="forget_password_text">Enter your email address. We will send an OTP code for verification in the next step.</string>
+    <string name="text_logout">Logout</string>
+    <string name="resendotp">Resend OTP</string>
+
+    <string name="there_is_no_note">No Documents Uploaded</string>
+    <string name="name_text">Name</string>
+    <string name="browse_text">Upload from Device</string>
+    <string name="save_text">Save</string>
+    <string name="upload">Upload File</string>
+    <string name="folder_text">Folder</string>
+    <string name="choose">Choose Folder</string>
+    <string name="create_new_folder">New Folder</string>
+    <string name="txtEmptyDoc1">We don\'t see any files</string>
+    <string name="txtEmptyDoc2">Start scanning!</string>
+    <string name="content_description">Content Description</string>
+    <string name="new_folder">New Folder</string>
+    <string name="new_tag">New Tag</string>
+    <string name="enter_name">Enter Name</string>
+
+    <string name="create">Create</string>
+
+    <string-array name="sync_options">
+        <item>In this device</item>
+        <item>Sync to Google Drive</item>
+        <item>Sync to One Drive</item>
+    </string-array>
+</resources>

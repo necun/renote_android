@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+
+    android:background="@color/white">
+
+    <data class="RegistrationDataBinding">
+
+        <variable
+            name="viewmodel"
+            type="com.renote.renoteai.ui.registration.RegistrationViewModel" />
+
+    </data>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/white"
+            tools:context=".ui.registration.RegistrationActivity">
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="217dp"
+                android:layout_height="121dp"
+                android:layout_marginTop="60dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/renote_logo" />
+
+            <ImageView
+                android:id="@+id/textView"
+                android:layout_width="170dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="4dp"
+                android:fontFamily="@font/exo_2_bold"
+                android:src="@drawable/logo"
+                android:textSize="40sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/imageView" />
+
+            <!--    <TextView-->
+            <!--        android:id="@+id/signUptxt"-->
+            <!--        android:layout_width="wrap_content"-->
+            <!--        android:layout_height="wrap_content"-->
+            <!--        android:fontFamily="@font/outfit_medium"-->
+            <!--        android:text="@string/signuptxt"-->
+            <!--        android:textColor="@color/green"-->
+            <!--        android:textSize="24sp"-->
+            <!--        app:layout_constraintTop_toBottomOf="@+id/textView"-->
+            <!--        android:layout_marginTop="16dp"-->
+            <!--        app:layout_constraintEnd_toEndOf="parent"-->
+            <!--        app:layout_constraintStart_toStartOf="parent" />-->
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/btnSignIn"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="105dp"
+                android:layout_marginEnd="32dp"
+                android:elevation="8dp"
+                android:foreground="?attr/selectableItemBackground"
+                android:onClick="@{(view) -> viewmodel.onresorceClick(view.getId())}"
+                app:cardCornerRadius="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView">
+
+                <LinearLayout
+                    android:id="@+id/signInWithGoogleAcoountLL"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/google_btn_background"
+                    android:gravity="center"
+                    android:onClick="@{(view) -> viewmodel.onresorceClick(view.getId())}"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="30dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="10dp"
+                        android:src="@drawable/google_logo" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:fontFamily="@font/red_hat_display"
+                        android:gravity="start"
+                        android:text="@string/google_login"
+                        android:textColor="@color/white"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/microsoft"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="40dp"
+                android:layout_marginEnd="32dp"
+                android:elevation="8dp"
+                android:foreground="?attr/selectableItemBackground"
+                app:cardCornerRadius="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btnSignIn">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/white"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="30dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="10dp"
+                        android:src="@drawable/microsoft_logo" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:fontFamily="@font/red_hat_display"
+                        android:gravity="start"
+                        android:text="@string/outlook_login"
+                        android:textColor="@color/black"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+
+            <!--    <androidx.cardview.widget.CardView-->
+            <!--        android:id="@+id/apple"-->
+            <!--        android:layout_width="340dp"-->
+            <!--        android:layout_height="50dp"-->
+            <!--        app:layout_constraintStart_toStartOf="parent"-->
+            <!--        app:layout_constraintEnd_toEndOf="parent"-->
+            <!--        app:layout_constraintTop_toBottomOf="@+id/microsoft"-->
+            <!--        android:layout_marginTop="40dp"-->
+            <!--        android:elevation="8dp"-->
+            <!--        android:foreground="?attr/selectableItemBackground"-->
+            <!--        app:cardCornerRadius="20dp">-->
+
+            <!--        <LinearLayout-->
+            <!--            android:layout_width="match_parent"-->
+            <!--            android:layout_height="match_parent"-->
+            <!--            android:background="@color/white"-->
+            <!--            android:gravity="center"-->
+            <!--            android:orientation="horizontal">-->
+
+            <!--            <ImageView-->
+            <!--                android:layout_width="30dp"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_marginEnd="10dp"-->
+            <!--                android:src="@drawable/apple_logo" />-->
+
+            <!--            <TextView-->
+            <!--                android:layout_width="wrap_content"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_gravity="center"-->
+            <!--                android:fontFamily="@font/red_hat_display"-->
+            <!--                android:gravity="start"-->
+            <!--                android:text="@string/apple_login"-->
+            <!--                android:textColor="@color/black"-->
+            <!--                android:textSize="15sp"-->
+            <!--                android:textStyle="bold" />-->
+
+            <!--        </LinearLayout>-->
+            <!--    </androidx.cardview.widget.CardView>-->
+
+            <ImageView
+                android:id="@+id/or"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:src="@drawable/or"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/microsoft" />
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/btnSignUp"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="25dp"
+                android:layout_marginEnd="32dp"
+                android:elevation="5dp"
+                android:foreground="?attr/selectableItemBackground"
+                android:onClick="@{(view) -> viewmodel.onresorceClick(view.getId())}"
+                android:padding="13dp"
+                app:cardCornerRadius="66dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/or">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/button_gradient"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/signupbutton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/red_hat_display"
+                        android:text="@string/sign_up_with_email_btn"
+                        android:textColor="@color/white"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:id="@+id/txtAlreadySignIn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:fontFamily="@font/red_hat_display"
+                android:text="@string/already_have_an_account"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btnSignUp" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.core.widget.NestedScrollView>
+</layout>

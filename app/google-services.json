@@ -1,0 +1,71 @@
+{
+  "project_info": {
+    "project_number": "177174074358",
+    "project_id": "renoteai-416904",
+    "storage_bucket": "renoteai-416904.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:177174074358:android:2118939e27b1aae00e2dd7",
+        "android_client_info": {
+          "package_name": "com.renote.renoteai"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "177174074358-4mml609j5qu2gnn1u3gs7vmv1ob961ce.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.renote.renoteai",
+            "certificate_hash": "fd9728a5b22ddf3040b1557aff88900d57680ddf"
+          }
+        },
+        {
+          "client_id": "177174074358-mv1qh6i80enp0vhrdsr8b7m8023014mo.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.renote.renoteai",
+            "certificate_hash": "786456635835de348cdb4a625cde68bddb6b073e"
+          }
+        },
+        {
+          "client_id": "177174074358-u3hvdu468lga0rpvsjqhts32h168nnju.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.renote.renoteai",
+            "certificate_hash": "80a9973b66d82b5f68b6aab436ef809682882a86"
+          }
+        },
+        {
+          "client_id": "177174074358-vqvh06ldupef3jfmniq6gariprq148gs.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.renote.renoteai",
+            "certificate_hash": "50e934ade7382643890a6f9deb973ffdec8eeeea"
+          }
+        },
+        {
+          "client_id": "177174074358-cfmdglcetcfndsh42cq0oqvkbh1tp4jv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDC5XrXKYZI2gUiAV5AY98rbzByAZ_nNxU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "177174074358-cfmdglcetcfndsh42cq0oqvkbh1tp4jv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

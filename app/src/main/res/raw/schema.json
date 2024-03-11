@@ -1,0 +1,59 @@
+{
+  "tags": {
+    "oa39weoiafk": {
+      "id": "oa39weoiafk",
+      "tagName": "Tag 1"
+    },
+    "afawef09489uew83": {
+      "id": "afawef09489uew83",
+      "tagName": "Tag 2"
+    }
+  },
+  "folders": {
+    "asdfafewasdfa": {
+      "id": "asdfafewasdfa",
+      "name": "Folder 1",
+      "createdDate": 1709109777943,
+      "updatedDate": 1709109777943,
+      "emailOrPhone": "raju@gmail.com",
+      "isSynced": true,
+      "isPin": true,
+      "isFavourite": true,
+      "fileCount": 60,
+      "driveType": "Google"
+    },
+    "aewfsdfsfs": {
+      "id": "aewfsdfsfs",
+      "name": "Folder 2",
+      "createdDate": 1709109777943,
+      "updatedDate": 1709109777943,
+      "emailOrPhone": "raju@gmail.com",
+      "isSynced": true,
+      "isPin": false,
+      "isFavourite": false,
+      "fileCount": 199,
+      "driveType": "Google"
+    }
+
+  },
+  "documents": {
+    "ifioaefksdlfa": {
+      "id": "ifioaefksdlfa",
+      "name": "Document1",
+      "createdDate": 1709109777943,
+      "updatedDate": 1709109777943,
+      "fileData": "",
+      "isSynced": true,
+      "isPin": false,
+      "isFavourite": true,
+      "folderId": "aewfsasdfdfsasfs",
+      "openCount": 100,
+      "localFilePathIos": "",
+      "localFilePathAndroid": "",
+      "tagId": "",
+      "driveType": "Google",
+      "fileExtension": "png"
+    }
+
+  }
+}

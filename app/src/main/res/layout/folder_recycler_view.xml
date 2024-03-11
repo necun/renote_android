@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data class="FoldersItemBinding">
+        <variable
+            name="folder"
+            type="com.renote.renoteai.database.tables.FolderEntity"/>
+    </data>
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:background="@color/white"
+        app:cardCornerRadius="16dp">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardViewFolder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:padding="10dp"
+            app:cardCornerRadius="16dp">
+
+            <RelativeLayout
+                android:id="@+id/relativeBg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#F7F7F7">
+
+                <TextView
+                    android:id="@+id/numberTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginTop="9dp"
+                    android:layout_toStartOf="@+id/imgCloud"
+                    android:fontFamily="@font/red_hat_display"
+                    android:gravity="center"
+                    android:text="@{String.valueOf(folder.fileCount)}"
+                    android:textColor="#303030"
+                    android:textSize="16sp" />
+
+                <ImageView
+                    android:id="@+id/imgPin"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginTop="4dp"
+                    android:layout_toEndOf="@+id/numberTextView"
+                    android:padding="8dp"
+                    android:src="@drawable/img_pin" />
+
+                <ImageView
+                    android:id="@+id/imgMore"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginEnd="2dp"
+                    android:layout_toEndOf="@+id/imgPin"
+                    android:padding="14dp"
+                    android:src="@drawable/more" />
+
+                <TextView
+                    android:id="@+id/folderNameTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:layout_below="@+id/numberTextView"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="5dp"
+                    android:fontFamily="@font/red_hat_display"
+                    android:text="@{folder.name}"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/emailTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/folderNameTextView"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginBottom="22dp"
+                    android:fontFamily="@font/red_hat_display"
+                    android:text="@{folder.emailOrPhone}"
+                    android:textColor="#787878" />
+
+                <ImageView
+                    android:id="@+id/imgCloud"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_below="@+id/imgPin"
+                    android:layout_marginStart="6dp"
+                    android:layout_marginTop="9dp"
+                    android:layout_toEndOf="@+id/emailTextView"
+                    android:padding="8dp"
+                    android:src="@drawable/img_cloud" />
+                <!--            android:layout_toEndOf="@+id/emailTextView"-->
+
+            </RelativeLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <RelativeLayout
+
+            android:id="@+id/relativeFolder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="24dp"
+            android:elevation="10dp">
+
+            <ImageView
+                android:id="@+id/iconImageView"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_centerInParent="true"
+                android:src="@drawable/img_folder_bg" />
+
+            <ImageView
+                android:id="@+id/imgDrive"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_centerInParent="true"
+                android:src="@drawable/img_drive" />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+</layout>

@@ -1,0 +1,13 @@
+{
+  "client_id" : "b4e80330-e0bb-430e-a8d1-83171f481cf5",
+  "authorization_user_agent" : "DEFAULT",
+  "redirect_uri" : "msauth://com.example.cameraxapp/LQNNL%2BjNxVVj0mpN6Ztdhi0l%2BMY%3D",
+  "account_mode" : "MULTIPLE",
+  "broker_redirect_uri_registered": true,
+  "authorities" : [
+    {
+      "type": "AAD",
+      "authority_url": "https://login.microsoftonline.com/common"
+    }
+  ]
+}
