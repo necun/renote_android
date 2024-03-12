@@ -9,6 +9,9 @@ import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.renote.renoteai.ui.main.MainActivity
 import com.renote.renoteai.R
 import com.renote.renoteai.ui.activities.signup.SignUpActivity
@@ -23,7 +26,9 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.renote.renoteai.ui.presentation.home.workers.DocumentSyncWorker
 import org.koin.android.ext.android.inject
+import java.util.concurrent.TimeUnit
 
 class RegistrationActivity : AppCompatActivity() {
 
@@ -148,6 +153,15 @@ class RegistrationActivity : AppCompatActivity() {
                         Log.d("sign in success", "signInWithCredential:success")
                         val user = auth.currentUser
                         startActivity(Intent(this@RegistrationActivity, MainActivity::class.java))
+
+                        val workRequest = PeriodicWorkRequestBuilder<DocumentSyncWorker>(1, TimeUnit.HOURS)
+                            .build()
+
+                        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+                            "documentSyncWork",
+                            ExistingPeriodicWorkPolicy.KEEP,
+                            workRequest
+                        )
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.w("sign in fail", "signInWithCredential:failure", task.exception)
