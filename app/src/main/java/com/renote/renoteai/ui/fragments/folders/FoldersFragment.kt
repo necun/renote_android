@@ -27,7 +27,6 @@ import org.json.JSONObject
 import org.koin.android.ext.android.inject
 import java.io.IOException
 
-
 class FoldersFragment : Fragment() {
     var mContext: Context? = null
     private var _binding: FragmentFoldersBinding? = null
@@ -50,7 +49,7 @@ class FoldersFragment : Fragment() {
         mContext = activity
 
         val fileName = arguments?.getString("folderName")
-      //  val adapter = SaveFolderAdapter(fileName)
+        //  val adapter = SaveFolderAdapter(fileName)
 
 
         Log.d("FoldersFragment", "Received folder name: $fileName")
@@ -150,28 +149,31 @@ class FoldersFragment : Fragment() {
             }
         }
 
-       // if (loginUserGoogleId != null) {
-            viewModel.getAllFolderFileDetails()
+        // if (loginUserGoogleId != null) {
+        viewModel.getAllFolderFileDetails()
 
-            viewModel.folderFileDetailsList.observe(requireActivity()) {
-                if (it.isNotEmpty()) {
-                    //showFolderEmpty(false)
-                    println("23213324324324:" + viewModel.folderFileDetailsList)
-                    foldersAdapter.differ.submitList(it)
-                    binding.recycleView.apply {
-                        layoutManager = LinearLayoutManager(
-                            requireActivity()
-                        )
-                        adapter = foldersAdapter
-                    }
-                } else {
-                    //  showFolderEmpty(true)
+        viewModel.folderFileDetailsList.observe(requireActivity()) {
+            if (it.isNotEmpty()) {
+                //showFolderEmpty(false)
+                println("23213324324324:" + viewModel.folderFileDetailsList)
+                foldersAdapter.differ.submitList(it)
+                binding.recycleView.apply {
+                    layoutManager = LinearLayoutManager(
+                        requireActivity()
+                    )
+                    adapter = foldersAdapter
                 }
+            } else {
+                //  showFolderEmpty(true)
             }
-       // }
+        }
+        // }
 
         binding.addIcon.setOnClickListener {
-            AddFolderBottomSheetFragment().show(childFragmentManager, AddFolderBottomSheetFragment().tag)
+            AddFolderBottomSheetFragment().show(
+                childFragmentManager,
+                AddFolderBottomSheetFragment().tag
+            )
         }
 
     }
