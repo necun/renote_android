@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <ScrollView
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        tools:context=".ui.presentation.home.HomeFragment">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/logo"
+                android:layout_width="60dp"
+                android:layout_height="65dp"
+                android:layout_marginStart="5dp"
+                android:src="@drawable/renote_logo"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/renotecompanyname"
+                android:layout_width="90dp"
+                android:layout_height="60dp"
+                android:layout_marginStart="12dp"
+                android:src="@drawable/renoteai"
+                app:layout_constraintStart_toEndOf="@+id/logo"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+
+            <LinearLayout
+                android:id="@+id/linear_layout_search"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/logo">
+
+                <!-- Add your search bar content here, for example, EditText and Button -->
+
+                <EditText
+                    android:id="@+id/etSearch"
+                    android:layout_width="191dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/edittext_border"
+                    android:drawableStart="@drawable/img_search"
+                    android:drawablePadding="18dp"
+                    android:hint="Search"
+                    android:padding="7dp" />
+                <ImageView
+                    android:id="@+id/selectIcon"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="10dp"
+                    android:padding="8dp"
+                    android:src="@drawable/select_icon" />
+
+                <ImageView
+                    android:id="@+id/sortIcon"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="10dp"
+                    android:padding="8dp"
+                    android:src="@drawable/export_icon" />
+
+                <ImageView
+                    android:id="@+id/listView"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:padding="7dp"
+                    android:src="@drawable/listview_icon" />
+
+                <ImageView
+                    android:id="@+id/gridView"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="10dp"
+                    android:padding="7dp"
+                    android:src="@drawable/gridview_icon" />
+
+            </LinearLayout>
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="76dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/linear_layout_search">
+
+                <ImageView
+                    android:id="@+id/imgEmptyRecycle"
+                    android:layout_width="220dp"
+                    android:layout_height="220dp"
+                    android:layout_centerInParent="true"
+                    android:scaleType="centerCrop"
+                    android:layout_marginTop="90dp"
+                    android:src="@drawable/empty_recycle_bg"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/txtEmptyDoc1"
+                    android:text="@string/txtEmptyDoc1"
+                    android:fontFamily="@font/red_hat_display"
+                    android:textSize="15sp"
+                    android:textColor="@color/txtEmptyDoc1"
+                    android:layout_centerHorizontal="true"
+                    android:layout_below="@+id/imgEmptyRecycle"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/txtEmptyDoc2"
+                    android:fontFamily="@font/red_hat_display"
+                    android:textSize="19sp"
+                    android:textColor="@color/txtEmptyDoc2"
+                    android:layout_centerHorizontal="true"
+                    android:layout_below="@+id/txtEmptyDoc1"/>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recycleview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:layout_marginTop="16dp"
+                    android:clipToPadding="false"
+                    android:paddingBottom="80dp"
+                    tools:listitem="@layout/docs_recycler_view" />
+
+            </RelativeLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>

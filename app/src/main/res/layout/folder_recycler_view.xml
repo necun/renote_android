@@ -7,6 +7,7 @@
             type="com.renote.renoteai.database.tables.FolderEntity"/>
     </data>
     <RelativeLayout
+        android:id="@+id/folderRecycle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
