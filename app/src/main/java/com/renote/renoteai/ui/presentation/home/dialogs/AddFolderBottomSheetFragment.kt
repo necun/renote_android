@@ -79,7 +79,7 @@ class AddFolderBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     private fun createFolderInInternalStorage(folderTitle:String) {
-        val directory = File(requireContext().filesDir, folderTitle)
+        val directory = File(requireContext().filesDir, "ReNoteAI/$folderTitle")
         if (!directory.exists()) {
             directory.mkdirs() // Create the directory if it doesn't exist
         }

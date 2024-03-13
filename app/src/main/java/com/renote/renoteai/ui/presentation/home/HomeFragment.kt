@@ -101,6 +101,11 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         auth = FirebaseAuth.getInstance()
 
+        val directory = File(requireContext().filesDir, "ReNoteAI")
+        if (!directory.exists()) {
+            directory.mkdirs() // Create the directory if it doesn't exist
+        }
+
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(getString(R.string.default_web_client_id)).requestEmail().build()
 
@@ -108,7 +113,6 @@ class HomeFragment : Fragment() {
 
         val auth = Firebase.auth
         val user = auth.currentUser
-
 
 
         loginUserGoogleId = user?.email
