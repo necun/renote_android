@@ -12,4 +12,7 @@
     <dimen name="view_margin_10">10dp</dimen>
     <dimen name="content">14sp</dimen>
     <dimen name="dimen_45dp">45dp</dimen>
+
+    <dimen name="height_25dp">25dp</dimen>
+    <dimen name="margin_8dp">8dp</dimen>
 </resources>

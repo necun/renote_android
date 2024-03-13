@@ -165,6 +165,7 @@ class EmailActivity : AppCompatActivity() {
         return true
     }
 
+    //function to save the filtered image into the app internal storage.....
     private fun saveImage() {
         val enhancedImageType = intent.getStringExtra("enhancedImageType")
         println("454354353346546"+enhancedImageType)
@@ -177,10 +178,13 @@ class EmailActivity : AppCompatActivity() {
         val fileName = "$enhancedImageType.jpg"
 
 
-        val directory = File(this.filesDir, "images") // Directory path within app's internal storage
+        val directory = File(this.filesDir, "ReNoteAI") // Directory path within app's internal storage
         if (!directory.exists()) {
             directory.mkdirs() // Create the directory if it doesn't exist
         }
+
+//        val storageDir: File =
+//            this.getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
 
         val newFile = File(directory, fileName)
         val fileUri:Uri = Uri.fromFile(newFile)
@@ -205,6 +209,7 @@ class EmailActivity : AppCompatActivity() {
 
     }
 
+    //function to save the file details to the room database after storing it in the internal storage........
     private fun saveToRoom(fileUri: Uri, fileName: String) {
 //        val uri:Uri = Uri.parse(fileUri.toString())
         val fileType = "jpg"
@@ -222,7 +227,6 @@ class EmailActivity : AppCompatActivity() {
                 isFavourite = false,
                 folderId = "12",
                 openCount = 30,
-                localFilePathIos = "aaaaaaaaaaaaa",
                 localFilePathAndroid = "ssssssssssssss",
                 tagId = "12345",
                 driveType = "gDrive",

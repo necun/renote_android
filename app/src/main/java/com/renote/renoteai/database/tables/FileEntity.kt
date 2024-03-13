@@ -1,11 +1,16 @@
-package com.renote.renoteai.database.custom_models
+package com.renote.renoteai.database.tables
 
-data class Document(
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "File_table")
+data class FileEntity(
+    @PrimaryKey
     val id: String,
     val name: String,
     val createdDate: Long,
     val updatedDate: Long,
-    val folderId:String,
+    val documentId:String,
     val isSynced: Boolean,
     val isPin: Boolean,
     val isFavourite: Boolean,
@@ -15,11 +20,4 @@ data class Document(
     val tagId:String,
     val driveType:String,
     val fileExtension:String
-
-)
-
-
-
-data class DocumentsContainer(
-    val documents: Map<String, Document>
 )

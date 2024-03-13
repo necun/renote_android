@@ -9,6 +9,12 @@ import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequest
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.renote.renoteai.ui.main.MainActivity
 import com.renote.renoteai.R
 import com.renote.renoteai.ui.activities.signup.SignUpActivity
@@ -23,7 +29,9 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.renote.renoteai.ui.presentation.home.workers.DocumentSyncWorker
 import org.koin.android.ext.android.inject
+import java.util.concurrent.TimeUnit
 
 class RegistrationActivity : AppCompatActivity() {
 
@@ -38,32 +46,36 @@ class RegistrationActivity : AppCompatActivity() {
 
     // private lateinit var txtCompany: TextView
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(
-            this@RegistrationActivity,
-            R.layout.activity_registration
+            this@RegistrationActivity, R.layout.activity_registration
         )
         binding.lifecycleOwner = this
         binding.viewmodel = viewmodel
         auth = FirebaseAuth.getInstance()
 
+      //  val constraints = Constraints.Builder()
+            //.setRequiredNetworkType(NetworkType.CONNECTED) // Example constraint: require network connectivity
+       //     .build()
+
+// Create WorkRequest
+        val workRequest = OneTimeWorkRequest.Builder(DocumentSyncWorker::class.java)
+           // .setConstraints(constraints) // Optional: apply constraints
+            .build()
+
+// Enqueue WorkRequest
+        WorkManager.getInstance(this).enqueue(workRequest)
 
         val spannable1 = SpannableStringBuilder(getString(R.string.company_name))
         spannable1.setSpan(
-            ForegroundColorSpan(getColor(R.color.green)),
-            0,
-            2,
-            Spannable.SPAN_INCLUSIVE_INCLUSIVE
+            ForegroundColorSpan(getColor(R.color.green)), 0, 2, Spannable.SPAN_INCLUSIVE_INCLUSIVE
         )
 //        binding.txtCompany.text = spannable1
 
         val spannable2 = SpannableStringBuilder(getString(R.string.already_have_an_account))
         spannable2.setSpan(
-            ForegroundColorSpan(getColor(R.color.green)),
-            25, 32,
-            Spannable.SPAN_INCLUSIVE_INCLUSIVE
+            ForegroundColorSpan(getColor(R.color.green)), 25, 32, Spannable.SPAN_INCLUSIVE_INCLUSIVE
         )
         binding.txtAlreadySignIn.text = spannable2
 
@@ -111,9 +123,7 @@ class RegistrationActivity : AppCompatActivity() {
 
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestScopes(Drive.SCOPE_FILE, Drive.SCOPE_APPFOLDER)
-            .requestIdToken(getString(R.string.default_web_client_id))
-            .requestEmail()
-            .build()
+            .requestIdToken(getString(R.string.default_web_client_id)).requestEmail().build()
 
         val googleSignInClient = GoogleSignIn.getClient(this, gso)
         val signInIntent = googleSignInClient.signInIntent
@@ -148,6 +158,15 @@ class RegistrationActivity : AppCompatActivity() {
                         Log.d("sign in success", "signInWithCredential:success")
                         val user = auth.currentUser
                         startActivity(Intent(this@RegistrationActivity, MainActivity::class.java))
+
+//                        val workRequest = PeriodicWorkRequestBuilder<DocumentSyncWorker>(1, TimeUnit.HOURS)
+//                            .build()
+//
+//                        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+//                            "documentSyncWork",
+//                            ExistingPeriodicWorkPolicy.KEEP,
+//                            workRequest
+//                        )
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.w("sign in fail", "signInWithCredential:failure", task.exception)

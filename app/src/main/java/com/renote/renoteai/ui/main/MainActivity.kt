@@ -12,13 +12,19 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.RecyclerView
+import androidx.work.Constraints
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
 import com.renote.renoteai.R
 import com.renote.renoteai.ui.activities.camera.CameraActivity
 import com.renote.renoteai.ui.presentation.home.HomeFragment
 import com.renote.renoteai.ui.fragments.imports.ImportFragment
 import com.renote.renoteai.ui.presentation.home.viewmodel.HomeFragmentViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.renote.renoteai.database.dao.DocumentDao
 import com.renote.renoteai.databinding.ActivityMainBinding
+import com.renote.renoteai.ui.presentation.home.workers.DocumentSyncWorker
 import org.koin.android.ext.android.inject
 
 
@@ -45,6 +51,18 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding!!.root)
 
         navView = findViewById(R.id.bottomNavigationView)
+
+//        val constraints = Constraints.Builder()
+//            .setRequiredNetworkType(NetworkType.CONNECTED) // Example constraint: require network connectivity
+//            .build()
+//
+//// Create WorkRequest
+//        val workRequest = OneTimeWorkRequest.Builder(DocumentSyncWorker::class.java)
+//            .setConstraints(constraints) // Optional: apply constraints
+//            .build()
+//
+//// Enqueue WorkRequest
+//        WorkManager.getInstance(this).enqueue(workRequest)
 
         val homeFragment = HomeFragment()
         supportFragmentManager.beginTransaction()
@@ -260,4 +278,19 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "Error opening file", Toast.LENGTH_SHORT).show()
         }
     }
+
+//    override fun onResume() {
+//        super.onResume()
+//        startDocumentSyncWorker()
+//    }
+
+//    private fun startDocumentSyncWorker() {
+//        val workRequest = OneTimeWorkRequest.Builder(DocumentSyncWorker::class.java)
+//            // Optional: apply constraints
+//            //.setConstraints(constraints)
+//            .build()
+//
+//        // Enqueue WorkRequest
+//        WorkManager.getInstance(this).enqueue(workRequest)
+//    }
 }
