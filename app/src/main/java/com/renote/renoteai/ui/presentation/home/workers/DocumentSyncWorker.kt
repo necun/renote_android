@@ -73,48 +73,6 @@ class DocumentSyncWorker(
         return tempDrive
     }
 
-//    private suspend fun uploadDocument(document: DocumentEntity): Boolean {
-//        try {
-//            // The MIME type of the folder
-//            val folderMimeType = "application/vnd.google-apps.folder"
-//            // Search for the ReNoteAI folder
-//            val folderSearchQuery =
-//                "name = 'ReNoteAI' and mimeType = '$folderMimeType' and trashed = false"
-//            val folderSearch = driveService.files().list().setQ(folderSearchQuery).execute()
-//            var folderId: String? = folderSearch.files.firstOrNull()?.id
-//
-//            // If the ReNoteAI folder doesn't exist, create it
-//            if (folderId == null) {
-//                val folderMetadata = com.google.api.services.drive.model.File().apply {
-//                    name = "ReNoteAI"
-//                    mimeType = folderMimeType
-//                }
-//                folderId = driveService.files().create(folderMetadata).execute().id
-//            }
-//
-//            // Prepare the file to be uploaded
-//            val fileMetadata = com.google.api.services.drive.model.File().apply {
-//                name = document.name
-//                parents = listOf(folderId)
-//            }
-//
-//            // Assuming document.fileData contains the path to the file in internal storage
-//            applicationContext.openFileInput(document.fileData).use { inputStream ->
-//                val content = inputStream.readBytes()
-//                val mediaContent = InputStreamContent(null, ByteArrayInputStream(content))
-//
-//                // Upload the file
-//                driveService.files().create(fileMetadata, mediaContent).execute()
-//            }
-//            Toast.makeText(applicationContext, "Uploaded", Toast.LENGTH_SHORT).show()
-//            return true // Return true if upload succeeds
-//
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//            return false // Return false if upload fails
-//        }
-//    }
-
     private suspend fun uploadDocument(
         document: DocumentEntity
     ): Boolean {

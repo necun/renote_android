@@ -139,9 +139,9 @@ class HomeFragment : Fragment() {
             requireActivity(), R.raw.schema
         )
         //tags
-        savingTagsDataFromJSONFileToRoomDatabase()
-        savingFoldersDataFromJSONFileToRoomDatabase()
-        savingDocumentsDataFromJSONFileToRoomDatabase()
+//        savingTagsDataFromJSONFileToRoomDatabase()
+//        savingFoldersDataFromJSONFileToRoomDatabase()
+//        savingDocumentsDataFromJSONFileToRoomDatabase()
 
 
 
@@ -176,7 +176,6 @@ class HomeFragment : Fragment() {
         foldersObserveData()
         initDocumentsRecyclerView()
         documentsObserveData()
-
 
     }
 
@@ -238,80 +237,80 @@ class HomeFragment : Fragment() {
     }
 
 
-    fun savingFoldersDataFromJSONFileToRoomDatabase() {
-//        if (loginUserGoogleId != null) {
-        val jsonString = loadJSONFromRaw(
-            requireActivity(), R.raw.schema
-        )
-        val foldersContainer = parseFolders(jsonString!!)
-        val folders = foldersContainer.folders // Your Map<String, Folder>
-        // Convert the Map<String, Folder> to JSONObject
-        val jsonFolderObject = JSONObject(folders)
-        viewModel.getAllFolderIds()
-
-        viewModel.allFolderIdsList.observe(requireActivity()) { folderIds ->
-
-            println("folderIdsfolderIds" + folderIds)
-            if (folderIds.isNotEmpty()) {
-                val folderEntities = mutableListOf<FolderEntity>()
-                val keys = jsonFolderObject.keys()
-                println("keys:" + keys)
-                while (keys.hasNext()) {
-                    val key = keys.next() as String
-                    println("key:" + key)
-                    if (key !in folderIds) {
-                        val folderData = jsonFolderObject.getJSONObject(key)
-                        println("folderData:" + folderData)
-                        val id = folderData.getString("id")
-                        val name = folderData.getString("name")
-                        val createdDate = folderData.getLong("createdDate")
-                        val updatedDate = folderData.getLong("updatedDate")
-                        val emailOrPhone = folderData.getString("emailOrPhone")
-                        val isSynced = folderData.getBoolean("isSynced")
-                        val isPin = folderData.getBoolean("isPin")
-                        val isFavourite = folderData.getBoolean("isFavourite")
-                        val fileCount = folderData.getInt("fileCount")
-                        val driveType = folderData.getString("driveType")
-
-                        folderEntities.add(
-                            FolderEntity(
-                                id = id,
-                                name = name,
-                                createdDate = createdDate,
-                                updatedDate = updatedDate,
-                                emailOrPhone = emailOrPhone,
-                                isSynced = isSynced,
-                                isPin = isPin,
-                                isFavourite = isFavourite,
-                                fileCount = fileCount,
-                                driveType = driveType
-                            )
-                        )
-                    }
-                }
-
-                viewModel.saveFolderFilesDetails(folderEntities)
-            } else {
-                val folderEntities = folders.map { (_, folder) ->
-                    FolderEntity(
-                        id = folder.id,
-                        name = folder.name,
-                        createdDate = folder.createdDate,
-                        updatedDate = folder.updatedDate,
-                        emailOrPhone = folder.emailOrPhone,
-                        isSynced = folder.isSynced,
-                        isPin = folder.isPin,
-                        isFavourite = folder.isFavourite,
-                        fileCount = folder.fileCount,
-                        driveType = folder.driveType
-                    )
-                }
-                viewModel.saveFolderFilesDetails(folderEntities)
-            }
-        }
-        //}
-
-    }
+//    fun savingFoldersDataFromJSONFileToRoomDatabase() {
+////        if (loginUserGoogleId != null) {
+//        val jsonString = loadJSONFromRaw(
+//            requireActivity(), R.raw.schema
+//        )
+//        val foldersContainer = parseFolders(jsonString!!)
+//        val folders = foldersContainer.folders // Your Map<String, Folder>
+//        // Convert the Map<String, Folder> to JSONObject
+//        val jsonFolderObject = JSONObject(folders)
+//        viewModel.getAllFolderIds()
+//
+//        viewModel.allFolderIdsList.observe(requireActivity()) { folderIds ->
+//
+//            println("folderIdsfolderIds" + folderIds)
+//            if (folderIds.isNotEmpty()) {
+//                val folderEntities = mutableListOf<FolderEntity>()
+//                val keys = jsonFolderObject.keys()
+//                println("keys:" + keys)
+//                while (keys.hasNext()) {
+//                    val key = keys.next() as String
+//                    println("key:" + key)
+//                    if (key !in folderIds) {
+//                        val folderData = jsonFolderObject.getJSONObject(key)
+//                        println("folderData:" + folderData)
+//                        val id = folderData.getString("id")
+//                        val name = folderData.getString("name")
+//                        val createdDate = folderData.getLong("createdDate")
+//                        val updatedDate = folderData.getLong("updatedDate")
+//                        val emailOrPhone = folderData.getString("emailOrPhone")
+//                        val isSynced = folderData.getBoolean("isSynced")
+//                        val isPin = folderData.getBoolean("isPin")
+//                        val isFavourite = folderData.getBoolean("isFavourite")
+//                        val fileCount = folderData.getInt("fileCount")
+//                        val driveType = folderData.getString("driveType")
+//
+//                        folderEntities.add(
+//                            FolderEntity(
+//                                id = id,
+//                                name = name,
+//                                createdDate = createdDate,
+//                                updatedDate = updatedDate,
+//                                emailOrPhone = emailOrPhone,
+//                                isSynced = isSynced,
+//                                isPin = isPin,
+//                                isFavourite = isFavourite,
+//                                fileCount = fileCount,
+//                                driveType = driveType
+//                            )
+//                        )
+//                    }
+//                }
+//
+//                viewModel.saveFolderFilesDetails(folderEntities)
+//            } else {
+//                val folderEntities = folders.map { (_, folder) ->
+//                    FolderEntity(
+//                        id = folder.id,
+//                        name = folder.name,
+//                        createdDate = folder.createdDate,
+//                        updatedDate = folder.updatedDate,
+//                        emailOrPhone = folder.emailOrPhone,
+//                        isSynced = folder.isSynced,
+//                        isPin = folder.isPin,
+//                        isFavourite = folder.isFavourite,
+//                        fileCount = folder.fileCount,
+//                        driveType = folder.driveType
+//                    )
+//                }
+//                viewModel.saveFolderFilesDetails(folderEntities)
+//            }
+//        }
+//        //}
+//
+//    }
 
     fun savingDocumentsDataFromJSONFileToRoomDatabase() {
         // if (loginUserGoogleId != null) {
@@ -364,7 +363,6 @@ class HomeFragment : Fragment() {
                                 isFavourite = isFavourite,
                                 folderId = folderId,
                                 openCount = openCount,
-                                localFilePathIos = localFilePathIos,
                                 localFilePathAndroid = localFilePathAndroid,
                                 tagId = tagId,
                                 driveType = driveType,
@@ -388,7 +386,6 @@ class HomeFragment : Fragment() {
                         isFavourite = document.isFavourite,
                         folderId = document.folderId,
                         openCount = document.openCount,
-                        localFilePathIos = document.localFilePathIos,
                         localFilePathAndroid = document.localFilePathAndroid,
                         tagId = document.tagId,
                         driveType = document.driveType,

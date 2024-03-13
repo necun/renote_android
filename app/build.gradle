@@ -65,8 +65,8 @@ android {
 
 chaquopy {
     defaultConfig {
-        version = "3.11"
-        buildPython("C:\\Users\\Komal\\AppData\\Local\\Programs\\Python\\Python311\\python.exe")
+        version = "3.8"
+        buildPython("C:\\Users\\DELL\\AppData\\Local\\Programs\\Python\\Python39\\python.exe")
         pip{
               install("opencv-python-headless")
 //            install("pandas")
