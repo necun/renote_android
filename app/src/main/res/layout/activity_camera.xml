@@ -15,6 +15,143 @@
         app:scaleType="fitCenter">
 
     </androidx.camera.view.PreviewView>
+    <com.renote.renoteai.ui.activities.camera.scanutil.RectOverlay
+        android:id="@+id/rectOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/scanBtnLay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/image_capture_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            app:fabSize="normal"
+            android:backgroundTint="@android:color/white"
+            android:contentDescription="@string/take_scan"
+            android:elevation="2dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/autoManualBtn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_manual"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/image_capture_button"
+            app:layout_constraintRight_toLeftOf="@id/image_capture_button"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_percent="0.2" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/importBtn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_import"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/image_capture_button"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_percent="0.2" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/scanTypeLay"
+        android:layout_width="match_parent"
+        android:background="@color/transparent"
+        android:layout_height="wrap_content"
+        app:tabTextColor="@color/white"
+        android:layout_marginBottom="@dimen/margin_20dp"
+        app:layout_constraintBottom_toTopOf="@id/scanBtnLay" >
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+                android:text="Ocr"/>
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Document"/>
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Book"/>
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="QR code"/>
+    </com.google.android.material.tabs.TabLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_8dp"
+        app:layout_constraintBottom_toTopOf="@id/scanTypeLay">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/scanBackBtn"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/height_25dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_percent="0.33"
+            app:srcCompat="@drawable/scan_back" />
+
+<!--        <androidx.appcompat.widget.AppCompatImageView-->
+<!--            android:id="@+id/switchCamBtn"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="@dimen/height_25dp"-->
+<!--            app:layout_constraintStart_toEndOf="@id/scanBackBtn"-->
+<!--            app:layout_constraintTop_toTopOf="parent"-->
+<!--            app:layout_constraintWidth_percent="0.2"-->
+<!--            app:srcCompat="@drawable/switch_cam" />-->
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/gridBtn"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/height_25dp"
+            app:layout_constraintStart_toEndOf="@id/scanBackBtn"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_percent="0.33"
+            app:srcCompat="@drawable/ic_grid" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/flashBtn"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/height_25dp"
+            app:layout_constraintStart_toEndOf="@id/gridBtn"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_percent="0.33"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:srcCompat="@drawable/flash_off" />
+
+<!--        <androidx.appcompat.widget.AppCompatTextView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:gravity="center"-->
+<!--            android:textSize="@dimen/text_size_18sp"-->
+<!--            android:textAllCaps="true"-->
+<!--            android:text="HDR"-->
+<!--            android:paddingStart="@dimen/padding_10dp"-->
+<!--            android:paddingEnd="@dimen/padding_10dp"-->
+<!--            android:textColor="@color/green"-->
+<!--            android:layout_marginStart="@dimen/margin_10dp"-->
+<!--            android:background="@drawable/hdr_background"-->
+<!--            app:layout_constraintStart_toEndOf="@id/flashBtn"-->
+<!--            app:layout_constraintTop_toTopOf="parent"-->
+<!--            app:layout_constraintWidth_percent="0.2" />-->
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
         android:id="@+id/txtLogout"
@@ -43,24 +180,21 @@
     <!--            app:layout_constraintEnd_toEndOf="parent"-->
     <!--            app:layout_constraintStart_toStartOf="parent" />-->
 
-    <ImageView
-        android:id="@+id/image_capture_button"
-        android:layout_width="75dp"
-        android:layout_height="75dp"
-        android:layout_marginBottom="24dp"
-        android:background="@drawable/ful_round"
-        android:contentDescription="button"
-        android:elevation="2dp"
-        android:padding="15dp"
-        android:src="@drawable/baseline_camera_alt_24"
-        app:layout_constraintBottom_toBottomOf="@+id/viewFinder"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+<!--    <ImageView-->
+<!--        android:id="@+id/image_capture_button"-->
+<!--        android:layout_width="75dp"-->
+<!--        android:layout_height="75dp"-->
+<!--        android:layout_marginBottom="24dp"-->
+<!--        android:background="@drawable/ful_round"-->
+<!--        android:contentDescription="button"-->
+<!--        android:elevation="2dp"-->
+<!--        android:padding="15dp"-->
+<!--        android:src="@drawable/baseline_camera_alt_24"-->
+<!--        app:layout_constraintBottom_toBottomOf="@+id/viewFinder"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent" />-->
 
-    <com.renote.renoteai.ui.activities.camera.scanutil.RectOverlay
-        android:id="@+id/rectOverlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+
 
     <RadioGroup
         android:layout_width="0dp"
