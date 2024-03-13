@@ -183,6 +183,9 @@ class EmailActivity : AppCompatActivity() {
             directory.mkdirs() // Create the directory if it doesn't exist
         }
 
+//        val storageDir: File =
+//            this.getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
+
         val newFile = File(directory, fileName)
         val fileUri:Uri = Uri.fromFile(newFile)
         try {

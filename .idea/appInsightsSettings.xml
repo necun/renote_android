@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.renote.renoteai" />
+                  <option name="mobileSdkAppId" value="1:177174074358:android:2118939e27b1aae00e2dd7" />
+                  <option name="projectId" value="renoteai-416904" />
+                  <option name="projectNumber" value="177174074358" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

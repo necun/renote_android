@@ -12,5 +12,7 @@ class DocumentsRepository(private val dao: DocumentDao) {
 //        dao.deleteNotes(note)
 fun documentsIdsFromDB() = dao.getAllDocumentIds()
 
+    fun getUnSyncedDocuments() = dao.getAllUnsyncedDocumentIds()
+
 
 }

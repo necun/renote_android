@@ -18,6 +18,15 @@ import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.work.Constraints
+import androidx.work.Data
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequest
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 import com.renote.renoteai.R
 import com.renote.renoteai.ui.presentation.home.adapters.DocumentsDetailsAdapter
 import com.renote.renoteai.ui.presentation.home.adapters.FoldersAdapter
@@ -50,6 +59,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.api.client.http.InputStreamContent
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import com.renote.renoteai.ui.presentation.home.workers.DocumentSyncWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -58,6 +68,7 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.FileNotFoundException
 import java.io.IOException
+import java.util.concurrent.TimeUnit
 
 class HomeFragment : Fragment() {
     var mContext: Context? = null
@@ -82,6 +93,8 @@ class HomeFragment : Fragment() {
         binding?.lifecycleOwner = this
         binding?.viewModel = viewModel
         return binding!!.root
+
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -96,17 +109,30 @@ class HomeFragment : Fragment() {
         val auth = Firebase.auth
         val user = auth.currentUser
 
+
+
         loginUserGoogleId = user?.email
 
         createReNoteAiFolderInGoogleDrive()
 
         binding?.adFolder?.setOnClickListener {
-            AddFolderBottomSheetFragment().show(childFragmentManager, AddFolderBottomSheetFragment().tag)
+            AddFolderBottomSheetFragment().show(
+                childFragmentManager,
+                AddFolderBottomSheetFragment().tag
+            )
         }
 
         binding?.adTag?.setOnClickListener {
             TagFragment().show(childFragmentManager, TagFragment().tag)
         }
+
+            syncDocuments()
+
+//
+//        val workRequest = OneTimeWorkRequest.Builder(DocumentSyncWorker::class.java).build()
+//
+//// Enqueue the WorkRequest
+//        WorkManager.getInstance(requireContext()).enqueue(workRequest)
 
 
         val jsonString = loadJSONFromRaw(
@@ -131,9 +157,9 @@ class HomeFragment : Fragment() {
             startActivity(i)
         }
 
-        binding?.imgSync?.setOnClickListener {
-            signOutFromGoogle()
-        }
+//        binding?.imgSync?.setOnClickListener {
+//            signOutFromGoogle()
+//        }
 
         val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.img_search)
         drawable?.setBounds(0, 0, 40, 40) // Set the desired width and height
@@ -154,6 +180,14 @@ class HomeFragment : Fragment() {
 
     }
 
+    private fun syncDocuments() {
+        val syncWorkRequest = OneTimeWorkRequestBuilder<DocumentSyncWorker>()
+            .setInputData(Data.Builder().build())
+            .build()
+
+        // Enqueue the work request
+        WorkManager.getInstance(requireContext()).enqueue(syncWorkRequest)
+    }
 
     fun createReNoteAiFolderInGoogleDrive() {
         try {
@@ -275,144 +309,144 @@ class HomeFragment : Fragment() {
                 viewModel.saveFolderFilesDetails(folderEntities)
             }
         }
-    //}
+        //}
 
     }
 
     fun savingDocumentsDataFromJSONFileToRoomDatabase() {
-       // if (loginUserGoogleId != null) {
-            val jsonString = loadJSONFromRaw(
-                requireActivity(), R.raw.schema
-            ) // Replace 'example' with your file's name without the extension
-            val documentsContainer = parseDocuments(jsonString!!)
-            val documents = documentsContainer.documents // Your Map<String, Folder>
-            // Convert the Map<String, Folder> to JSONObject
-            val jsonObject = JSONObject(documents)
-            viewModel.getAllDocumentsIds()
-            viewModel.allDocumentsIdsList.observe(requireActivity()) { documentIds ->
+        // if (loginUserGoogleId != null) {
+        val jsonString = loadJSONFromRaw(
+            requireActivity(), R.raw.schema
+        ) // Replace 'example' with your file's name without the extension
+        val documentsContainer = parseDocuments(jsonString!!)
+        val documents = documentsContainer.documents // Your Map<String, Folder>
+        // Convert the Map<String, Folder> to JSONObject
+        val jsonObject = JSONObject(documents)
+        viewModel.getAllDocumentsIds()
+        viewModel.allDocumentsIdsList.observe(requireActivity()) { documentIds ->
 
-                println("documentIds documentIds " + documentIds)
-                if (documentIds.isNotEmpty()) {
-                    val documentEntities = mutableListOf<DocumentEntity>()
-                    val keys = jsonObject.keys()
-                    println("keys:" + keys)
-                    while (keys.hasNext()) {
-                        val key = keys.next() as String
-                        println("key:" + key)
-                        if (key !in documentIds) {
-                            val documentData = jsonObject.getJSONObject(key)
-                            println("documentData:" + documentData)
+            println("documentIds documentIds " + documentIds)
+            if (documentIds.isNotEmpty()) {
+                val documentEntities = mutableListOf<DocumentEntity>()
+                val keys = jsonObject.keys()
+                println("keys:" + keys)
+                while (keys.hasNext()) {
+                    val key = keys.next() as String
+                    println("key:" + key)
+                    if (key !in documentIds) {
+                        val documentData = jsonObject.getJSONObject(key)
+                        println("documentData:" + documentData)
 
-                            val id = documentData.getString("id")
-                            val name = documentData.getString("name")
-                            val createdDate = documentData.getLong("createdDate")
-                            val updatedDate = documentData.getLong("updatedDate")
-                            val fileData = documentData.getString("fileData")
-                            val isSynced = documentData.getBoolean("isSynced")
-                            val isPin = documentData.getBoolean("isPin")
-                            val isFavourite = documentData.getBoolean("isFavourite")
-                            val folderId = documentData.getString("folderId")
-                            val openCount = documentData.getInt("openCount")
-                            val localFilePathIos = documentData.getString("localFilePathIos")
-                            val localFilePathAndroid = documentData.getString("localFilePathIos")
-                            val tagId = documentData.getString("tagId")
-                            val driveType = documentData.getString("driveType")
-                            val fileExtension = documentData.getString("fileExtension")
-                            documentEntities.add(
-                                DocumentEntity(
-                                    id = id,
-                                    name = name,
-                                    createdDate = createdDate,
-                                    updatedDate = updatedDate,
-                                    fileData = fileData,
-                                    isSynced = isSynced,
-                                    isPin = isPin,
-                                    isFavourite = isFavourite,
-                                    folderId = folderId,
-                                    openCount = openCount,
-                                    localFilePathIos = localFilePathIos,
-                                    localFilePathAndroid = localFilePathAndroid,
-                                    tagId = tagId,
-                                    driveType = driveType,
-                                    fileExtension = fileExtension
-                                )
+                        val id = documentData.getString("id")
+                        val name = documentData.getString("name")
+                        val createdDate = documentData.getLong("createdDate")
+                        val updatedDate = documentData.getLong("updatedDate")
+                        val fileData = documentData.getString("fileData")
+                        val isSynced = documentData.getBoolean("isSynced")
+                        val isPin = documentData.getBoolean("isPin")
+                        val isFavourite = documentData.getBoolean("isFavourite")
+                        val folderId = documentData.getString("folderId")
+                        val openCount = documentData.getInt("openCount")
+                        val localFilePathIos = documentData.getString("localFilePathIos")
+                        val localFilePathAndroid = documentData.getString("localFilePathIos")
+                        val tagId = documentData.getString("tagId")
+                        val driveType = documentData.getString("driveType")
+                        val fileExtension = documentData.getString("fileExtension")
+                        documentEntities.add(
+                            DocumentEntity(
+                                id = id,
+                                name = name,
+                                createdDate = createdDate,
+                                updatedDate = updatedDate,
+                                fileData = fileData,
+                                isSynced = isSynced,
+                                isPin = isPin,
+                                isFavourite = isFavourite,
+                                folderId = folderId,
+                                openCount = openCount,
+                                localFilePathIos = localFilePathIos,
+                                localFilePathAndroid = localFilePathAndroid,
+                                tagId = tagId,
+                                driveType = driveType,
+                                fileExtension = fileExtension
                             )
-                        }
-                    }
-
-                    viewModel.saveDocumentsDetails(documentEntities)
-                } else {
-                    val documentEntities = documents.map { (_, document) ->
-                        DocumentEntity(
-                            id = document.id,
-                            name = document.name,
-                            createdDate = document.createdDate,
-                            updatedDate = document.updatedDate,
-                            fileData = document.fileData,
-                            isSynced = document.isSynced,
-                            isPin = document.isPin,
-                            isFavourite = document.isFavourite,
-                            folderId = document.folderId,
-                            openCount = document.openCount,
-                            localFilePathIos = document.localFilePathIos,
-                            localFilePathAndroid = document.localFilePathAndroid,
-                            tagId = document.tagId,
-                            driveType = document.driveType,
-                            fileExtension = document.fileExtension
                         )
                     }
-                    viewModel.saveDocumentsDetails(documentEntities)
                 }
+
+                viewModel.saveDocumentsDetails(documentEntities)
+            } else {
+                val documentEntities = documents.map { (_, document) ->
+                    DocumentEntity(
+                        id = document.id,
+                        name = document.name,
+                        createdDate = document.createdDate,
+                        updatedDate = document.updatedDate,
+                        fileData = document.fileData,
+                        isSynced = document.isSynced,
+                        isPin = document.isPin,
+                        isFavourite = document.isFavourite,
+                        folderId = document.folderId,
+                        openCount = document.openCount,
+                        localFilePathIos = document.localFilePathIos,
+                        localFilePathAndroid = document.localFilePathAndroid,
+                        tagId = document.tagId,
+                        driveType = document.driveType,
+                        fileExtension = document.fileExtension
+                    )
+                }
+                viewModel.saveDocumentsDetails(documentEntities)
             }
+        }
         //}
     }
 
     fun savingTagsDataFromJSONFileToRoomDatabase() {
-       // if (loginUserGoogleId != null) {
-            val jsonString = loadJSONFromRaw(
-                requireActivity(), R.raw.schema
-            )
-            val tagsContainer = parseTags(jsonString!!)
-            val tags = tagsContainer.tags // Your Map<String, Folder>
-            // Convert the Map<String, Folder> to JSONObject
-            val jsonTagObject = JSONObject(tags)
-            viewModel.getAllTagIds()
-            viewModel.allTagIdsList.observe(requireActivity()) { tagIds ->
+        // if (loginUserGoogleId != null) {
+        val jsonString = loadJSONFromRaw(
+            requireActivity(), R.raw.schema
+        )
+        val tagsContainer = parseTags(jsonString!!)
+        val tags = tagsContainer.tags // Your Map<String, Folder>
+        // Convert the Map<String, Folder> to JSONObject
+        val jsonTagObject = JSONObject(tags)
+        viewModel.getAllTagIds()
+        viewModel.allTagIdsList.observe(requireActivity()) { tagIds ->
 
-                println("tagIds tagIds " + tagIds)
-                if (tagIds.isNotEmpty()) {
-                    val tagEntities = mutableListOf<TagEntity>()
-                    val keys = jsonTagObject.keys()
-                    println("keys:" + keys)
-                    while (keys.hasNext()) {
-                        val key = keys.next() as String
-                        println("key:" + key)
-                        if (key !in tagIds) {
-                            val tagData = jsonTagObject.getJSONObject(key)
-                            println("tagData:" + tagData)
+            println("tagIds tagIds " + tagIds)
+            if (tagIds.isNotEmpty()) {
+                val tagEntities = mutableListOf<TagEntity>()
+                val keys = jsonTagObject.keys()
+                println("keys:" + keys)
+                while (keys.hasNext()) {
+                    val key = keys.next() as String
+                    println("key:" + key)
+                    if (key !in tagIds) {
+                        val tagData = jsonTagObject.getJSONObject(key)
+                        println("tagData:" + tagData)
 
-                            val id = tagData.getString("id")
-                            val tagName = tagData.getString("name")
+                        val id = tagData.getString("id")
+                        val tagName = tagData.getString("name")
 
-                            tagEntities.add(
-                                TagEntity(
-                                    id = id, tagName = tagName, isSelected = false
-                                )
+                        tagEntities.add(
+                            TagEntity(
+                                id = id, tagName = tagName, isSelected = false
                             )
-                        }
-                    }
-
-                    viewModel.saveTagDetails(tagEntities)
-                } else {
-                    val tagEntities = tags.map { (_, tag) ->
-                        TagEntity(
-                            id = tag.id, tagName = tag.tagName, isSelected = false
                         )
                     }
-                    viewModel.saveTagDetails(tagEntities)
                 }
+
+                viewModel.saveTagDetails(tagEntities)
+            } else {
+                val tagEntities = tags.map { (_, tag) ->
+                    TagEntity(
+                        id = tag.id, tagName = tag.tagName, isSelected = false
+                    )
+                }
+                viewModel.saveTagDetails(tagEntities)
             }
-       // }
+        }
+        // }
     }
 
     fun initTagsRecyclerview() {
@@ -427,23 +461,23 @@ class HomeFragment : Fragment() {
 
     fun tagsObserveData() {
         //if (loginUserGoogleId != null) {
-            viewModel.getAllTagDetails()
+        viewModel.getAllTagDetails()
 
-            viewModel.tagDetailsList.observe(requireActivity()) {
-                if (it.isNotEmpty()) {
-                    showTagEmpty(false)
-                    println("232133243243244545:" + viewModel.tagDetailsList)
+        viewModel.tagDetailsList.observe(requireActivity()) {
+            if (it.isNotEmpty()) {
+                showTagEmpty(false)
+                println("232133243243244545:" + viewModel.tagDetailsList)
 
-                    if (viewModel.tagsAdapter != null) {
-                        viewModel.tagsAdapter.submitList(it)
-                        viewModel.tagsAdapter.notifyDataSetChanged()
+                if (viewModel.tagsAdapter != null) {
+                    viewModel.tagsAdapter.submitList(it)
+                    viewModel.tagsAdapter.notifyDataSetChanged()
 
-                    }
-                } else {
-                    showTagEmpty(true)
                 }
+            } else {
+                showTagEmpty(true)
             }
-      //  }
+        }
+        //  }
     }
 
     fun initFoldersRecyclerView() {
@@ -458,23 +492,23 @@ class HomeFragment : Fragment() {
     }
 
     fun foldersObserveData() {
-      //  if (loginUserGoogleId != null) {
-            viewModel.getAllFolderFileDetails()
+        //  if (loginUserGoogleId != null) {
+        viewModel.getAllFolderFileDetails()
 
-            viewModel.folderFileDetailsList.observe(requireActivity()) {
-                if (it.isNotEmpty()) {
-                    showFolderEmpty(false)
-                    println("23213324324324:" + viewModel.folderFileDetailsList)
-                    if (viewModel.foldersAdapter != null) {
-                        viewModel.foldersAdapter.submitList(it)
-                        viewModel.foldersAdapter.notifyDataSetChanged()
-                    }
-
-                } else {
-                    showFolderEmpty(true)
+        viewModel.folderFileDetailsList.observe(requireActivity()) {
+            if (it.isNotEmpty()) {
+                showFolderEmpty(false)
+                println("23213324324324:" + viewModel.folderFileDetailsList)
+                if (viewModel.foldersAdapter != null) {
+                    viewModel.foldersAdapter.submitList(it)
+                    viewModel.foldersAdapter.notifyDataSetChanged()
                 }
+
+            } else {
+                showFolderEmpty(true)
             }
-      //  }
+        }
+        //  }
     }
 
     fun initDocumentsRecyclerView() {
@@ -487,23 +521,23 @@ class HomeFragment : Fragment() {
     }
 
     fun documentsObserveData() {
-       // if (loginUserGoogleId != null) {
-            viewModel.getAllDocumentsDetails()
+        // if (loginUserGoogleId != null) {
+        viewModel.getAllDocumentsDetails()
 
-            viewModel.documentsDetailsList.observe(requireActivity()) {
-                if (it.isNotEmpty()) {
-                    showEmpty(false)
-                    println("23213324324324:" + viewModel.documentsDetailsList)
-                    if (viewModel.documentsAdapter != null) {
-                        viewModel.documentsAdapter.submitList(it)
-                        viewModel.documentsAdapter.notifyDataSetChanged()
-                    }
-
-                } else {
-                    showEmpty(true)
+        viewModel.documentsDetailsList.observe(requireActivity()) {
+            if (it.isNotEmpty()) {
+                showEmpty(false)
+                println("23213324324324:" + viewModel.documentsDetailsList)
+                if (viewModel.documentsAdapter != null) {
+                    viewModel.documentsAdapter.submitList(it)
+                    viewModel.documentsAdapter.notifyDataSetChanged()
                 }
+
+            } else {
+                showEmpty(true)
             }
-      //  }
+        }
+        //  }
     }
 
     suspend fun createFolderInGoogleDrive(folderName: String): String? {
@@ -947,4 +981,23 @@ class HomeFragment : Fragment() {
 
         return jsonDocument
     }
+
+//    override fun onResume() {
+//        super.onResume()
+//
+//        binding!!.imgSync.setOnClickListener {
+////            val constraints = Constraints.Builder()
+////                .setRequiredNetworkType(NetworkType.CONNECTED) // Example constraint: require network connectivity
+////                .build()
+//
+//// Create WorkRequest
+//            val workRequest = OneTimeWorkRequest.Builder(DocumentSyncWorker::class.java)
+//                //.setConstraints(constraints) // Optional: apply constraints
+//                .build()
+//
+//// Enqueue WorkRequest
+//            WorkManager.getInstance(requireContext()).enqueue(workRequest)
+//        }
+//
+//    }
 }
