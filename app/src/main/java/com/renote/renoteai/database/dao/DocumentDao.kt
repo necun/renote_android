@@ -19,14 +19,11 @@ interface DocumentDao {
      fun getAllDocumentIds(): Flow<MutableList<String>>
 
      //query if isSync is false then all the un synced files will retrieve
-
     @Query("SELECT * FROM document_table WHERE isSynced = 0")
     fun getAllUnsyncedDocumentIds(): Flow<MutableList<DocumentEntity>>
 
     //after successful uploading the file in drive it will update isSync to true
-
     @Query("UPDATE document_table SET isSynced = 1 WHERE id = :documentId")
     suspend fun markDocumentAsSynced(documentId: String)
-
 
 }

@@ -5,8 +5,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "tag_table")
 data class TagEntity(
-    @PrimaryKey(autoGenerate = true)
-    val idd: Int = 0,
+    @PrimaryKey
     val id: String,
     val tagName: String,
     var isSelected: Boolean? = false

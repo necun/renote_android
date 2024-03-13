@@ -92,38 +92,10 @@ class CameraActivity : AppCompatActivity() {
         // Set up the listeners for take photo and video capture buttons
         viewBinding.imageCaptureButton.setOnClickListener {
             takePhoto()
-
-            /**
-             * Removes the signed-in account and cached tokens from this app.
-             */
-//        mSingleAccountApp!!.signOut(object : ISingleAccountPublicClientApplication.SignOutCallback {
-//          override fun onSignOut() {
-//
-//            performOperationOnSignOut()
-//          }
-//
-//          override fun onError(exception: MsalException) {
-//            Toast.makeText(this@MainActivity,"something went wrong, please try again after sometine",Toast.LENGTH_LONG).show()
-//          }
-//        })
         }
 
         cameraExecutor = Executors.newSingleThreadExecutor()
     }
-
-//    private fun performOperationOnSignOut() {
-//        val signOutText = "Signed Out."
-//        val preferences = getSharedPreferences("userEmailId", MODE_PRIVATE)
-//        val editor = preferences.edit()
-//        editor.clear()
-//        editor.apply()
-//        Toast.makeText(this@CameraActivity, signOutText, Toast.LENGTH_SHORT)
-//            .show()
-//        val intent = Intent(this@CameraActivity, SignInActivity::class.java)
-//        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-//        startActivity(intent)
-//        finishAffinity()
-//    }
 
     private fun takePhoto() {
         // Get a stable reference of the modifiable image capture use case

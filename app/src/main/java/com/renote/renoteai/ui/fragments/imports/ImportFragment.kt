@@ -105,7 +105,6 @@ class ImportFragment : Fragment() {
                             isFavourite = false,
                             folderId = "12",
                             openCount = 20,
-                            localFilePathIos = "aaaaaaaaaaa",
                             localFilePathAndroid = "sssssssssssssss",
                             tagId = "1234",
                             driveType = "Gdrive",

@@ -1,26 +1,25 @@
 package com.renote.renoteai.ui.presentation.home.workers
 
 import android.content.Context
+import android.net.Uri
+import android.util.Log
 import android.widget.Toast
-import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.ViewModel
 import androidx.work.CoroutineWorker
+import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.api.client.extensions.android.http.AndroidHttp
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
 import com.google.api.client.http.InputStreamContent
 import com.google.api.client.json.jackson2.JacksonFactory
+import com.google.api.services.drive.DriveScopes
+import com.google.api.services.drive.Drive
+import com.renote.renoteai.R
+import com.renote.renoteai.database.dao.DocumentDao
 import com.renote.renoteai.database.tables.DocumentEntity
-import com.renote.renoteai.di.provideDocumentDao
 import com.renote.renoteai.di.provideDocumentDatabase
 import kotlinx.coroutines.flow.first
 import java.io.ByteArrayInputStream
-
-import com.google.api.services.drive.Drive
-import com.google.api.services.drive.DriveScopes
-import com.renote.renoteai.R
-import com.renote.renoteai.ui.presentation.home.viewmodel.HomeFragmentViewModel
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
@@ -30,6 +29,7 @@ class DocumentSyncWorker(
     workerParams: WorkerParameters,
 ) : CoroutineWorker(context, workerParams) {
 
+    //private val driveService: Drive = getDriveService(context)
     private val driveService: Drive = getDriveService(context)
 
     override suspend fun doWork(): Result {
@@ -42,7 +42,7 @@ class DocumentSyncWorker(
 
             unsyncedDocuments.forEach { document ->
                 // Simulate a task like uploading to Google Drive.
-                if (uploadDocument(document,driveService,applicationContext)) {
+                if (uploadDocument(document)) {
                     // Mark document as synced if upload is successful.
                     documentDao.markDocumentAsSynced(document.id)
                 }
@@ -73,61 +73,24 @@ class DocumentSyncWorker(
         return tempDrive
     }
 
-//    private suspend fun uploadDocument(document: DocumentEntity): Boolean {
-//        try {
-//            // The MIME type of the folder
-//            val folderMimeType = "application/vnd.google-apps.folder"
-//            // Search for the ReNoteAI folder
-//            val folderSearchQuery =
-//                "name = 'ReNoteAI' and mimeType = '$folderMimeType' and trashed = false"
-//            val folderSearch = driveService.files().list().setQ(folderSearchQuery).execute()
-//            var folderId: String? = folderSearch.files.firstOrNull()?.id
-//
-//            // If the ReNoteAI folder doesn't exist, create it
-//            if (folderId == null) {
-//                val folderMetadata = com.google.api.services.drive.model.File().apply {
-//                    name = "ReNoteAI"
-//                    mimeType = folderMimeType
-//                }
-//                folderId = driveService.files().create(folderMetadata).execute().id
-//            }
-//
-//            // Prepare the file to be uploaded
-//            val fileMetadata = com.google.api.services.drive.model.File().apply {
-//                name = document.name
-//                parents = listOf(folderId)
-//            }
-//
-//            // Assuming document.fileData contains the path to the file in internal storage
-//            applicationContext.openFileInput(document.fileData).use { inputStream ->
-//                val content = inputStream.readBytes()
-//                val mediaContent = InputStreamContent(null, ByteArrayInputStream(content))
-//
-//                // Upload the file
-//                driveService.files().create(fileMetadata, mediaContent).execute()
-//            }
-//            Toast.makeText(applicationContext, "Uploaded", Toast.LENGTH_SHORT).show()
-//            return true // Return true if upload succeeds
-//
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//            return false // Return false if upload fails
-//        }
-//    }
-
-    private suspend fun uploadDocument(document: DocumentEntity, driveService: Drive, context: Context): Boolean {
+    private suspend fun uploadDocument(
+        document: DocumentEntity
+    ): Boolean {
         return try {
             // Get the file path from the document entity
             val filePath = document.fileData
 
+            println("filePath:$filePath")
             // Get the file content from the file path
-            val fileContent = getFileContentFromPath(filePath, context)
+            val fileContent = getFileContentFromPath(filePath, applicationContext)
+            println("fileContent:$fileContent")
 
             if (fileContent != null) {
                 // The MIME type of the folder
                 val folderMimeType = "application/vnd.google-apps.folder"
                 // Search for the ReNoteAI folder
-                val folderSearchQuery = "name = 'ReNoteAI' and mimeType = '$folderMimeType' and trashed = false"
+                val folderSearchQuery =
+                    "name = 'ReNoteAI' and mimeType = '$folderMimeType' and trashed = false"
                 val folderSearch = driveService.files().list().setQ(folderSearchQuery).execute()
                 var folderId: String? = folderSearch.files.firstOrNull()?.id
 
@@ -164,11 +127,20 @@ class DocumentSyncWorker(
     // Function to get file content from path
     private fun getFileContentFromPath(filePath: String, context: Context): ByteArray? {
         return try {
-            val file = File(filePath)
+
+            val uri = Uri.parse(filePath)
+            val fileDestin = uri.path
+
+            val file = File(fileDestin.toString())
+            Log.d("FilePath", "File path: $filePath")
+            Log.d("FileExistence", "File exists: ${file.exists()}")
             FileInputStream(file).use { inputStream ->
                 inputStream.readBytes()
             }
         } catch (e: FileNotFoundException) {
+            e.printStackTrace()
+            null
+        }catch (e:Exception){
             e.printStackTrace()
             null
         }

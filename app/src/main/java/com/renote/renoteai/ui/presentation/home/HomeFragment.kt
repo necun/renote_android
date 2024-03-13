@@ -18,10 +18,15 @@ import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.work.Constraints
+import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import androidx.work.workDataOf
 import com.renote.renoteai.R
 import com.renote.renoteai.ui.presentation.home.adapters.DocumentsDetailsAdapter
 import com.renote.renoteai.ui.presentation.home.adapters.FoldersAdapter
@@ -88,11 +93,18 @@ class HomeFragment : Fragment() {
         binding?.lifecycleOwner = this
         binding?.viewModel = viewModel
         return binding!!.root
+
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         auth = FirebaseAuth.getInstance()
+
+        val directory = File(requireContext().filesDir, "ReNoteAI")
+        if (!directory.exists()) {
+            directory.mkdirs() // Create the directory if it doesn't exist
+        }
 
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(getString(R.string.default_web_client_id)).requestEmail().build()
@@ -101,6 +113,7 @@ class HomeFragment : Fragment() {
 
         val auth = Firebase.auth
         val user = auth.currentUser
+
 
         loginUserGoogleId = user?.email
 
@@ -117,19 +130,22 @@ class HomeFragment : Fragment() {
             TagFragment().show(childFragmentManager, TagFragment().tag)
         }
 
-        val workRequest = OneTimeWorkRequest.Builder(DocumentSyncWorker::class.java).build()
+            syncDocuments()
 
-// Enqueue the WorkRequest
-        WorkManager.getInstance(requireContext()).enqueue(workRequest)
+//
+//        val workRequest = OneTimeWorkRequest.Builder(DocumentSyncWorker::class.java).build()
+//
+//// Enqueue the WorkRequest
+//        WorkManager.getInstance(requireContext()).enqueue(workRequest)
 
 
         val jsonString = loadJSONFromRaw(
             requireActivity(), R.raw.schema
         )
         //tags
-        savingTagsDataFromJSONFileToRoomDatabase()
-        savingFoldersDataFromJSONFileToRoomDatabase()
-        savingDocumentsDataFromJSONFileToRoomDatabase()
+//        savingTagsDataFromJSONFileToRoomDatabase()
+//        savingFoldersDataFromJSONFileToRoomDatabase()
+//        savingDocumentsDataFromJSONFileToRoomDatabase()
 
 
 
@@ -145,9 +161,9 @@ class HomeFragment : Fragment() {
             startActivity(i)
         }
 
-        binding?.imgSync?.setOnClickListener {
-            signOutFromGoogle()
-        }
+//        binding?.imgSync?.setOnClickListener {
+//            signOutFromGoogle()
+//        }
 
         val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.img_search)
         drawable?.setBounds(0, 0, 40, 40) // Set the desired width and height
@@ -165,9 +181,16 @@ class HomeFragment : Fragment() {
         initDocumentsRecyclerView()
         documentsObserveData()
 
-
     }
 
+    private fun syncDocuments() {
+        val syncWorkRequest = OneTimeWorkRequestBuilder<DocumentSyncWorker>()
+            .setInputData(Data.Builder().build())
+            .build()
+
+        // Enqueue the work request
+        WorkManager.getInstance(requireContext()).enqueue(syncWorkRequest)
+    }
 
     fun createReNoteAiFolderInGoogleDrive() {
         try {
@@ -218,80 +241,80 @@ class HomeFragment : Fragment() {
     }
 
 
-    fun savingFoldersDataFromJSONFileToRoomDatabase() {
-//        if (loginUserGoogleId != null) {
-        val jsonString = loadJSONFromRaw(
-            requireActivity(), R.raw.schema
-        )
-        val foldersContainer = parseFolders(jsonString!!)
-        val folders = foldersContainer.folders // Your Map<String, Folder>
-        // Convert the Map<String, Folder> to JSONObject
-        val jsonFolderObject = JSONObject(folders)
-        viewModel.getAllFolderIds()
-
-        viewModel.allFolderIdsList.observe(requireActivity()) { folderIds ->
-
-            println("folderIdsfolderIds" + folderIds)
-            if (folderIds.isNotEmpty()) {
-                val folderEntities = mutableListOf<FolderEntity>()
-                val keys = jsonFolderObject.keys()
-                println("keys:" + keys)
-                while (keys.hasNext()) {
-                    val key = keys.next() as String
-                    println("key:" + key)
-                    if (key !in folderIds) {
-                        val folderData = jsonFolderObject.getJSONObject(key)
-                        println("folderData:" + folderData)
-                        val id = folderData.getString("id")
-                        val name = folderData.getString("name")
-                        val createdDate = folderData.getLong("createdDate")
-                        val updatedDate = folderData.getLong("updatedDate")
-                        val emailOrPhone = folderData.getString("emailOrPhone")
-                        val isSynced = folderData.getBoolean("isSynced")
-                        val isPin = folderData.getBoolean("isPin")
-                        val isFavourite = folderData.getBoolean("isFavourite")
-                        val fileCount = folderData.getInt("fileCount")
-                        val driveType = folderData.getString("driveType")
-
-                        folderEntities.add(
-                            FolderEntity(
-                                id = id,
-                                name = name,
-                                createdDate = createdDate,
-                                updatedDate = updatedDate,
-                                emailOrPhone = emailOrPhone,
-                                isSynced = isSynced,
-                                isPin = isPin,
-                                isFavourite = isFavourite,
-                                fileCount = fileCount,
-                                driveType = driveType
-                            )
-                        )
-                    }
-                }
-
-                viewModel.saveFolderFilesDetails(folderEntities)
-            } else {
-                val folderEntities = folders.map { (_, folder) ->
-                    FolderEntity(
-                        id = folder.id,
-                        name = folder.name,
-                        createdDate = folder.createdDate,
-                        updatedDate = folder.updatedDate,
-                        emailOrPhone = folder.emailOrPhone,
-                        isSynced = folder.isSynced,
-                        isPin = folder.isPin,
-                        isFavourite = folder.isFavourite,
-                        fileCount = folder.fileCount,
-                        driveType = folder.driveType
-                    )
-                }
-                viewModel.saveFolderFilesDetails(folderEntities)
-            }
-        }
-        //}
-
-    }
+//    fun savingFoldersDataFromJSONFileToRoomDatabase() {
+////        if (loginUserGoogleId != null) {
+//        val jsonString = loadJSONFromRaw(
+//            requireActivity(), R.raw.schema
+//        )
+//        val foldersContainer = parseFolders(jsonString!!)
+//        val folders = foldersContainer.folders // Your Map<String, Folder>
+//        // Convert the Map<String, Folder> to JSONObject
+//        val jsonFolderObject = JSONObject(folders)
+//        viewModel.getAllFolderIds()
+//
+//        viewModel.allFolderIdsList.observe(requireActivity()) { folderIds ->
+//
+//            println("folderIdsfolderIds" + folderIds)
+//            if (folderIds.isNotEmpty()) {
+//                val folderEntities = mutableListOf<FolderEntity>()
+//                val keys = jsonFolderObject.keys()
+//                println("keys:" + keys)
+//                while (keys.hasNext()) {
+//                    val key = keys.next() as String
+//                    println("key:" + key)
+//                    if (key !in folderIds) {
+//                        val folderData = jsonFolderObject.getJSONObject(key)
+//                        println("folderData:" + folderData)
+//                        val id = folderData.getString("id")
+//                        val name = folderData.getString("name")
+//                        val createdDate = folderData.getLong("createdDate")
+//                        val updatedDate = folderData.getLong("updatedDate")
+//                        val emailOrPhone = folderData.getString("emailOrPhone")
+//                        val isSynced = folderData.getBoolean("isSynced")
+//                        val isPin = folderData.getBoolean("isPin")
+//                        val isFavourite = folderData.getBoolean("isFavourite")
+//                        val fileCount = folderData.getInt("fileCount")
+//                        val driveType = folderData.getString("driveType")
+//
+//                        folderEntities.add(
+//                            FolderEntity(
+//                                id = id,
+//                                name = name,
+//                                createdDate = createdDate,
+//                                updatedDate = updatedDate,
+//                                emailOrPhone = emailOrPhone,
+//                                isSynced = isSynced,
+//                                isPin = isPin,
+//                                isFavourite = isFavourite,
+//                                fileCount = fileCount,
+//                                driveType = driveType
+//                            )
+//                        )
+//                    }
+//                }
+//
+//                viewModel.saveFolderFilesDetails(folderEntities)
+//            } else {
+//                val folderEntities = folders.map { (_, folder) ->
+//                    FolderEntity(
+//                        id = folder.id,
+//                        name = folder.name,
+//                        createdDate = folder.createdDate,
+//                        updatedDate = folder.updatedDate,
+//                        emailOrPhone = folder.emailOrPhone,
+//                        isSynced = folder.isSynced,
+//                        isPin = folder.isPin,
+//                        isFavourite = folder.isFavourite,
+//                        fileCount = folder.fileCount,
+//                        driveType = folder.driveType
+//                    )
+//                }
+//                viewModel.saveFolderFilesDetails(folderEntities)
+//            }
+//        }
+//        //}
+//
+//    }
 
     fun savingDocumentsDataFromJSONFileToRoomDatabase() {
         // if (loginUserGoogleId != null) {
@@ -344,7 +367,6 @@ class HomeFragment : Fragment() {
                                 isFavourite = isFavourite,
                                 folderId = folderId,
                                 openCount = openCount,
-                                localFilePathIos = localFilePathIos,
                                 localFilePathAndroid = localFilePathAndroid,
                                 tagId = tagId,
                                 driveType = driveType,
@@ -368,7 +390,6 @@ class HomeFragment : Fragment() {
                         isFavourite = document.isFavourite,
                         folderId = document.folderId,
                         openCount = document.openCount,
-                        localFilePathIos = document.localFilePathIos,
                         localFilePathAndroid = document.localFilePathAndroid,
                         tagId = document.tagId,
                         driveType = document.driveType,
@@ -961,4 +982,23 @@ class HomeFragment : Fragment() {
 
         return jsonDocument
     }
+
+//    override fun onResume() {
+//        super.onResume()
+//
+//        binding!!.imgSync.setOnClickListener {
+////            val constraints = Constraints.Builder()
+////                .setRequiredNetworkType(NetworkType.CONNECTED) // Example constraint: require network connectivity
+////                .build()
+//
+//// Create WorkRequest
+//            val workRequest = OneTimeWorkRequest.Builder(DocumentSyncWorker::class.java)
+//                //.setConstraints(constraints) // Optional: apply constraints
+//                .build()
+//
+//// Enqueue WorkRequest
+//            WorkManager.getInstance(requireContext()).enqueue(workRequest)
+//        }
+//
+//    }
 }
