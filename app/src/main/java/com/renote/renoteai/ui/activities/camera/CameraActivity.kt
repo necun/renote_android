@@ -4,13 +4,20 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.ContentValues
+import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.graphics.ImageFormat
 import android.media.Image
+import android.graphics.Paint
+import android.graphics.Path
+import android.hardware.display.DisplayManager
 import android.net.Uri
 import android.os.Build
+import androidx.annotation.DrawableRes
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Base64
@@ -38,10 +45,27 @@ import java.util.Locale
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import android.provider.Settings
+import android.view.View
+import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
+import androidx.compose.ui.graphics.Canvas
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import androidx.lifecycle.lifecycleScope
+import com.google.android.material.tabs.TabLayout
 import com.renote.renoteai.ui.activities.camera.libs.CVLib
 import com.renote.renoteai.ui.activities.camera.scanutil.DocumentBorders
 import com.renote.renoteai.databinding.ActivityCameraBinding
+import com.renote.renoteai.ui.activities.camera.extension.toggleButton
 import com.renote.renoteai.ui.main.MainActivity
+import com.renote.renoteai.R
+import com.renote.renoteai.ui.activities.camera.extension.circularClose
+import com.renote.renoteai.ui.activities.camera.extension.circularReveal
+import com.renote.renoteai.ui.activities.camera.scanutil.ScanType
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlin.properties.Delegates
+
 
 typealias CVAnalyzerListener = () -> Unit
 
@@ -60,6 +84,10 @@ class CameraActivity : AppCompatActivity() {
     private var bitmap: Bitmap? = null
     private var mask: Mat? = null
 
+    private var preview: Preview? = null
+    private var cameraProvider: ProcessCameraProvider? = null
+    private var imageAnalyzer: ImageAnalysis? = null
+
     private lateinit var cameraExecutor: ExecutorService
 
     private var documentBorders: DocumentBorders? = null
@@ -67,6 +95,21 @@ class CameraActivity : AppCompatActivity() {
     private var documentImageHeight: Int = 0
 
     private lateinit var txtLogout: TextView
+
+    private var activeScanType = ScanType.DOCUMENT_TYPE
+
+    //new variables
+    private var hasGrid = false
+
+    private var flashMode by Delegates.observable(ImageCapture.FLASH_MODE_OFF) { _, _, new ->
+        viewBinding.flashBtn.setImageResource(
+            when (new) {
+                ImageCapture.FLASH_MODE_ON -> R.drawable.ic_flash_on
+                ImageCapture.FLASH_MODE_AUTO -> R.drawable.ic_flash_auto
+                else -> R.drawable.ic_flash_off
+            }
+        )
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -89,13 +132,135 @@ class CameraActivity : AppCompatActivity() {
             )
         }
 
+
+        viewBinding.scanTypeLay.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                if (activeScanType == tab?.position) return
+
+//                if (viewModel.getPreviousScans().value?.isNotEmpty() == true) {
+//                    basicAlert()
+//                } else {
+//                    changeScanType(tab?.position)
+//                }
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+                when (tab?.position) {
+                    ScanType.BOOK_TYPE -> viewBinding.dashedLine.visibility = View.GONE
+                    ScanType.QR_CODE -> {
+                        viewBinding.overlay.visibility = View.GONE
+                        imageAnalyzer?.clearAnalyzer()
+                        startCamera()
+                    }
+                }
+            }
+
+            override fun onTabReselected(tab: TabLayout.Tab?) {}
+        })
+
         // Set up the listeners for take photo and video capture buttons
         viewBinding.imageCaptureButton.setOnClickListener {
             takePhoto()
         }
 
+        viewBinding.scanBackBtn.setOnClickListener { onBackPressed() }
+        viewBinding.gridBtn.setOnClickListener { toggleGrid() }
+        viewBinding.flashBtn.setOnClickListener { selectFlash() }
+        viewBinding.btnFlashOff.setOnClickListener { closeFlashAndSelect(ImageCapture.FLASH_MODE_OFF) }
+        viewBinding.btnFlashOn.setOnClickListener { closeFlashAndSelect(ImageCapture.FLASH_MODE_ON) }
+        viewBinding.btnFlashAuto.setOnClickListener { closeFlashAndSelect(ImageCapture.FLASH_MODE_AUTO) }
+
         cameraExecutor = Executors.newSingleThreadExecutor()
+//
+//         val positiveButtonClick = { dialog: DialogInterface, which: Int ->
+//            deleteAndChangeScan()
+//            //  dialog.dismiss()
+//        }
+//
+//         val cancelButtonClick = { dialog: DialogInterface, which: Int ->
+//            selectPreviousTab(activeScanType)
+//            //dialog.dismiss()
+//        }
     }
+
+
+    private fun toggleGrid() {
+        viewBinding.gridBtn.toggleButton(
+            flag = hasGrid,
+            rotationAngle = 180f,
+            firstIcon = R.drawable.ic_grid_off,
+            secondIcon = R.drawable.ic_grid,
+        ) { flag ->
+            hasGrid = flag
+            // prefs.putBoolean(KEY_GRID, flag)
+            viewBinding.groupGridLines.visibility = if (flag) View.VISIBLE else View.GONE
+        }
+    }
+
+    private fun selectFlash() = viewBinding.llFlashOptions.circularReveal(viewBinding.flashBtn)
+
+    private fun closeFlashAndSelect(@ImageCapture.FlashMode flash: Int) =
+        viewBinding.llFlashOptions.circularClose(viewBinding.flashBtn) {
+            flashMode = flash
+            viewBinding.flashBtn.setImageResource(
+                when (flash) {
+                    ImageCapture.FLASH_MODE_ON -> R.drawable.ic_flash_on
+                    ImageCapture.FLASH_MODE_OFF -> R.drawable.ic_flash_off
+                    else -> R.drawable.ic_flash_auto
+                }
+            )
+            imageCapture?.flashMode = flashMode
+            // prefs.putInt(KEY_FLASH, flashMode)
+        }
+
+//    fun basicAlert() {
+//        val builder = AlertDialog.Builder(this)
+//        with(builder)
+//        {
+//            setTitle("Confirmation?")
+//            setMessage("Are you sure want to discard this scan")
+//            setPositiveButton(
+//                "Delete",
+//                DialogInterface.OnClickListener(function = positiveButtonClick)
+//            )
+//            setNeutralButton(
+//                "Cancel",
+//                DialogInterface.OnClickListener(function = cancelButtonClick)
+//            )
+//            show()
+//        }
+//    }
+
+//    fun deleteAndChangeScan() {
+//        lifecycleScope.launch {
+//            viewModel.deleteAllScans()
+//            delay(200)
+//            changeScanType(binding.scanTypeLay.selectedTabPosition)
+//        }
+//
+//    }
+
+//    fun changeScanType(position: Int?) {
+//        when (position) {
+//            ScanType.BOOK_TYPE -> viewBinding.dashedLine.visibility = View.VISIBLE
+//            ScanType.QR_CODE -> {
+//                imageAnalyzer?.clearAnalyzer()
+//                viewBinding.overlay.visibility = View.VISIBLE
+//                viewBinding.overlay.post {
+//                    viewBinding.overlay.setViewFinder()
+//                }
+//                startCamera()
+//            }
+//
+//            ScanType.CALENDAR -> {
+//
+//                val intent = Intent(this, TextScanner::class.java)
+//                startActivity(intent)
+//                requireActivity().finish()
+//            }
+//        }
+//        activeScanType = position!!
+//    }
 
     private fun takePhoto() {
         // Get a stable reference of the modifiable image capture use case
@@ -251,16 +416,17 @@ class CameraActivity : AppCompatActivity() {
         }
     }
 
-    private fun showPermissionDialog(){
+    private fun showPermissionDialog() {
         val permissionDialog = Dialog(this@CameraActivity)
         permissionDialog.setContentView(com.renote.renoteai.R.layout.permission_diaog)
         permissionDialog.setCancelable(false)
         permissionDialog.setCanceledOnTouchOutside(false)
         permissionDialog.window!!.setBackgroundDrawableResource(android.R.color.transparent)
 
-        permissionDialog.findViewById<CardView>(com.renote.renoteai.R.id.btnCancel).setOnClickListener {
-            permissionDialog.dismiss()
-        }
+        permissionDialog.findViewById<CardView>(com.renote.renoteai.R.id.btnCancel)
+            .setOnClickListener {
+                permissionDialog.dismiss()
+            }
 
         permissionDialog.findViewById<CardView>(com.renote.renoteai.R.id.btnOk).setOnClickListener {
             openAppPermissionSettings()
@@ -287,7 +453,7 @@ class CameraActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         super.onBackPressed()
-       // moveTaskToBack(true)
+        // moveTaskToBack(true)
         val intent = Intent(this@CameraActivity, MainActivity::class.java)
         startActivity(intent)
     }
@@ -500,7 +666,6 @@ class CameraActivity : AppCompatActivity() {
                 success_counter = 0;
             }
             frame_counter += 1
-
 
             System.gc()
             return mat

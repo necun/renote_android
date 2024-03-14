@@ -28,4 +28,7 @@
 
     <color name="thumbnail_bg">#F2F2F2</color>
     <color name="personal_text_color">#3D3D3D</color>
+    <color name="colorTransperatDark">#50000000</color>
+    <color name="colorLightTransperatBg">#BB000000</color>
+    <color name="colorTransperatGray">#20000000</color>
 </resources>

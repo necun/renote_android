@@ -15,4 +15,15 @@
 
     <dimen name="height_25dp">25dp</dimen>
     <dimen name="margin_8dp">8dp</dimen>
+    <dimen name="height_50dp">50dp</dimen>
+    <dimen name="dp4">4dp</dimen>
+    <dimen name="text_size_11sp">11sp</dimen>
+    <dimen name="dp20">20dp</dimen>
+    <dimen name="scan_icon_size">24dp</dimen>
+    <dimen name="text_size_12sp">12sp</dimen>
+    <dimen name="dp15">15dp</dimen>
+    <dimen name="margin_35dp">35dp</dimen>
+    <dimen name="padding_15dp">15dp</dimen>
+    <dimen name="button_size_small">28dp</dimen>
+    <dimen name="dp_8">8dp</dimen>
 </resources>

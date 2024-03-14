@@ -54,4 +54,7 @@
         <item>Sync to Google Drive</item>
         <item>Sync to One Drive</item>
     </string-array>
+
+    <string name="manual">Manual</string>
+    <string name="importtxt">Import</string>
 </resources>
