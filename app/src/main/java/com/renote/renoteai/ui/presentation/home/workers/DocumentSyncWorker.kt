@@ -65,9 +65,7 @@ class DocumentSyncWorker(
                 AndroidHttp.newCompatibleTransport(),
                 JacksonFactory.getDefaultInstance(),
                 credential
-            )
-                .setApplicationName(context.getString(R.string.app_name))
-                .build()
+            ).setApplicationName(context.getString(R.string.app_name)).build()
         }
         var tempDrive: Drive
         return tempDrive
@@ -140,7 +138,7 @@ class DocumentSyncWorker(
         } catch (e: FileNotFoundException) {
             e.printStackTrace()
             null
-        }catch (e:Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
             null
         }
