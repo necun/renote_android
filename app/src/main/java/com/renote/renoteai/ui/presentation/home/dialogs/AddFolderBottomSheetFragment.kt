@@ -1,12 +1,14 @@
 package com.renote.renoteai.ui.presentation.home.dialogs
 
 import android.app.Dialog
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import com.renote.renoteai.R
 import com.renote.renoteai.database.tables.FolderEntity
@@ -18,12 +20,20 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.Snackbar
 import org.koin.android.ext.android.inject
 import java.io.File
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 class AddFolderBottomSheetFragment : BottomSheetDialogFragment() {
     private var _binding: FragmentAddFolderBinding? = null
     private val binding get() = _binding
     private var folderTitle = ""
     val folderEntities = mutableListOf<FolderEntity>()
+    @RequiresApi(Build.VERSION_CODES.O)
+    val current = LocalDateTime.now()
+    @RequiresApi(Build.VERSION_CODES.O)
+    val formatter = DateTimeFormatter.ofPattern("ddHHmmss")
+    @RequiresApi(Build.VERSION_CODES.O)
+    val formattedTimestamp = current.format(formatter).toLong()
     private val viewModel: HomeFragmentViewModel by inject()
   //  private val folderEntity by lazy { FolderEntity() }
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,6 +56,7 @@ class AddFolderBottomSheetFragment : BottomSheetDialogFragment() {
         _binding = null
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         (dialog as? BottomSheetDialog)?.behavior?.state = STATE_EXPANDED
@@ -78,6 +89,7 @@ class AddFolderBottomSheetFragment : BottomSheetDialogFragment() {
 
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun createFolderInInternalStorage(folderTitle:String) {
         val directory = File(requireContext().filesDir, "ReNoteAI/$folderTitle")
         if (!directory.exists()) {
@@ -88,13 +100,14 @@ class AddFolderBottomSheetFragment : BottomSheetDialogFragment() {
         saveToRoom(folderTitle)
     }
 
-    private fun saveToRoom( folderTitle: String){
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun saveToRoom(folderTitle: String){
 
         folderEntities.add(
             FolderEntity(
-                id = "200",
+                id = "folder_${formattedTimestamp}",
                 name = folderTitle,
-                createdDate = 10005003,
+                createdDate = formattedTimestamp,
                 updatedDate = 10005003,
                 emailOrPhone = "raju@gmail.com",
                 isSynced = false,

@@ -7,11 +7,13 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Environment
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
@@ -41,6 +43,8 @@ import org.koin.android.ext.android.inject
 import java.io.FileOutputStream
 import java.io.IOException
 import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 
@@ -54,9 +58,19 @@ class EmailActivity : AppCompatActivity() {
     val viewModel: EmailViewModel by inject()
     var enhancedImageType: String = ""
     private lateinit var viewBinding: EmailDataBinding
+    private lateinit var folderId:String
+    private lateinit var folderName:String
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    val current = LocalDateTime.now()
+    @RequiresApi(Build.VERSION_CODES.O)
+    val formatter = DateTimeFormatter.ofPattern("ddHHmmss")
+    @RequiresApi(Build.VERSION_CODES.O)
+    val formattedTimestamp = current.format(formatter).toLong()
 
     private val viewModelHome: HomeFragmentViewModel by inject()
     val docEntities = mutableListOf<DocumentEntity>()
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportActionBar?.hide()
@@ -74,6 +88,12 @@ class EmailActivity : AppCompatActivity() {
 
      //  val uri = Uri.parse(intent.getStringExtra(EXTRA_PICTURE_URI))
 
+        val sharedPreference =
+            this.getSharedPreferences("PREFERENCE_NAME", Context.MODE_PRIVATE)
+         folderId = sharedPreference.getString("folderId", "100").toString()
+         folderName = sharedPreference.getString("folderName", "ReNoteAI").toString()
+        println("folderId:$folderId")
+        println("folderName:$folderName")
 
         enhancedImageType = intent.getStringExtra("enhancedImageType").toString()
         println("enhancedImageType:$enhancedImageType")
@@ -83,12 +103,22 @@ class EmailActivity : AppCompatActivity() {
 
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun observeData() {
         viewModel.resourseClick.observe(this) { integer ->
             when (integer) {
                 R.id.emailImageView -> {
                     //enhancedImageType = intent.getStringExtra("enhancedImageType").toString()
-                    saveImage()
+                    saveImage(folderId,folderName)
+
+
+                    val sharedPreference =
+                        this.getSharedPreferences("PREFERENCE_NAME", Context.MODE_PRIVATE)
+                    var editor = sharedPreference.edit()
+                    editor.putString("folderId", "100")
+                    editor.putString("folderName","ReNoteAI")
+                    editor.apply()
+                    editor.commit()
                 }
 
                 R.id.cameraRetakeImgVw->{
@@ -166,7 +196,8 @@ class EmailActivity : AppCompatActivity() {
     }
 
     //function to save the filtered image into the app internal storage.....
-    private fun saveImage() {
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun saveImage(folderId: String, folderName: String) {
         val enhancedImageType = intent.getStringExtra("enhancedImageType")
         println("454354353346546"+enhancedImageType)
         val output_path =
@@ -178,46 +209,73 @@ class EmailActivity : AppCompatActivity() {
         val fileName = "$enhancedImageType.jpg"
 
 
-        val directory = File(this.filesDir, "ReNoteAI") // Directory path within app's internal storage
-        if (!directory.exists()) {
-            directory.mkdirs() // Create the directory if it doesn't exist
-        }
-
-//        val storageDir: File =
-//            this.getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
-
-        val newFile = File(directory, fileName)
-        val fileUri:Uri = Uri.fromFile(newFile)
-        try {
-            val inputStream = FileInputStream(file)
-            val outputStream = FileOutputStream(newFile)
-            val buffer = ByteArray(1024)
-            var length: Int
-            while (inputStream.read(buffer).also { length = it } > 0) {
-                outputStream.write(buffer, 0, length)
+        if (folderName != "ReNoteAI" && folderId != "100"){
+            val directory = File(this.filesDir, "ReNoteAI/$folderName") // Directory path within app's internal storage
+            if (!directory.exists()) {
+                directory.mkdirs() // Create the directory if it doesn't exist
             }
-            outputStream.flush()
-            outputStream.close()
-            inputStream.close()
-            // Now 'newFile' contains the copied image file in the internal storage of your app
-            Toast.makeText(this@EmailActivity,"Image Saved",Toast.LENGTH_SHORT).show()
-            saveToRoom(fileUri,fileName)
-        } catch (e: IOException) {
-            e.printStackTrace()
-            // Handle error
+                val newFile = File(directory, fileName)
+                val fileUri:Uri = Uri.fromFile(newFile)
+                try {
+                    val inputStream = FileInputStream(file)
+                    val outputStream = FileOutputStream(newFile)
+                    val buffer = ByteArray(1024)
+                    var length: Int
+                    while (inputStream.read(buffer).also { length = it } > 0) {
+                        outputStream.write(buffer, 0, length)
+                    }
+                    outputStream.flush()
+                    outputStream.close()
+                    inputStream.close()
+                    // Now 'newFile' contains the copied image file in the internal storage of your app
+                    Toast.makeText(this@EmailActivity,"Image Saved",Toast.LENGTH_SHORT).show()
+                    saveToRoom(fileUri,fileName,folderId)
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                    // Handle error
+                }
+
+        } else {
+            val directory =
+                File(this.filesDir, "ReNoteAI") // Directory path within app's internal storage
+            if (!directory.exists()) {
+                directory.mkdirs() // Create the directory if it doesn't exist
+            }
+
+            val newFile = File(directory, fileName)
+            val fileUri:Uri = Uri.fromFile(newFile)
+            try {
+                val inputStream = FileInputStream(file)
+                val outputStream = FileOutputStream(newFile)
+                val buffer = ByteArray(1024)
+                var length: Int
+                while (inputStream.read(buffer).also { length = it } > 0) {
+                    outputStream.write(buffer, 0, length)
+                }
+                outputStream.flush()
+                outputStream.close()
+                inputStream.close()
+                // Now 'newFile' contains the copied image file in the internal storage of your app
+                Toast.makeText(this@EmailActivity,"Image Saved",Toast.LENGTH_SHORT).show()
+                saveToRoom(fileUri,fileName,folderId)
+            } catch (e: IOException) {
+                e.printStackTrace()
+                // Handle error
+            }
         }
 
     }
 
     //function to save the file details to the room database after storing it in the internal storage........
-    private fun saveToRoom(fileUri: Uri, fileName: String) {
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun saveToRoom(fileUri: Uri, fileName: String, folderId: String) {
 //        val uri:Uri = Uri.parse(fileUri.toString())
         val fileType = "jpg"
 
        // println("")
         docEntities.add(
             DocumentEntity(
-                id = "100",
+                id = "doc_$formattedTimestamp",
                 name = fileName,
                 createdDate = 10005000,
                 updatedDate = 10005000,
@@ -225,7 +283,7 @@ class EmailActivity : AppCompatActivity() {
                 isSynced = false,
                 isPin = false,
                 isFavourite = false,
-                folderId = "12",
+                folderId = folderId,
                 openCount = 30,
                 localFilePathAndroid = "ssssssssssssss",
                 tagId = "12345",
@@ -235,7 +293,6 @@ class EmailActivity : AppCompatActivity() {
         )
 
         println("savedFileUri:$fileUri")
-
         viewModelHome.saveDocumentsDetails(docEntities)
         startActivity(Intent(this@EmailActivity, MainActivity::class.java))
         finishAffinity()

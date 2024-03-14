@@ -1,4 +1,4 @@
-package com.renote.renoteai.ui.fragments.folders
+package com.renote.renoteai.ui.fragments.imports
 
 import android.content.Context
 import android.os.Bundle
@@ -11,7 +11,6 @@ import androidx.annotation.RawRes
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.renote.renoteai.ui.presentation.home.dialogs.AddFolderBottomSheetFragment
 import com.renote.renoteai.R
-import com.renote.renoteai.ui.fragments.folders.adapters.SaveFolderAdapter
 import com.renote.renoteai.databinding.FragmentFoldersBinding
 import com.renote.renoteai.database.tables.FolderEntity
 import com.renote.renoteai.database.custom_models.FoldersContainer

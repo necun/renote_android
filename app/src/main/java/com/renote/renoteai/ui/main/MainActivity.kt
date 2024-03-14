@@ -52,6 +52,8 @@ class MainActivity : AppCompatActivity() {
 
         navView = findViewById(R.id.bottomNavigationView)
 
+        println(currentFragment)
+
 //        val constraints = Constraints.Builder()
 //            .setRequiredNetworkType(NetworkType.CONNECTED) // Example constraint: require network connectivity
 //            .build()
