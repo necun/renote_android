@@ -113,7 +113,7 @@ class HomeFragmentViewModel(private val documentsRepository: DocumentsRepository
 
 
 
-    fun saveTagDetails(tag: List<TagEntity>) = viewModelScope.launch {
+    fun saveTagDetails(tag: TagEntity) = viewModelScope.launch {
         tagsRepository.saveTagDetails(tag)
     }
 

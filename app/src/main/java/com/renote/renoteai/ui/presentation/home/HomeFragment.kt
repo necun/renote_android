@@ -45,7 +45,7 @@ import com.renote.renoteai.database.custom_models.TagsContainer
 import com.renote.renoteai.databinding.HomeFragmentDataBinding
 import com.renote.renoteai.ui.base.listeners.TagsItemListener
 import com.renote.renoteai.ui.presentation.home.dialogs.AddFolderBottomSheetFragment
-import com.renote.renoteai.ui.presentation.home.dialogs.TagFragment
+import com.renote.renoteai.ui.presentation.home.dialogs.CreateTagBottomSheetFragment
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.api.client.http.InputStreamContent
 import com.google.firebase.Firebase
@@ -105,7 +105,7 @@ class HomeFragment : Fragment() {
         }
 
         binding?.adTag?.setOnClickListener {
-            TagFragment().show(childFragmentManager, TagFragment().tag)
+            CreateTagBottomSheetFragment().show(childFragmentManager, CreateTagBottomSheetFragment().tag)
         }
 
 
@@ -113,11 +113,13 @@ class HomeFragment : Fragment() {
             requireActivity(), R.raw.schema
         )
         //tags
-        savingTagsDataFromJSONFileToRoomDatabase()
-        savingFoldersDataFromJSONFileToRoomDatabase()
-        savingDocumentsDataFromJSONFileToRoomDatabase()
+        //savingTagsDataFromJSONFileToRoomDatabase()
+        //savingFoldersDataFromJSONFileToRoomDatabase()
+        //savingDocumentsDataFromJSONFileToRoomDatabase()
 
-
+        viewModel.saveTagDetails(TagEntity("1000","All"))
+        viewModel.saveTagDetails(TagEntity("2000","Starred"))
+        viewModel.saveTagDetails(TagEntity("3000","Most Viewed"))
 
 
         binding?.profileIcon?.setOnClickListener {
@@ -145,16 +147,18 @@ class HomeFragment : Fragment() {
         }
 
         initTagsRecyclerview()
-        tagsObserveData()
+       tagsObserveData()
         initFoldersRecyclerView()
         foldersObserveData()
-        initDocumentsRecyclerView()
-        documentsObserveData()
+        //initDocumentsRecyclerView()
+       // documentsObserveData()
 
 
     }
 
-
+    fun getCurrentTimestamp(): Long {
+        return System.currentTimeMillis()
+    }
     fun createReNoteAiFolderInGoogleDrive() {
         try {
             if (loginUserGoogleId != null) {
@@ -330,7 +334,6 @@ class HomeFragment : Fragment() {
                                     isFavourite = isFavourite,
                                     folderId = folderId,
                                     openCount = openCount,
-                                    localFilePathIos = localFilePathIos,
                                     localFilePathAndroid = localFilePathAndroid,
                                     tagId = tagId,
                                     driveType = driveType,
@@ -354,7 +357,6 @@ class HomeFragment : Fragment() {
                             isFavourite = document.isFavourite,
                             folderId = document.folderId,
                             openCount = document.openCount,
-                            localFilePathIos = document.localFilePathIos,
                             localFilePathAndroid = document.localFilePathAndroid,
                             tagId = document.tagId,
                             driveType = document.driveType,
@@ -367,53 +369,53 @@ class HomeFragment : Fragment() {
         //}
     }
 
-    fun savingTagsDataFromJSONFileToRoomDatabase() {
-       // if (loginUserGoogleId != null) {
-            val jsonString = loadJSONFromRaw(
-                requireActivity(), R.raw.schema
-            )
-            val tagsContainer = parseTags(jsonString!!)
-            val tags = tagsContainer.tags // Your Map<String, Folder>
-            // Convert the Map<String, Folder> to JSONObject
-            val jsonTagObject = JSONObject(tags)
-            viewModel.getAllTagIds()
-            viewModel.allTagIdsList.observe(requireActivity()) { tagIds ->
-
-                println("tagIds tagIds " + tagIds)
-                if (tagIds.isNotEmpty()) {
-                    val tagEntities = mutableListOf<TagEntity>()
-                    val keys = jsonTagObject.keys()
-                    println("keys:" + keys)
-                    while (keys.hasNext()) {
-                        val key = keys.next() as String
-                        println("key:" + key)
-                        if (key !in tagIds) {
-                            val tagData = jsonTagObject.getJSONObject(key)
-                            println("tagData:" + tagData)
-
-                            val id = tagData.getString("id")
-                            val tagName = tagData.getString("name")
-
-                            tagEntities.add(
-                                TagEntity(
-                                    id = id, tagName = tagName, isSelected = false
-                                )
-                            )
-                        }
-                    }
-
-                    viewModel.saveTagDetails(tagEntities)
-                } else {
-                    val tagEntities = tags.map { (_, tag) ->
-                        TagEntity(
-                            id = tag.id, tagName = tag.tagName, isSelected = false
-                        )
-                    }
-                    viewModel.saveTagDetails(tagEntities)
-                }
-            }
-       // }
-    }
+//    fun savingTagsDataFromJSONFileToRoomDatabase() {
+//       // if (loginUserGoogleId != null) {
+//            val jsonString = loadJSONFromRaw(
+//                requireActivity(), R.raw.schema
+//            )
+//            val tagsContainer = parseTags(jsonString!!)
+//            val tags = tagsContainer.tags // Your Map<String, Folder>
+//            // Convert the Map<String, Folder> to JSONObject
+//            val jsonTagObject = JSONObject(tags)
+//            viewModel.getAllTagIds()
+//            viewModel.allTagIdsList.observe(requireActivity()) { tagIds ->
+//
+//                println("tagIds tagIds " + tagIds)
+//                if (tagIds.isNotEmpty()) {
+//                    val tagEntities = mutableListOf<TagEntity>()
+//                    val keys = jsonTagObject.keys()
+//                    println("keys:" + keys)
+//                    while (keys.hasNext()) {
+//                        val key = keys.next() as String
+//                        println("key:" + key)
+//                        if (key !in tagIds) {
+//                            val tagData = jsonTagObject.getJSONObject(key)
+//                            println("tagData:" + tagData)
+//
+//                            val id = tagData.getString("id")
+//                            val tagName = tagData.getString("name")
+//
+//                            tagEntities.add(
+//                                TagEntity(
+//                                    id = id, tagName = tagName
+//                                )
+//                            )
+//                        }
+//                    }
+//
+//                    viewModel.saveTagDetails(tagEntities)
+//                } else {
+//                    val tagEntities = tags.map { (_, tag) ->
+//                        TagEntity(
+//                            id = tag.id, tagName = tag.tagName
+//                        )
+//                    }
+//                    viewModel.saveTagDetails(tagEntities)
+//                }
+//            }
+//       // }
+//    }
 
     fun initTagsRecyclerview() {
         viewModel.tagsAdapter = TagsAdapter(mContext!!)

@@ -222,7 +222,6 @@ class EmailActivity : AppCompatActivity() {
                 isFavourite = false,
                 folderId = "12",
                 openCount = 30,
-                localFilePathIos = "aaaaaaaaaaaaa",
                 localFilePathAndroid = "ssssssssssssss",
                 tagId = "12345",
                 driveType = "gDrive",
