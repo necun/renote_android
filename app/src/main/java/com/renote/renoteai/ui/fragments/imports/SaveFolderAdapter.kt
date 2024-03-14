@@ -1,4 +1,4 @@
-package com.renote.renoteai.ui.fragments.folders.adapters
+package com.renote.renoteai.ui.fragments.imports
 
 import android.content.Context
 import android.view.LayoutInflater

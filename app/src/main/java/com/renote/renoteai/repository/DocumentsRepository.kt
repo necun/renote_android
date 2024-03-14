@@ -13,6 +13,6 @@ class DocumentsRepository(private val dao: DocumentDao) {
 fun documentsIdsFromDB() = dao.getAllDocumentIds()
 
     fun getUnSyncedDocuments() = dao.getAllUnsyncedDocumentIds()
-
+    fun getDocuments(folderId:String)=dao.getDocuments(folderId)
 
 }
