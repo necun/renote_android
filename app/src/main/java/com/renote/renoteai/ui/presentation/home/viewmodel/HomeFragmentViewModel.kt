@@ -156,10 +156,11 @@ class HomeFragmentViewModel(private val documentsRepository: DocumentsRepository
 //
 //    // Add additional ViewModel operations for updating and deleting folders if needed.
 //    // ...
-
-
-
+    companion object {
     }
+
+
+}
 
 
 

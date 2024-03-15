@@ -15,6 +15,7 @@ data class DocumentEntity(
     val isPin: Boolean,
     val isFavourite: Boolean,
     val fileData: String,
+    val fileDriveId:String,
     val openCount:Int,
     val localFilePathAndroid:String,
     val tagId:String,

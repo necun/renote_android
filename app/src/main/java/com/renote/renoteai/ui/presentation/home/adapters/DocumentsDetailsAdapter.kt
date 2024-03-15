@@ -61,6 +61,7 @@ class DocumentsDetailsAdapter(private val context: Context) :
                 binding.executePendingBindings()
 
                 binding.docRelativeLayout.setOnClickListener {
+                    Toast.makeText(context, data.fileDriveId, Toast.LENGTH_SHORT).show()
                     openFileFromUri(data.fileData.toUri())
                 }
             }
@@ -75,6 +76,7 @@ class DocumentsDetailsAdapter(private val context: Context) :
 
     private fun openFileFromUri(uri: Uri) {
         try {
+
             val file = File(uri.path ?: return)
             val fileUri = FileProvider.getUriForFile(context, "com.renote.renoteai.provider", file)
 

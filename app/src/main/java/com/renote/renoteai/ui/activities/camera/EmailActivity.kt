@@ -205,7 +205,7 @@ class EmailActivity : AppCompatActivity() {
         val file = File(output_path, "$enhancedImageType.jpg")
 
         val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-        val fileName = "$enhancedImageType.jpg"
+        val fileName = "file_$formattedTimestamp.jpg"
 
 
         if (folderName != "ReNoteAI" && folderId != "100"){
@@ -279,6 +279,7 @@ class EmailActivity : AppCompatActivity() {
                 createdDate = 10005000,
                 updatedDate = 10005000,
                 fileData = fileUri.toString(),
+                fileDriveId = "",
                 isSynced = false,
                 isPin = false,
                 isFavourite = false,

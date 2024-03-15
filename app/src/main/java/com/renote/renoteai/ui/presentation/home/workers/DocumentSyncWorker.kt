@@ -42,10 +42,16 @@ class DocumentSyncWorker(
 
             unsyncedDocuments.forEach { document ->
                 // Simulate a task like uploading to Google Drive.
-                if (uploadDocument(document)) {
-                    // Mark document as synced if upload is successful.
-                    documentDao.markDocumentAsSynced(document.id)
+//                if (uploadDocument(document)) {
+                    val (uploadSuccess, fileId) = uploadDocument(document)
+                if (uploadSuccess && fileId != null) {
+                    // Now also passing the fileId to update the record accordingly
+                    documentDao.updateDocumentWithDriveId(document.id, fileId)
                 }
+
+                    // Mark document as synced if upload is successful.
+                   // documentDao.updateDocumentWithDriveId(document.id,)
+                //}
             }
 
             return Result.success()
@@ -73,7 +79,7 @@ class DocumentSyncWorker(
 
     private suspend fun uploadDocument(
         document: DocumentEntity
-    ): Boolean {
+    ): Pair<Boolean, String?> {
         return try {
             // Get the file path from the document entity
             val filePath = document.fileData
@@ -110,15 +116,19 @@ class DocumentSyncWorker(
                 val mediaContent = InputStreamContent(null, ByteArrayInputStream(fileContent))
 
                 // Upload the file
-                driveService.files().create(fileMetadata, mediaContent).execute()
+               val uploadFile =  driveService.files().create(fileMetadata, mediaContent).execute()
+                Pair(true,uploadFile.id)
 
-                true // Return true if upload succeeds
+                //true // Return true if upload succeeds
             } else {
-                false // Return false if file content is null or cannot be obtained
+                Pair(false, null)
+               // false // Return false if file content is null or cannot be obtained
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            false // Return false if upload fails
+           // false // Return false if upload fails
+            Pair(false, null)
+
         }
     }
 

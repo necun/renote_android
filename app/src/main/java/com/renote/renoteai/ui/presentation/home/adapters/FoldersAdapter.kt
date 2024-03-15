@@ -5,15 +5,18 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.renote.renoteai.R
 import com.renote.renoteai.database.tables.FolderEntity
 import com.renote.renoteai.databinding.FoldersItemBinding
+
 import com.renote.renoteai.di.provideDocumentDatabase
 import com.renote.renoteai.ui.base.listeners.TagsItemListener
 import com.renote.renoteai.ui.fragments.folders.FolderFilesFragment
+import com.renote.renoteai.ui.presentation.home.viewmodel.HomeFragmentViewModel
 
 
 class FoldersAdapter(private val context: Context, private val userEmailId: String?) :
@@ -56,15 +59,20 @@ class FoldersAdapter(private val context: Context, private val userEmailId: Stri
                 binding.folderRecycle.setOnClickListener {
 //                selectedPosition = adapterPosition
 //                itemClickListener?.onItemClicked(data, adapterPosition)
+
                     val folderId = data.id
                     val folderName = data.name
+
+
                     val sharedPreference =
+
                         context.getSharedPreferences("PREFERENCE_NAME", Context.MODE_PRIVATE)
                     var editor = sharedPreference.edit()
                     editor.putString("folderId", folderId)
                     editor.putString("folderName",folderName)
                     editor.apply()
                     editor.commit()
+
 
                     val database = provideDocumentDatabase(context)
                     val documentDao = database.documentDao()

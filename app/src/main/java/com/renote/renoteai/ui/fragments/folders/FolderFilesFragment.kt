@@ -6,16 +6,22 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.navArgs
+
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.renote.renoteai.R
 import com.renote.renoteai.databinding.FolderFilesFragmentDataBinding
 import com.renote.renoteai.ui.fragments.folders.viewmodel.FolderFilesViewModel
+import com.renote.renoteai.ui.main.MainActivity
+import com.renote.renoteai.ui.presentation.home.HomeFragment
 import com.renote.renoteai.ui.presentation.home.adapters.DocumentsDetailsAdapter
 import org.koin.android.ext.android.inject
+
 
 class FolderFilesFragment : Fragment() {
 
@@ -23,6 +29,7 @@ class FolderFilesFragment : Fragment() {
     private val viewModel: FolderFilesViewModel by inject()
     private var mContext: Context? = null
     private var folderId: String? = null
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,19 +45,32 @@ class FolderFilesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
+
+
         val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.img_search)
         drawable?.setBounds(0, 0, 40, 40) // Set the desired width and height
         binding?.etSearch?.setCompoundDrawables(drawable, null, null, null)
 
         val sharedPreference = requireContext().getSharedPreferences("PREFERENCE_NAME", Context.MODE_PRIVATE)
         folderId = sharedPreference.getString("folderId", "100")
-        val folderName = sharedPreference.getString("folderName", "ReNoteAI")
+        val folderName =sharedPreference.getString("folderName", "ReNoteAI")
         println("folderId:$folderId")
         println("folderName:$folderName")
         initFolderFilesRecyclerview()
         folderDocumentsObserveData()
 
         handleBackPress()
+
+        val tvFolderName = view.findViewById<TextView>(R.id.tvFolderName) // Use 'requireView().findViewById' if you're in a Fragment
+        tvFolderName.setText(folderName)
+
+        binding!!.tvBreadcrumbs.setOnClickListener {
+            val intent = Intent(requireContext(), MainActivity::class.java)
+            startActivity(intent)
+        }
+
+
     }
 
     private fun handleBackPress() {
@@ -110,3 +130,5 @@ class FolderFilesFragment : Fragment() {
         binding?.folderFilesRecyclerview?.adapter = viewModel.documentsDetailsAdapter
     }
 }
+
+
