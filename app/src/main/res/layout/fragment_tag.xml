@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".ui.presentation.home.dialogs.TagFragment">
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <data class="CreateTagDataBinding">
+        <variable
+            name="viewModel"
+            type="com.renote.renoteai.ui.presentation.home.dialogs.CreateTagViewModel" />
+
+    </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -18,6 +23,7 @@
             android:id="@+id/close_iv"
             android:layout_width="@dimen/iconSize"
             android:layout_height="@dimen/iconSize"
+            android:onClick="@{(view) -> viewModel.onresorceClick(view.getId())}"
             android:layout_gravity="center_horizontal"
             android:contentDescription="@string/content_description"
             android:src="@drawable/ic_close"
@@ -76,6 +82,7 @@
                 android:autofillHints="name"
                 android:background="@android:color/transparent"
                 android:hint="@string/enter_name"
+                android:text="@={viewModel.tagName}"
                 android:inputType="text"
                 android:textColor="@color/dark_grey"
                 android:textColorHint="@color/light_grey"
@@ -84,6 +91,7 @@
 
             <LinearLayout
                 android:id="@+id/create_tag_ll"
+                android:onClick="@{(view) -> viewModel.onresorceClick(view.getId())}"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/dimen_45dp"
                 android:layout_alignParentEnd="true"
@@ -98,6 +106,7 @@
                     android:layout_height="wrap_content"
                     android:padding="10dp"
                     android:gravity="center"
+
                     android:layout_gravity="center"
                     android:orientation="horizontal">
 

@@ -37,7 +37,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
 import java.io.FileInputStream
 import java.util.concurrent.TimeUnit
-
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.android.ext.android.inject
 import java.io.FileOutputStream

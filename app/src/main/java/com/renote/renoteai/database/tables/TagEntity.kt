@@ -8,5 +8,5 @@ data class TagEntity(
     @PrimaryKey
     val id: String,
     val tagName: String,
-    var isSelected: Boolean? = false
+
 )

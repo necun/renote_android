@@ -49,6 +49,7 @@ class ImageFilter : AppCompatActivity() {
     private lateinit var bw: View
     private lateinit var grey: View
     private lateinit var soft: View
+    private var pictureType: String? = ""
 
     var enhancedImageType: String = ""
 
@@ -59,6 +60,9 @@ class ImageFilter : AppCompatActivity() {
         viewBinding = ActivityImageFilterBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
         supportActionBar?.hide()
+
+        val uri = Uri.parse(intent.getStringExtra(EXTRA_PICTURE_URI))
+        pictureType = intent.getStringExtra(EXTRA_PICTURE_TYPE)
 
         org = findViewById(R.id.viewOrg)
         ai = findViewById(R.id.viewAI)
@@ -249,7 +253,7 @@ class ImageFilter : AppCompatActivity() {
 //      doOCR()
 //    }
 
-        val uri = Uri.parse(intent.getStringExtra(EXTRA_PICTURE_URI))
+        //  val uri = Uri.parse(intent.getStringExtra(EXTRA_PICTURE_URI))
         val imageDecoder = ImageDecoder.createSource(contentResolver, uri)
         val bitmap = ImageDecoder.decodeBitmap(imageDecoder)
         val bmp32 = bitmap.copy(Bitmap.Config.ARGB_8888, true);
@@ -713,8 +717,8 @@ class ImageFilter : AppCompatActivity() {
 
 
     override fun onBackPressed() {
-      super.onBackPressed()
-      // Start MainActivity
+        super.onBackPressed()
+        // Start MainActivity
         deleteInternalStorageDirectoryy()
         val intent = Intent(this, CameraActivity::class.java)
         startActivity(intent)
