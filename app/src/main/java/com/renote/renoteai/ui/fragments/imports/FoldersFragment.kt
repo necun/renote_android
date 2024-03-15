@@ -1,4 +1,4 @@
-package com.renote.renoteai.ui.fragments.folders
+package com.renote.renoteai.ui.fragments.imports
 
 import android.content.Context
 import android.os.Bundle
@@ -11,7 +11,6 @@ import androidx.annotation.RawRes
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.renote.renoteai.ui.presentation.home.dialogs.AddFolderBottomSheetFragment
 import com.renote.renoteai.R
-import com.renote.renoteai.ui.fragments.folders.adapters.SaveFolderAdapter
 import com.renote.renoteai.databinding.FragmentFoldersBinding
 import com.renote.renoteai.database.tables.FolderEntity
 import com.renote.renoteai.database.custom_models.FoldersContainer
@@ -26,7 +25,6 @@ import com.google.gson.Gson
 import org.json.JSONObject
 import org.koin.android.ext.android.inject
 import java.io.IOException
-
 
 class FoldersFragment : Fragment() {
     var mContext: Context? = null
@@ -50,7 +48,7 @@ class FoldersFragment : Fragment() {
         mContext = activity
 
         val fileName = arguments?.getString("folderName")
-      //  val adapter = SaveFolderAdapter(fileName)
+        //  val adapter = SaveFolderAdapter(fileName)
 
 
         Log.d("FoldersFragment", "Received folder name: $fileName")
@@ -150,28 +148,31 @@ class FoldersFragment : Fragment() {
             }
         }
 
-       // if (loginUserGoogleId != null) {
-            viewModel.getAllFolderFileDetails()
+        // if (loginUserGoogleId != null) {
+        viewModel.getAllFolderFileDetails()
 
-            viewModel.folderFileDetailsList.observe(requireActivity()) {
-                if (it.isNotEmpty()) {
-                    //showFolderEmpty(false)
-                    println("23213324324324:" + viewModel.folderFileDetailsList)
-                    foldersAdapter.differ.submitList(it)
-                    binding.recycleView.apply {
-                        layoutManager = LinearLayoutManager(
-                            requireActivity()
-                        )
-                        adapter = foldersAdapter
-                    }
-                } else {
-                    //  showFolderEmpty(true)
+        viewModel.folderFileDetailsList.observe(requireActivity()) {
+            if (it.isNotEmpty()) {
+                //showFolderEmpty(false)
+                println("23213324324324:" + viewModel.folderFileDetailsList)
+                foldersAdapter.differ.submitList(it)
+                binding.recycleView.apply {
+                    layoutManager = LinearLayoutManager(
+                        requireActivity()
+                    )
+                    adapter = foldersAdapter
                 }
+            } else {
+                //  showFolderEmpty(true)
             }
-       // }
+        }
+        // }
 
         binding.addIcon.setOnClickListener {
-            AddFolderBottomSheetFragment().show(childFragmentManager, AddFolderBottomSheetFragment().tag)
+            AddFolderBottomSheetFragment().show(
+                childFragmentManager,
+                AddFolderBottomSheetFragment().tag
+            )
         }
 
     }

@@ -15,6 +15,7 @@ import com.renote.renoteai.database.tables.TagEntity
 import com.renote.renoteai.repository.TagsRepository
 import com.renote.renoteai.ui.presentation.home.adapters.DocumentsDetailsAdapter
 import com.renote.renoteai.ui.presentation.home.adapters.FoldersAdapter
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class HomeFragmentViewModel(private val documentsRepository: DocumentsRepository,private  val foldersRepository: FoldersRepository,private val tagsRepository:TagsRepository): ViewModel() {
@@ -33,6 +34,10 @@ class HomeFragmentViewModel(private val documentsRepository: DocumentsRepository
     val documentsDetailsList: LiveData<List<DocumentEntity>>
         get() = _documentsDetailsList
 
+    private val _unSyncedDocumentDetailsList = MutableLiveData<List<DocumentEntity>>()
+    val unSyncedDocumentDetailsList:LiveData<List<DocumentEntity>>
+        get() = _unSyncedDocumentDetailsList
+
     fun getAllDocumentsDetails() = viewModelScope.launch {
         documentsRepository.getAllDocumentsDetails().collect() {
             _documentsDetailsList.postValue(it)
@@ -42,6 +47,12 @@ class HomeFragmentViewModel(private val documentsRepository: DocumentsRepository
     fun getAllDocumentsIds() = viewModelScope.launch {
         documentsRepository.documentsIdsFromDB().collect(){
             _allDocumentsIdsList.postValue(it)
+        }
+    }
+
+    fun getAllUnSyncedDocumentIds() = viewModelScope.launch {
+        documentsRepository.getUnSyncedDocuments().collect(){
+            _unSyncedDocumentDetailsList.postValue(it)
         }
     }
 
@@ -113,7 +124,8 @@ class HomeFragmentViewModel(private val documentsRepository: DocumentsRepository
 
 
 
-    fun saveTagDetails(tag: List<TagEntity>) = viewModelScope.launch {
+
+    fun saveTagDetails(tag: TagEntity) = viewModelScope.launch {
         tagsRepository.saveTagDetails(tag)
     }
 

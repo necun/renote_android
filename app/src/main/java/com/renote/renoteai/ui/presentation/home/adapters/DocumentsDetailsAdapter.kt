@@ -64,7 +64,6 @@ class DocumentsDetailsAdapter(private val context: Context) :
                     openFileFromUri(data.fileData.toUri())
                 }
             }
-
         }
     }
 
@@ -73,25 +72,6 @@ class DocumentsDetailsAdapter(private val context: Context) :
         val date = Date(timestamp)
         return sdf.format(date)
     }
-
-//    private fun openFileFromUri(uri: Uri) {
-//        try {
-//            val intent = Intent(Intent.ACTION_VIEW)
-//
-//            // Use the document URI directly
-//            intent.setDataAndType(uri, context.contentResolver.getType(uri))
-//            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-//
-//
-//            if (intent.resolveActivity(context.packageManager) != null) {
-//                context.startActivity(intent)
-//            }
-//        } catch (exception: Exception) {
-//            Toast.makeText(context, "uri:$uri", Toast.LENGTH_SHORT).show()
-//            println("fileSavedUri:$uri")
-//        }
-//
-//    }
 
     private fun openFileFromUri(uri: Uri) {
         try {

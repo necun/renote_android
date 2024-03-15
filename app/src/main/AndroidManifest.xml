@@ -7,6 +7,7 @@
         android:targetSdkVersion="34" />
 
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera.any" />
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -42,7 +43,7 @@
         <activity
             android:name=".ui.main.MainActivity"
             android:exported="true"
-            android:windowSoftInputMode="adjustPan"/>
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".ui.activities.signupotp.SignUpOTPActivity"
             android:exported="false" />
@@ -65,7 +66,7 @@
         <activity
             android:name=".ui.splash.SplashActivity"
             android:exported="true"
-            android:launchMode="singleTop" >
+            android:launchMode="singleTop">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

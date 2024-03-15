@@ -16,7 +16,6 @@ import androidx.core.content.FileProvider
 import com.renote.renoteai.R
 import com.renote.renoteai.database.tables.DocumentEntity
 import com.renote.renoteai.databinding.FragmentImportBinding
-import com.renote.renoteai.ui.fragments.folders.FoldersFragment
 import com.renote.renoteai.ui.presentation.home.viewmodel.HomeFragmentViewModel
 import com.google.android.material.snackbar.Snackbar
 import org.koin.android.ext.android.inject
@@ -105,7 +104,6 @@ class ImportFragment : Fragment() {
                             isFavourite = false,
                             folderId = "12",
                             openCount = 20,
-                            localFilePathIos = "aaaaaaaaaaa",
                             localFilePathAndroid = "sssssssssssssss",
                             tagId = "1234",
                             driveType = "Gdrive",
