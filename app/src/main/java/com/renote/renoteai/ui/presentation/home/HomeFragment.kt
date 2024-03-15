@@ -17,6 +17,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.Constraints
 import androidx.work.Data
@@ -82,6 +83,7 @@ class HomeFragment : Fragment() {
     private val viewModel: HomeFragmentViewModel by inject()
 
     var folderId: String? = null
+
     var actualFolderName: String? = null
     var loginUserGoogleId: String? = null
     override fun onCreateView(
@@ -113,6 +115,10 @@ class HomeFragment : Fragment() {
 
         val auth = Firebase.auth
         val user = auth.currentUser
+
+
+
+
 
 
         loginUserGoogleId = user?.email
@@ -349,6 +355,7 @@ class HomeFragment : Fragment() {
                         val isPin = documentData.getBoolean("isPin")
                         val isFavourite = documentData.getBoolean("isFavourite")
                         val folderId = documentData.getString("folderId")
+                        val fileDriveId = documentData.getString("fileDriveId")
                         val openCount = documentData.getInt("openCount")
                         val localFilePathIos = documentData.getString("localFilePathIos")
                         val localFilePathAndroid = documentData.getString("localFilePathIos")
@@ -366,6 +373,7 @@ class HomeFragment : Fragment() {
                                 isPin = isPin,
                                 isFavourite = isFavourite,
                                 folderId = folderId,
+                                fileDriveId = fileDriveId,
                                 openCount = openCount,
                                 localFilePathAndroid = localFilePathAndroid,
                                 tagId = tagId,
@@ -385,6 +393,7 @@ class HomeFragment : Fragment() {
                         createdDate = document.createdDate,
                         updatedDate = document.updatedDate,
                         fileData = document.fileData,
+                        fileDriveId = "",
                         isSynced = document.isSynced,
                         isPin = document.isPin,
                         isFavourite = document.isFavourite,
