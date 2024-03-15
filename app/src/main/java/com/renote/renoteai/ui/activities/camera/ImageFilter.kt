@@ -17,6 +17,7 @@ import org.opencv.imgproc.Imgproc
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
+import android.util.Base64
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
@@ -33,8 +34,12 @@ import com.chaquo.python.Python
 import com.chaquo.python.android.AndroidPlatform
 import com.renote.renoteai.R
 import com.renote.renoteai.ui.activities.camera.libs.CVLib
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.OutputStream
+import java.nio.charset.StandardCharsets
 
 
 const val EXTRA_OCR_TEXT = "com.example.cameraxapp.OCR_TEXT"
@@ -145,8 +150,8 @@ class ImageFilter : AppCompatActivity() {
 //      viewBinding.aiFilterImageView.setImageResource(R.drawable.ic_no_picture)
 //      viewBinding.greyFilterImageView.setImageResource(R.drawable.ic_no_picture)
 //      viewBinding.softFilterImageView.setImageResource(R.drawable.ic_no_picture)
-            doSaveGetSave()
-            blackAndWhiteFilter()
+           // doSaveGetSave()
+            blackAndWhiteFilterBitmap()
         }
 //    viewBinding.BWFilterButton.setOnClickListener {
 //      doBWFilter()
@@ -269,7 +274,7 @@ class ImageFilter : AppCompatActivity() {
         Utils.matToBitmap(mat, resultBitmap)
 
         doSaveGetSave()
-        blackAndWhiteFilter()
+        blackAndWhiteFilterBitmap()
 
         //doSaveGetSave()
         // doNoFilter()
@@ -519,6 +524,99 @@ class ImageFilter : AppCompatActivity() {
         viewBinding.imageView2.setImageBitmap(resultBitmap)
     }
 
+    private fun blackAndWhiteFilterBitmap(){
+
+        val original = original ?: return
+        result = original.clone()
+        val resultBitmap = Bitmap.createBitmap(original.cols(), original.rows(), Bitmap.Config.ARGB_8888)
+        Utils.matToBitmap(original, resultBitmap)
+
+        // Don't compress the bitmap here
+        val base64EncodedImage = bitmapToBase64(resultBitmap, quality = 100, format = Bitmap.CompressFormat.JPEG)
+
+        if (!Python.isStarted()) {
+            Python.start(AndroidPlatform(this))
+        }
+        val py = Python.getInstance()
+        val module = py.getModule("script")
+
+        val fact = module["black_and_white_filter_return_bitmap"]
+
+        val pythonResultBitmap = fact?.call(base64EncodedImage)
+
+        if(pythonResultBitmap != null) {
+            val decodedByteArray = Base64.decode(pythonResultBitmap.toString().toByteArray(
+                StandardCharsets.UTF_8), Base64.DEFAULT)
+            val decodedBitmap = BitmapFactory.decodeByteArray(decodedByteArray, 0, decodedByteArray.size)
+            viewBinding.imageView2.setImageBitmap(decodedBitmap)
+            val file=createImageFromBitmap(decodedBitmap)
+        }
+//        val original = original ?: return
+//        result = original.clone()
+//        val resultBitmap =
+//            Bitmap.createBitmap(original.cols(), original.rows(), Bitmap.Config.ARGB_8888)
+//        Utils.matToBitmap(original, resultBitmap)
+//        // Compress the bitmap
+//        val outputStream = ByteArrayOutputStream()
+//        resultBitmap.compress(Bitmap.CompressFormat.JPEG, 20, outputStream)
+//        val compressedByteArray = outputStream.toByteArray()
+//
+//// Create a new Bitmap from the compressed byte array
+//        val compressedBitmap = BitmapFactory.decodeByteArray(compressedByteArray, 0, compressedByteArray.size)
+//        println("compressedBitmap:$compressedBitmap")
+//        if (!Python.isStarted()) {
+//            Python.start(AndroidPlatform(this))
+//        }
+//        val py = Python.getInstance()
+//        val module = py.getModule("script")
+//
+//        val fact = module["black_and_white_filter_return_bitmap"]
+//        println("fact:$fact")
+//        val base64EncodedImage = bitmapToBase64(compressedBitmap)
+//        println("base64EncodedImage:$base64EncodedImage")
+//        var pythonResultBitmap=fact?.call(base64EncodedImage)
+//        println("python result bitmap:$pythonResultBitmap")
+//        if(pythonResultBitmap != null) {
+//            val decodedByteArray = Base64.decode(pythonResultBitmap.toString().toByteArray(
+//                StandardCharsets.UTF_8), Base64.DEFAULT)
+//            val decodedBitmap = BitmapFactory.decodeByteArray(decodedByteArray, 0, decodedByteArray.size)
+//            viewBinding.imageView2.setImageBitmap(decodedBitmap)
+//            val file=createImageFromBitmap(decodedBitmap)
+
+        }
+
+
+    private fun bitmapToBase64(bitmap: Bitmap, quality: Int, format: Bitmap.CompressFormat): String {
+        val outputStream = ByteArrayOutputStream()
+        // Compress the bitmap with the specified quality and format
+        bitmap.compress(format, quality, outputStream)
+        val byteArray = outputStream.toByteArray()
+        return Base64.encodeToString(byteArray, Base64.DEFAULT)
+    }
+
+    private fun ai_filter_return_bitmap(inputBitmap: String): String {
+        // Your image processing logic here
+        // For demonstration purposes, returning the input image as is
+        return inputBitmap
+    }
+
+    private fun createImageFromBitmap(bitmap: Bitmap): File {
+        val name= Calendar.getInstance().timeInMillis
+        val filesDir: File = applicationContext.filesDir
+        val imageFile = File(filesDir, "$name.jpg")
+        System.out.println("imageFileimageFile"+imageFile)
+        val os: OutputStream
+        try {
+            os = FileOutputStream(imageFile)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 0, os)
+            os.flush()
+            os.close()
+        } catch (e: java.lang.Exception) {
+            println("createImageFromBitmap Exception "+e.cause+" "+e.localizedMessage)
+        }
+        return imageFile
+    }
+
     private fun doNoFilter() {
         val original = original ?: return
         result = original.clone()
@@ -587,7 +685,6 @@ class ImageFilter : AppCompatActivity() {
             contentResolver.openOutputStream(uri)
                 ?: throw IOException("Could not open output stream")
         bitmap.compress(Bitmap.CompressFormat.JPEG, 50, stream)
-
 
         stream.close()
         //val msg = "Save succeeded: ${uri.getPath()}"

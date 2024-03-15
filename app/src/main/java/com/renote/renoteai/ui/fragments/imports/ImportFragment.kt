@@ -92,26 +92,26 @@ class ImportFragment : Fragment() {
 
                     println("importUri:$fileUri")
 
-                    docEntities.add(
-                        DocumentEntity(
-                            id = "10",
-                            name = noteTitle,
-                            createdDate = 10052003,
-                            updatedDate = 10052003,
-                            fileData = fileUri.toString(),
-                            isSynced = false,
-                            isPin = false,
-                            isFavourite = false,
-                            folderId = "12",
-                            openCount = 20,
-                            localFilePathAndroid = "sssssssssssssss",
-                            tagId = "1234",
-                            driveType = "Gdrive",
-                            fileExtension = fileType.toString()
-                        )
-                    )
+//                    docEntities.add(
+//                        DocumentEntity(
+//                            id = "10",
+//                            name = noteTitle,
+//                            createdDate = 10052003,
+//                            updatedDate = 10052003,
+//                            fileData = fileUri.toString(),
+//                            isSynced = false,
+//                            isPin = false,
+//                            isFavourite = false,
+//                            folderId = "12",
+//                            openCount = 20,
+//                            localFilePathAndroid = "sssssssssssssss",
+//                            tagId = "1234",
+//                            driveType = "Gdrive",
+//                            fileExtension = fileType.toString()
+//                        )
+//                    )
 
-                    viewModel.saveDocumentsDetails(docEntities)
+                   // viewModel.saveDocumentsDetails(docEntities)
 
 //                    .noteId = 0
 //                    noteEntity.noteTitle = noteTitle

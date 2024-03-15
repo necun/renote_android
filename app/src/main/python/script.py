@@ -1,3 +1,4 @@
+import base64
 import cv2
 import numpy as np
 import os
@@ -229,4 +230,28 @@ def black_and_white_filter(input_image_path,output_path):
     cv2.imwrite(output_path, dilated)
     #cv2.imwrite(output_path, dilated, [int(cv2.IMWRITE_JPEG_QUALITY), 9])
     return dilated
+
+    
+def black_and_white_filter_return_bitmap(input_bitmap):
+     # Decode base64-encoded bitmap data
+     decoded_data = base64.b64decode(input_bitmap)
+     np_data = np.frombuffer(decoded_data, dtype=np.uint8)
+     image = cv2.imdecode(np_data, cv2.IMREAD_UNCHANGED)
+
+     # Convert to grayscale
+     image_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+     # Apply adaptive thresholding
+     _, thresh = cv2.threshold(image_gray, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+
+     # Dilate the thresholded image
+     dilate_kernel = np.ones((5, 5), np.uint8)
+     dilated = cv2.dilate(thresh, dilate_kernel, iterations=1)
+
+     # Encode the processed image back to base64
+     _, img_encoded = cv2.imencode('.bmp', dilated)
+     img_str = base64.b64encode(img_encoded.tobytes())
+
+
+     return str(img_str, 'utf-8')
 
