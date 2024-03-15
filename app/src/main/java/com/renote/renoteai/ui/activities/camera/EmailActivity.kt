@@ -219,7 +219,7 @@ class EmailActivity : AppCompatActivity() {
                 fileData = fileUri.toString(),
                 isSynced = false,
                 isPin = false,
-                isFavourite = false,
+                isFavourite = 0,
                 folderId = "12",
                 openCount = 30,
                 localFilePathAndroid = "ssssssssssssss",

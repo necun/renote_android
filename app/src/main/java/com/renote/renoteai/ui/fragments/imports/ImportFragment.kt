@@ -102,7 +102,7 @@ class ImportFragment : Fragment() {
                             fileData = fileUri.toString(),
                             isSynced = false,
                             isPin = false,
-                            isFavourite = false,
+                            isFavourite = 0,
                             folderId = "12",
                             openCount = 20,
                             localFilePathAndroid = "sssssssssssssss",

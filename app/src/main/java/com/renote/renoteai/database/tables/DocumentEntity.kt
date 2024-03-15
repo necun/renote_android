@@ -13,7 +13,7 @@ data class DocumentEntity(
     val folderId:String,
     val isSynced: Boolean,
     val isPin: Boolean,
-    val isFavourite: Boolean,
+    val isFavourite: Int,
     val fileData: String,
     val openCount:Int,
     val localFilePathAndroid:String,

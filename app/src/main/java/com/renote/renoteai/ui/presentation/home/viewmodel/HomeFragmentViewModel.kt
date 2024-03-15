@@ -33,6 +33,14 @@ class HomeFragmentViewModel(private val documentsRepository: DocumentsRepository
     val documentsDetailsList: LiveData<List<DocumentEntity>>
         get() = _documentsDetailsList
 
+    private val _mostViewedDocumentsDetailsList = MutableLiveData<List<DocumentEntity>>()
+    val mostViewedDocumentsDetailsList: LiveData<List<DocumentEntity>>
+        get() = _mostViewedDocumentsDetailsList
+
+
+    private val _starredDocumentsDetailsList = MutableLiveData<List<DocumentEntity>>()
+    val starredDocumentsDetailsList: LiveData<List<DocumentEntity>>
+        get() = _starredDocumentsDetailsList
     fun getAllDocumentsDetails() = viewModelScope.launch {
         documentsRepository.getAllDocumentsDetails().collect() {
             _documentsDetailsList.postValue(it)
@@ -45,6 +53,16 @@ class HomeFragmentViewModel(private val documentsRepository: DocumentsRepository
         }
     }
 
+    fun getMostViewedDocumentsDetails() = viewModelScope.launch {
+        documentsRepository.getAllMostViewedDocuments().collect() {
+            _mostViewedDocumentsDetailsList.postValue(it)
+        }
+    }
+    fun getStarredDocumentsDetails() = viewModelScope.launch {
+        documentsRepository.getAllStarredDocuments().collect() {
+            _starredDocumentsDetailsList.postValue(it)
+        }
+    }
 
 //    fun saveFolderFilesDetails(note: List<FolderEntity>) = viewModelScope.launch {
 //        folderRepository.saveFolderFiles(note)

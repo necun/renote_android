@@ -17,4 +17,10 @@ interface DocumentDao {
 
     @Query("SELECT id FROM document_table")
      fun getAllDocumentIds(): Flow<MutableList<String>>
+
+    @Query("SELECT * FROM document_table ORDER BY openCount DESC ")
+    fun getAllMostViewedDocuments(): Flow<MutableList<DocumentEntity>>
+
+    @Query("SELECT * FROM document_table where isFavourite = 1 ORDER BY isFavourite DESC ")
+    fun getAllStarredDocuments(): Flow<MutableList<DocumentEntity>>
 }

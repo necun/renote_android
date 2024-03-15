@@ -12,5 +12,8 @@ class DocumentsRepository(private val dao: DocumentDao) {
 //        dao.deleteNotes(note)
 fun documentsIdsFromDB() = dao.getAllDocumentIds()
 
+    fun getAllMostViewedDocuments()=dao.getAllMostViewedDocuments()
+
+    fun getAllStarredDocuments()=dao.getAllStarredDocuments()
 
 }
