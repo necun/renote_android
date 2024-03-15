@@ -3,21 +3,371 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:background="@color/white"
     android:layout_height="match_parent"
+    android:background="@color/black"
     tools:context=".ui.activities.camera.ImageFilter">
 
     <com.jsibbold.zoomage.ZoomageView
         android:id="@+id/imageView2"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_margin="@dimen/margin_8dp"
         android:layout_marginBottom="15dp"
-        app:layout_constraintBottom_toTopOf="@id/horizontalSV"
+        app:layout_constraintBottom_toTopOf="@id/bottomLay"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:srcCompat="@tools:sample/avatars" />
+
+    <!--    <androidx.viewpager2.widget.ViewPager2-->
+    <!--        android:id="@+id/imageView2"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="0dp"-->
+    <!--        android:background="@color/colorButtonGreyBg"-->
+    <!--        android:layout_margin="@dimen/margin_8dp"-->
+    <!--        app:layout_constraintTop_toTopOf="parent"-->
+    <!--        app:layout_constraintBottom_toTopOf="@id/bottomLay" />-->
+
+    <!--    <androidx.viewpager2.widget.ViewPager2-->
+    <!--        android:id="@+id/previewPager"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="0dp"-->
+    <!--        android:background="@color/colorButtonGreyBg"-->
+    <!--        android:layout_margin="@dimen/margin_8dp"-->
+    <!--        app:layout_constraintTop_toTopOf="parent"-->
+    <!--        app:layout_constraintBottom_toTopOf="@id/bottomLay" />-->
+
+    <!--    <ProgressBar-->
+    <!--        android:id="@+id/progressbar"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:visibility="gone"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        app:layout_constraintTop_toTopOf="@id/previewPager"-->
+    <!--        app:layout_constraintBottom_toBottomOf="@id/previewPager"-->
+    <!--        />-->
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/bottomLay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardBackgroundColor="@color/white"
+        app:cardCornerRadius="@dimen/filter_card_radius"
+        app:cardElevation="@dimen/dp2"
+        app:cardPreventCornerOverlap="false"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#323131"
+            android:orientation="vertical">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/margin_10dp"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <LinearLayout
+                    android:id="@+id/autoBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="@dimen/padding_5dp"
+                    app:layout_constraintEnd_toStartOf="@id/cropBtn"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="@dimen/filter_icon_size"
+                        android:layout_height="@dimen/filter_icon_size"
+                        android:src="@drawable/vector"
+                        android:tint="@color/green" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="@dimen/padding_5dp"
+                        android:text="@string/auto"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/filter_text_size" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/cropBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="@dimen/padding_5dp"
+                    app:layout_constraintEnd_toStartOf="@id/filterBtn"
+                    app:layout_constraintStart_toEndOf="@id/autoBtn"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="@dimen/filter_icon_size"
+                        android:layout_height="@dimen/filter_icon_size"
+                        android:tint="@color/white"
+                        app:srcCompat="@drawable/ic_crop" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="@dimen/padding_5dp"
+                        android:text="@string/crop"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/filter_text_size" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/filterBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="@dimen/padding_5dp"
+                    app:layout_constraintEnd_toStartOf="@id/rotateBtn"
+                    app:layout_constraintStart_toEndOf="@id/cropBtn"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="@dimen/filter_icon_size"
+                        android:layout_height="@dimen/filter_icon_size"
+                        android:tint="@color/white"
+                        app:srcCompat="@drawable/ic_filter" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="@dimen/padding_5dp"
+                        android:text="@string/filter"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/filter_text_size" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/rotateBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="@dimen/padding_5dp"
+                    app:layout_constraintEnd_toStartOf="@id/deleteBtn"
+                    app:layout_constraintStart_toEndOf="@id/filterBtn"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="@dimen/filter_icon_size"
+                        android:layout_height="@dimen/filter_icon_size"
+                        android:tint="@color/white"
+                        app:srcCompat="@drawable/ic_rotate" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="@dimen/padding_5dp"
+                        android:text="@string/rotate"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/filter_text_size" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/deleteBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="@dimen/padding_5dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/rotateBtn"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="@dimen/filter_icon_size"
+                        android:layout_height="@dimen/filter_icon_size"
+                        android:tint="@color/white"
+                        app:srcCompat="@drawable/ic_delete" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="@dimen/padding_5dp"
+                        android:text="@string/delete"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/filter_text_size" />
+
+                </LinearLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/darker_gray" />
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="@dimen/filter_card_radius"
+                app:cardElevation="10dp"
+                app:cardPreventCornerOverlap="false">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#323131"
+                    android:padding="@dimen/padding_10dp">
+
+                    <LinearLayout
+                        android:id="@+id/backBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="@dimen/padding_5dp"
+                        app:layout_constraintEnd_toStartOf="@id/cameraRetakeImageView"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="@dimen/filter_icon_size"
+                            android:layout_height="@dimen/filter_icon_size"
+                            android:tint="@color/white"
+                            app:srcCompat="@drawable/ic_black_back_arrow" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="@dimen/padding_5dp"
+                            android:text="@string/back"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/filter_text_size" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/cameraRetakeImageView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="@dimen/padding_5dp"
+                        app:layout_constraintEnd_toStartOf="@id/scanMoreBtn"
+                        app:layout_constraintStart_toEndOf="@id/backBtn"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="@dimen/filter_icon_size"
+                            android:layout_height="@dimen/filter_icon_size"
+                            android:tint="@color/white"
+                            app:srcCompat="@drawable/ic_retake" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="@dimen/padding_5dp"
+                            android:text="@string/retake"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/filter_text_size" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/scanMoreBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="@dimen/padding_5dp"
+                        app:layout_constraintEnd_toStartOf="@id/shareBtn"
+                        app:layout_constraintStart_toEndOf="@id/cameraRetakeImageView"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="@dimen/filter_icon_size"
+                            android:layout_height="@dimen/filter_icon_size"
+                            android:tint="@color/white"
+                            app:srcCompat="@drawable/ic_scan_more" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="@dimen/padding_5dp"
+                            android:text="@string/scan_more"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/filter_text_size" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/shareBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="@dimen/padding_5dp"
+                        app:layout_constraintEnd_toStartOf="@id/tickMarkImageView"
+                        app:layout_constraintStart_toEndOf="@id/scanMoreBtn"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="@dimen/filter_icon_size"
+                            android:layout_height="@dimen/filter_icon_size"
+                            android:tint="@color/white"
+                            app:srcCompat="@drawable/ic_share" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="@dimen/padding_5dp"
+                            android:text="@string/share"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/filter_text_size" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/tickMarkImageView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="@dimen/padding_5dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/shareBtn"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:layout_width="@dimen/filter_icon_size"
+                            android:layout_height="@dimen/filter_icon_size"
+                            android:tint="@color/white"
+                            app:srcCompat="@drawable/ic_save_tick" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="@dimen/padding_5dp"
+                            android:text="@string/save"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/filter_text_size" />
+
+                    </LinearLayout>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
 
     <HorizontalScrollView
         android:id="@+id/horizontalSV"
@@ -27,6 +377,7 @@
         android:fillViewport="true"
         android:paddingStart="40dp"
         android:paddingEnd="40dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/cameraLay"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -432,34 +783,35 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="8dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/horizontalSV">
 
-        <ImageView
-            android:id="@+id/cameraRetakeImageView"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_marginEnd="40dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/camera_retake"
-            app:layout_constraintEnd_toStartOf="@id/tickMarkImageView"
-            app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        <!--        <ImageView-->
+        <!--            android:id="@+id/cameraRetakeImageView"-->
+        <!--            android:layout_width="80dp"-->
+        <!--            android:layout_height="80dp"-->
+        <!--            android:layout_marginEnd="40dp"-->
+        <!--            android:scaleType="centerCrop"-->
+        <!--            android:src="@drawable/camera_retake"-->
+        <!--            app:layout_constraintEnd_toStartOf="@id/tickMarkImageView"-->
+        <!--            app:layout_constraintHorizontal_chainStyle="packed"-->
+        <!--            app:layout_constraintStart_toStartOf="parent"-->
+        <!--            app:layout_constraintTop_toTopOf="parent" />-->
 
-        <ImageView
-            android:id="@+id/tickMarkImageView"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_marginStart="40dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/tick_mark"
-            app:layout_constraintBottom_toBottomOf="@id/cameraRetakeImageView"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/cameraRetakeImageView"
-            app:layout_constraintTop_toTopOf="@id/cameraRetakeImageView" />
+        <!--        <ImageView-->
+        <!--            android:id="@+id/tickMarkImageView"-->
+        <!--            android:layout_width="80dp"-->
+        <!--            android:layout_height="80dp"-->
+        <!--            android:layout_marginStart="40dp"-->
+        <!--            android:scaleType="centerCrop"-->
+        <!--            android:src="@drawable/tick_mark"-->
+        <!--            app:layout_constraintBottom_toBottomOf="@id/cameraRetakeImageView"-->
+        <!--            app:layout_constraintEnd_toEndOf="parent"-->
+        <!--            app:layout_constraintStart_toEndOf="@+id/cameraRetakeImageView"-->
+        <!--            app:layout_constraintTop_toTopOf="@id/cameraRetakeImageView" />-->
 
     </androidx.constraintlayout.widget.ConstraintLayout>
     <!--    <Button-->

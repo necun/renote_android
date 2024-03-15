@@ -9,7 +9,7 @@
 
 
     <string name="default_web_client_id">177174074358-vqvh06ldupef3jfmniq6gariprq148gs.apps.googleusercontent.com</string>
-    <string name="app_name">cameraxapp</string>
+    <string name="app_name">ReNoteAI</string>
     <string name="company_name">ReNoteAI</string>
     <string name="signuptxt">Sign-up</string>
     <string name="outlook_login">Sign in with Microsoft Account</string>
@@ -58,4 +58,14 @@
 
     <string name="manual">Manual</string>
     <string name="importtxt">Import</string>
+    <string name="auto">Auto</string>
+    <string name="crop">Crop</string>'
+    <string name="filter">Filter</string>
+    <string name="rotate">Rotate</string>
+    <string name="delete">Delete</string>
+    <string name="back">Back</string>
+    <string name="retake">Retake</string>
+    <string name="scan_more">Scan More</string>
+    <string name="share">Share</string>
+    <string name="save">Save</string>
 </resources>

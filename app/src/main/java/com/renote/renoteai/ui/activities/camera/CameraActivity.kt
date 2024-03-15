@@ -51,17 +51,20 @@ import androidx.appcompat.app.AlertDialog
 import androidx.compose.ui.graphics.Canvas
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.tabs.TabLayout
 import com.renote.renoteai.ui.activities.camera.libs.CVLib
 import com.renote.renoteai.ui.activities.camera.scanutil.DocumentBorders
-import com.renote.renoteai.databinding.ActivityCameraBinding
+import org.koin.android.ext.android.inject
 import com.renote.renoteai.ui.activities.camera.extension.toggleButton
 import com.renote.renoteai.ui.main.MainActivity
 import com.renote.renoteai.R
+import com.renote.renoteai.databinding.CameraDataBinding
 import com.renote.renoteai.ui.activities.camera.extension.circularClose
 import com.renote.renoteai.ui.activities.camera.extension.circularReveal
 import com.renote.renoteai.ui.activities.camera.scanutil.ScanType
+import com.renote.renoteai.ui.activities.camera.viewmodel.CameraViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.properties.Delegates
@@ -73,7 +76,10 @@ const val EXTRA_PICTURE_URI = "com.example.cameraxapp.PICTURE_URI"
 const val EXTRA_PICTURE_TYPE = "com.example.cameraxapp.PICTURE_TYPE"
 
 class CameraActivity : AppCompatActivity() {
-    private lateinit var viewBinding: ActivityCameraBinding
+
+    val viewModel: CameraViewModel by inject()
+    private lateinit var viewBinding: CameraDataBinding
+
     private var imageCapture: ImageCapture? = null
 
     private val CAMERA_PERMISSION_REQUEST_CODE = 100
@@ -114,11 +120,14 @@ class CameraActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewBinding = ActivityCameraBinding.inflate(layoutInflater)
-        setContentView(viewBinding.root)
+        viewBinding = DataBindingUtil.setContentView(
+            this@CameraActivity, R.layout.activity_camera
+        )
+        viewBinding.lifecycleOwner = this
+        viewBinding.viewmodel = viewModel
+
         window.setFlags(
-            WindowManager.LayoutParams.FLAG_SECURE,
-            WindowManager.LayoutParams.FLAG_SECURE
+            WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE
         )
 
         // val userEmailId = intent.getStringExtra("userEmailId")
@@ -132,6 +141,7 @@ class CameraActivity : AppCompatActivity() {
             )
         }
 
+        observeData()
 
         viewBinding.scanTypeLay.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
@@ -158,32 +168,47 @@ class CameraActivity : AppCompatActivity() {
             override fun onTabReselected(tab: TabLayout.Tab?) {}
         })
 
-        // Set up the listeners for take photo and video capture buttons
-        viewBinding.imageCaptureButton.setOnClickListener {
-            takePhoto()
-        }
-
-        viewBinding.scanBackBtn.setOnClickListener { onBackPressed() }
-        viewBinding.gridBtn.setOnClickListener { toggleGrid() }
-        viewBinding.flashBtn.setOnClickListener { selectFlash() }
-        viewBinding.btnFlashOff.setOnClickListener { closeFlashAndSelect(ImageCapture.FLASH_MODE_OFF) }
-        viewBinding.btnFlashOn.setOnClickListener { closeFlashAndSelect(ImageCapture.FLASH_MODE_ON) }
-        viewBinding.btnFlashAuto.setOnClickListener { closeFlashAndSelect(ImageCapture.FLASH_MODE_AUTO) }
-
         cameraExecutor = Executors.newSingleThreadExecutor()
-//
-//         val positiveButtonClick = { dialog: DialogInterface, which: Int ->
-//            deleteAndChangeScan()
-//            //  dialog.dismiss()
-//        }
-//
-//         val cancelButtonClick = { dialog: DialogInterface, which: Int ->
-//            selectPreviousTab(activeScanType)
-//            //dialog.dismiss()
-//        }
+
     }
 
+    private fun observeData() {
+        viewModel.resourseClick.observe(this) { integer ->
+            when (integer) {
+                R.id.image_capture_button -> {
+                    takePhoto()
+                    hasGrid = false
+                }
 
+                R.id.scanBackBtn -> {
+                    onBackPressed()
+                }
+
+                R.id.gridBtn -> {
+                    toggleGrid()
+                }
+
+                R.id.flashBtn -> {
+                    selectFlash()
+                }
+
+                R.id.btnFlashOff -> {
+                    closeFlashAndSelect(ImageCapture.FLASH_MODE_OFF)
+                }
+
+                R.id.btnFlashOn -> {
+                    closeFlashAndSelect(ImageCapture.FLASH_MODE_ON)
+                }
+
+                R.id.btnFlashAuto -> {
+                    closeFlashAndSelect(ImageCapture.FLASH_MODE_AUTO)
+                }
+
+            }
+        }
+    }
+
+    //function to toggle grid view
     private fun toggleGrid() {
         viewBinding.gridBtn.toggleButton(
             flag = hasGrid,
@@ -197,6 +222,7 @@ class CameraActivity : AppCompatActivity() {
         }
     }
 
+    //function that will opens menu to select flashLight options to the user
     private fun selectFlash() = viewBinding.llFlashOptions.circularReveal(viewBinding.flashBtn)
 
     private fun closeFlashAndSelect(@ImageCapture.FlashMode flash: Int) =
@@ -213,62 +239,12 @@ class CameraActivity : AppCompatActivity() {
             // prefs.putInt(KEY_FLASH, flashMode)
         }
 
-//    fun basicAlert() {
-//        val builder = AlertDialog.Builder(this)
-//        with(builder)
-//        {
-//            setTitle("Confirmation?")
-//            setMessage("Are you sure want to discard this scan")
-//            setPositiveButton(
-//                "Delete",
-//                DialogInterface.OnClickListener(function = positiveButtonClick)
-//            )
-//            setNeutralButton(
-//                "Cancel",
-//                DialogInterface.OnClickListener(function = cancelButtonClick)
-//            )
-//            show()
-//        }
-//    }
-
-//    fun deleteAndChangeScan() {
-//        lifecycleScope.launch {
-//            viewModel.deleteAllScans()
-//            delay(200)
-//            changeScanType(binding.scanTypeLay.selectedTabPosition)
-//        }
-//
-//    }
-
-//    fun changeScanType(position: Int?) {
-//        when (position) {
-//            ScanType.BOOK_TYPE -> viewBinding.dashedLine.visibility = View.VISIBLE
-//            ScanType.QR_CODE -> {
-//                imageAnalyzer?.clearAnalyzer()
-//                viewBinding.overlay.visibility = View.VISIBLE
-//                viewBinding.overlay.post {
-//                    viewBinding.overlay.setViewFinder()
-//                }
-//                startCamera()
-//            }
-//
-//            ScanType.CALENDAR -> {
-//
-//                val intent = Intent(this, TextScanner::class.java)
-//                startActivity(intent)
-//                requireActivity().finish()
-//            }
-//        }
-//        activeScanType = position!!
-//    }
-
     private fun takePhoto() {
         // Get a stable reference of the modifiable image capture use case
         val imageCapture = imageCapture ?: return
 
         // Create time stamped name and MediaStore entry.
-        val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
-            .format(System.currentTimeMillis())
+        val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US).format(System.currentTimeMillis())
         val contentValues = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, name)
             put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
@@ -278,34 +254,27 @@ class CameraActivity : AppCompatActivity() {
         }
 
         // Create output options object which contains file + metadata
-        val outputOptions = ImageCapture.OutputFileOptions
-            .Builder(
-                contentResolver,
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                contentValues
-            )
-            .build()
+        val outputOptions = ImageCapture.OutputFileOptions.Builder(
+            contentResolver, MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues
+        ).build()
 
         // Set up image capture listener, which is triggered after photo has
         // been taken
-        imageCapture.takePicture(
-            outputOptions,
+        imageCapture.takePicture(outputOptions,
             ContextCompat.getMainExecutor(this),
             object : ImageCapture.OnImageSavedCallback {
                 override fun onError(exc: ImageCaptureException) {
                     Log.e(TAG, "Photo capture failed: ${exc.message}", exc)
                 }
 
-                override fun
-                        onImageSaved(output: ImageCapture.OutputFileResults) {
+                override fun onImageSaved(output: ImageCapture.OutputFileResults) {
                     val msg = "Photo capture succeeded: ${output.savedUri}"
                     // Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
                     // Log.d(TAG, msg)
                     val uri = output.savedUri ?: return
                     startViewer(uri)
                 }
-            }
-        )
+            })
     }
 
     private fun startViewer(uri: Uri) {
@@ -339,38 +308,32 @@ class CameraActivity : AppCompatActivity() {
             val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
 
             // Preview
-            val preview = Preview.Builder()
-                .build()
-                .also {
-                    it.setSurfaceProvider(viewBinding.viewFinder.surfaceProvider)
-                }
+            val preview = Preview.Builder().build().also {
+                it.setSurfaceProvider(viewBinding.viewFinder.surfaceProvider)
+            }
 
-            imageCapture = ImageCapture.Builder()
-                .setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY)
-                .build()
+            imageCapture =
+                ImageCapture.Builder().setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY)
+                    .build()
 
             // Analyzer
-            val analyzer = ImageAnalysis.Builder()
-                .build()
-                .also {
-                    it.setAnalyzer(cameraExecutor, CVAnalyzer {
-                        runOnUiThread(Runnable {
-                            if (documentBorders != null) {
-                                viewBinding.rectOverlay.setDocumentBorders(
-                                    documentBorders,
-                                    documentImageWidth,
-                                    documentImageHeight
-                                )
-                            } else {
-                                viewBinding.rectOverlay.clear();
-                            }
+            val analyzer = ImageAnalysis.Builder().build().also {
+                it.setAnalyzer(cameraExecutor, CVAnalyzer {
+                    runOnUiThread(Runnable {
+                        if (documentBorders != null) {
+                            viewBinding.rectOverlay.setDocumentBorders(
+                                documentBorders, documentImageWidth, documentImageHeight
+                            )
+                        } else {
+                            viewBinding.rectOverlay.clear();
+                        }
 
-                            if (bitmap != null) {
-                                viewBinding.rectOverlay.setBitmap(bitmap)
-                            }
-                        })
+                        if (bitmap != null) {
+                            viewBinding.rectOverlay.setBitmap(bitmap)
+                        }
                     })
-                }
+                })
+            }
 
             // Select back camera as a default
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
@@ -397,8 +360,7 @@ class CameraActivity : AppCompatActivity() {
     }
 
     override fun onRequestPermissionsResult(
-        requestCode: Int, permissions: Array<String>, grantResults:
-        IntArray
+        requestCode: Int, permissions: Array<String>, grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
@@ -485,9 +447,7 @@ class CameraActivity : AppCompatActivity() {
         private fun Image.yuvToRgba(): Mat {
             val rgbaMat = Mat()
 
-            if (format == ImageFormat.YUV_420_888
-                && planes.size == 3
-            ) {
+            if (format == ImageFormat.YUV_420_888 && planes.size == 3) {
 
                 val chromaPixelStride = planes[1].pixelStride
 
@@ -632,9 +592,7 @@ class CameraActivity : AppCompatActivity() {
 
                         90 -> {
                             documentBorders?.rotate(
-                                DocumentBorders.Rotation.ROTATE_90,
-                                mat.cols(),
-                                mat.rows()
+                                DocumentBorders.Rotation.ROTATE_90, mat.cols(), mat.rows()
                             )
 
                             documentImageWidth = mat.rows()
@@ -648,9 +606,7 @@ class CameraActivity : AppCompatActivity() {
 
                         270 -> {
                             documentBorders?.rotate(
-                                DocumentBorders.Rotation.ROTATE_180,
-                                mat.cols(),
-                                mat.rows()
+                                DocumentBorders.Rotation.ROTATE_180, mat.cols(), mat.rows()
                             )
 
                             documentImageWidth = mat.rows()
@@ -676,28 +632,25 @@ class CameraActivity : AppCompatActivity() {
         private const val TAG = "CameraXApp"
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
         private const val REQUEST_CODE_PERMISSIONS = 10
-        private val REQUIRED_PERMISSIONS =
-            mutableListOf(
-                Manifest.permission.CAMERA,
-            ).apply {
-                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
-                    add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                }
-            }.toTypedArray()
+        private val REQUIRED_PERMISSIONS = mutableListOf(
+            Manifest.permission.CAMERA,
+        ).apply {
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
+                add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            }
+        }.toTypedArray()
     }
 
     fun generateBase64EncodedSHA1(input: String): String {
         try {
             val info = packageManager.getPackageInfo(
-                packageName,
-                PackageManager.GET_SIGNATURES
+                packageName, PackageManager.GET_SIGNATURES
             )
             for (signature in info.signatures) {
                 val md = MessageDigest.getInstance("SHA")
                 md.update(signature.toByteArray())
                 val hash = Base64.encodeToString(
-                    md.digest(),
-                    Base64.DEFAULT
+                    md.digest(), Base64.DEFAULT
                 )
                 Log.d("KeyHash", "KeyHash:$hash")
             }

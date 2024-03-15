@@ -1,465 +1,484 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white"
-    tools:context=".ui.activities.camera.CameraActivity">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <androidx.camera.view.PreviewView
-        android:id="@+id/viewFinder"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:scaleType="fitCenter" />
+    <data class="CameraDataBinding">
 
-    <com.renote.renoteai.ui.activities.camera.extension.ViewFinderOverlay
-        android:id="@+id/overlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layerType="software"
-        android:visibility="gone" />
+        <variable
+            name="viewmodel"
+            type="com.renote.renoteai.ui.activities.camera.viewmodel.CameraViewModel" />
 
-    <com.renote.renoteai.ui.activities.camera.scanutil.RectOverlay
-        android:id="@+id/rectOverlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@android:color/transparent" />
-
-    <View
-        android:id="@+id/dashedLine"
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:layout_marginBottom="10dp"
-        android:background="@drawable/dashed_line"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <View
-        android:id="@+id/gridVertical1"
-        android:layout_width="1dp"
-        android:layout_height="0dp"
-        android:alpha="0.5"
-        android:background="@android:color/white"
-        android:elevation="2dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.33"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <View
-        android:id="@+id/gridVertical2"
-        android:layout_width="1dp"
-        android:layout_height="0dp"
-        android:alpha="0.5"
-        android:background="@android:color/white"
-        android:elevation="2dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.66"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <View
-        android:id="@+id/gridHorizontal1"
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:alpha="0.5"
-        android:background="@android:color/white"
-        android:elevation="2dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.33" />
-
-    <View
-        android:id="@+id/gridHorizontal2"
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:alpha="0.5"
-        android:background="@android:color/white"
-        android:elevation="2dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.66" />
-
-    <androidx.constraintlayout.widget.Group
-        android:id="@+id/groupGridLines"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:constraint_referenced_ids="gridVertical1,gridVertical2,gridHorizontal1,gridHorizontal2" />
+    </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorTransperatDark"
-        app:layout_constraintBottom_toBottomOf="parent">
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        tools:context=".ui.activities.camera.CameraActivity">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/scanBtnLay"
+        <androidx.camera.view.PreviewView
+            android:id="@+id/viewFinder"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="@dimen/dp20"
-            app:layout_constraintBottom_toBottomOf="parent">
+            android:layout_height="match_parent"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:scaleType="fitCenter" />
 
-            <FrameLayout
-                android:id="@+id/previewLay"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/scanModeLay"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/previewImage"
-                    android:layout_width="40dp"
-                    android:layout_height="@dimen/height_50dp"
-                    android:layout_marginTop="@dimen/margin_5dp"
-                    android:layout_marginEnd="@dimen/margin_5dp"
-                    android:adjustViewBounds="true"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/ic_no_picture" />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/previewCount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:background="@drawable/circle_bg"
-                    android:backgroundTint="@color/green"
-                    android:gravity="center"
-                    android:minWidth="@dimen/height_25dp"
-                    android:minHeight="@dimen/height_25dp"
-                    android:padding="@dimen/dp4"
-                    android:text="0"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/text_size_11sp" />
-
-            </FrameLayout>
-
-            <LinearLayout
-                android:id="@+id/scanModeLay"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/image_capture_button"
-                app:layout_constraintStart_toEndOf="@id/previewLay"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/autoManualBtn"
-                    android:layout_width="@dimen/scan_icon_size"
-                    android:layout_height="@dimen/scan_icon_size"
-                    android:src="@drawable/ic_manual" />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/manual"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/text_size_12sp" />
-
-            </LinearLayout>
-
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/image_capture_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:backgroundTint="@android:color/white"
-                android:contentDescription="@string/take_scan"
-                android:elevation="2dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/galleryLay"
-                app:layout_constraintStart_toEndOf="@id/scanModeLay"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <LinearLayout
-                android:id="@+id/galleryLay"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/conformScanBtn"
-                app:layout_constraintStart_toEndOf="@id/image_capture_button"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:layout_width="@dimen/scan_icon_size"
-                    android:layout_height="@dimen/scan_icon_size"
-                    android:src="@drawable/ic_import"
-                    android:tint="@color/white" />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/importtxt"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/text_size_12sp" />
-            </LinearLayout>
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/conformScanBtn"
-                android:layout_width="@dimen/scan_icon_size"
-                android:layout_height="@dimen/scan_icon_size"
-                android:src="@drawable/conform_tick"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/galleryLay"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <!--    <androidx.constraintlayout.widget.ConstraintLayout-->
-            <!--        android:id="@+id/scanModeLay"-->
-            <!--        android:layout_width="match_parent"-->
-            <!--        android:layout_height="wrap_content"-->
-            <!--        android:layout_marginBottom="20dp"-->
-            <!--        app:layout_constraintBottom_toBottomOf="parent"-->
-            <!--        app:layout_constraintEnd_toEndOf="parent"-->
-            <!--        app:layout_constraintStart_toStartOf="parent">-->
-
-            <!--        <com.google.android.material.floatingactionbutton.FloatingActionButton-->
-            <!--            android:id="@+id/image_capture_button"-->
-            <!--            android:layout_width="wrap_content"-->
-            <!--            android:layout_height="wrap_content"-->
-            <!--            android:layout_marginStart="10dp"-->
-            <!--            android:layout_marginEnd="10dp"-->
-            <!--            android:backgroundTint="@android:color/white"-->
-            <!--            android:contentDescription="@string/take_scan"-->
-            <!--            android:elevation="2dp"-->
-            <!--            app:fabSize="normal"-->
-            <!--            app:layout_constraintBottom_toBottomOf="parent"-->
-            <!--            app:layout_constraintEnd_toEndOf="parent"-->
-            <!--            app:layout_constraintStart_toStartOf="parent" />-->
-
-            <!--        <androidx.appcompat.widget.AppCompatImageView-->
-            <!--            android:id="@+id/autoManualBtn"-->
-            <!--            android:layout_width="0dp"-->
-            <!--            android:layout_height="wrap_content"-->
-            <!--            android:src="@drawable/ic_manual"-->
-            <!--            app:layout_constraintBottom_toBottomOf="parent"-->
-            <!--            app:layout_constraintEnd_toStartOf="@id/image_capture_button"-->
-            <!--            app:layout_constraintRight_toLeftOf="@id/image_capture_button"-->
-            <!--            app:layout_constraintTop_toTopOf="parent"-->
-            <!--            app:layout_constraintWidth_percent="0.2" />-->
-
-            <!--        <androidx.appcompat.widget.AppCompatImageView-->
-            <!--            android:id="@+id/importBtn"-->
-            <!--            android:layout_width="0dp"-->
-            <!--            android:layout_height="wrap_content"-->
-            <!--            android:src="@drawable/ic_import"-->
-            <!--            app:layout_constraintBottom_toBottomOf="parent"-->
-            <!--            app:layout_constraintStart_toEndOf="@id/image_capture_button"-->
-            <!--            app:layout_constraintTop_toTopOf="parent"-->
-            <!--            app:layout_constraintWidth_percent="0.2" />-->
-
-            <!--    </androidx.constraintlayout.widget.ConstraintLayout>-->
-
-            <!--        <androidx.appcompat.widget.AppCompatImageView-->
-            <!--            android:id="@+id/conformScanBtn"-->
-            <!--            android:layout_width="@dimen/scan_icon_size"-->
-            <!--            android:layout_height="@dimen/scan_icon_size"-->
-            <!--            android:src="@drawable/conform_tick"-->
-            <!--            app:layout_constraintBottom_toBottomOf="parent"-->
-            <!--            app:layout_constraintEnd_toEndOf="parent"-->
-            <!--            app:layout_constraintStart_toEndOf="@id/galleryLay"-->
-            <!--            app:layout_constraintTop_toTopOf="parent" />-->
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/scanTypeLay"
-            style="@style/RoundedTabLayoutStyle"
+        <com.renote.renoteai.ui.activities.camera.extension.ViewFinderOverlay
+            android:id="@+id/overlay"
             android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:layout_marginBottom="@dimen/margin_35dp"
-            android:background="@color/transparent"
-            app:layout_constraintBottom_toTopOf="@id/scanBtnLay"
-            app:tabGravity="fill"
-            app:tabIndicatorColor="@android:color/transparent"
-            app:tabRippleColor="@android:color/transparent"
-            app:tabTextColor="@color/white">
+            android:layout_height="match_parent"
+            android:layerType="software"
+            android:visibility="gone" />
 
-            <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Ocr" />
-
-            <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Document" />
-
-            <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Book" />
-
-            <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="QR code" />
-        </com.google.android.material.tabs.TabLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <com.renote.renoteai.ui.activities.camera.scanutil.RectOverlay
+            android:id="@+id/rectOverlay"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/margin_20dp"
-            android:paddingTop="@dimen/padding_15dp"
-            app:layout_constraintBottom_toTopOf="@id/scanTypeLay">
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent" />
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/scanBackBtn"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/height_25dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintWidth_percent="0.33"
-                app:srcCompat="@drawable/scan_back" />
-
-            <!--        <androidx.appcompat.widget.AppCompatImageView-->
-            <!--            android:id="@+id/switchCamBtn"-->
-            <!--            android:layout_width="0dp"-->
-            <!--            android:layout_height="@dimen/height_25dp"-->
-            <!--            app:layout_constraintStart_toEndOf="@id/scanBackBtn"-->
-            <!--            app:layout_constraintTop_toTopOf="parent"-->
-            <!--            app:layout_constraintWidth_percent="0.2"-->
-            <!--            app:srcCompat="@drawable/switch_cam" />-->
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/gridBtn"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/height_25dp"
-                app:layout_constraintStart_toEndOf="@id/scanBackBtn"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintWidth_percent="0.33"
-                app:srcCompat="@drawable/ic_grid_off" />
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/flashBtn"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/height_25dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/gridBtn"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintWidth_percent="0.33"
-                app:srcCompat="@drawable/flash_off" />
-
-            <!--        <androidx.appcompat.widget.AppCompatTextView-->
-            <!--            android:layout_width="wrap_content"-->
-            <!--            android:layout_height="wrap_content"-->
-            <!--            android:gravity="center"-->
-            <!--            android:textSize="@dimen/text_size_18sp"-->
-            <!--            android:textAllCaps="true"-->
-            <!--            android:text="HDR"-->
-            <!--            android:paddingStart="@dimen/padding_10dp"-->
-            <!--            android:paddingEnd="@dimen/padding_10dp"-->
-            <!--            android:textColor="@color/green"-->
-            <!--            android:layout_marginStart="@dimen/margin_10dp"-->
-            <!--            android:background="@drawable/hdr_background"-->
-            <!--            app:layout_constraintStart_toEndOf="@id/flashBtn"-->
-            <!--            app:layout_constraintTop_toTopOf="parent"-->
-            <!--            app:layout_constraintWidth_percent="0.2" />-->
-
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <RadioGroup
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
+        <View
+            android:id="@+id/dashedLine"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/dashed_line"
             android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@+id/scanBtnLay"
-            app:layout_constraintEnd_toEndOf="parent">
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <RadioButton
-                android:id="@+id/radioDocument"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="Document"
-                android:textColor="#FFFFFF" />
+        <View
+            android:id="@+id/gridVertical1"
+            android:layout_width="1dp"
+            android:layout_height="0dp"
+            android:alpha="0.5"
+            android:background="@android:color/white"
+            android:elevation="2dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.33"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <RadioButton
-                android:id="@+id/radioIDCard"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="ID card"
-                android:textColor="#FFFFFF" />
+        <View
+            android:id="@+id/gridVertical2"
+            android:layout_width="1dp"
+            android:layout_height="0dp"
+            android:alpha="0.5"
+            android:background="@android:color/white"
+            android:elevation="2dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.66"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <RadioButton
-                android:id="@+id/radioBook"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Book"
-                android:textColor="#FFFFFF" />
-        </RadioGroup>
+        <View
+            android:id="@+id/gridHorizontal1"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:alpha="0.5"
+            android:background="@android:color/white"
+            android:elevation="2dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.33" />
 
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/vertical_centerline"
+        <View
+            android:id="@+id/gridHorizontal2"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:alpha="0.5"
+            android:background="@android:color/white"
+            android:elevation="2dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.66" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/groupGridLines"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_percent=".50" />
-
-        <LinearLayout
-            android:id="@+id/llFlashOptions"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/height_50dp"
-            android:layout_marginBottom="@dimen/margin_8dp"
-            android:background="@color/colorLightTransperatBg"
-            android:clickable="true"
-            android:elevation="3dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
             android:visibility="gone"
-            app:layout_constraintBottom_toTopOf="@id/scanTypeLay"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
+            app:constraint_referenced_ids="gridVertical1,gridVertical2,gridHorizontal1,gridHorizontal2" />
 
-            <ImageButton
-                android:id="@+id/btnFlashOff"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/button_size_small"
-                android:layout_weight="1"
-                android:background="@android:color/transparent"
-                android:src="@drawable/ic_flash_off"
-                tools:ignore="ContentDescription" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorTransperatDark"
+            app:layout_constraintBottom_toBottomOf="parent">
 
-            <ImageButton
-                android:id="@+id/btnFlashAuto"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/button_size_small"
-                android:layout_weight="1"
-                android:background="@android:color/transparent"
-                android:src="@drawable/ic_flash_auto"
-                tools:ignore="ContentDescription" />
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/scanBtnLay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="@dimen/dp20"
+                app:layout_constraintBottom_toBottomOf="parent">
 
-            <ImageButton
-                android:id="@+id/btnFlashOn"
+                <FrameLayout
+                    android:id="@+id/previewLay"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/scanModeLay"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/previewImage"
+                        android:layout_width="40dp"
+                        android:layout_height="@dimen/height_50dp"
+                        android:layout_marginTop="@dimen/margin_5dp"
+                        android:layout_marginEnd="@dimen/margin_5dp"
+                        android:adjustViewBounds="true"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/ic_no_picture" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/previewCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:background="@drawable/circle_bg"
+                        android:backgroundTint="@color/green"
+                        android:gravity="center"
+                        android:minWidth="@dimen/height_25dp"
+                        android:minHeight="@dimen/height_25dp"
+                        android:padding="@dimen/dp4"
+                        android:text="0"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_11sp" />
+
+                </FrameLayout>
+
+                <LinearLayout
+                    android:id="@+id/scanModeLay"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/image_capture_button"
+                    app:layout_constraintStart_toEndOf="@id/previewLay"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/autoManualBtn"
+                        android:layout_width="@dimen/scan_icon_size"
+                        android:layout_height="@dimen/scan_icon_size"
+                        android:src="@drawable/ic_manual" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/manual"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_12sp" />
+
+                </LinearLayout>
+
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/image_capture_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@android:color/white"
+                    android:contentDescription="@string/take_scan"
+                    android:elevation="2dp"
+                    android:onClick="@{(view) -> viewmodel.onresorceClick(view.getId())}"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/galleryLay"
+                    app:layout_constraintStart_toEndOf="@id/scanModeLay"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <LinearLayout
+                    android:id="@+id/galleryLay"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/conformScanBtn"
+                    app:layout_constraintStart_toEndOf="@id/image_capture_button"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="@dimen/scan_icon_size"
+                        android:layout_height="@dimen/scan_icon_size"
+                        android:src="@drawable/ic_import"
+                        android:tint="@color/white" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/importtxt"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_12sp" />
+                </LinearLayout>
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/conformScanBtn"
+                    android:layout_width="@dimen/scan_icon_size"
+                    android:layout_height="@dimen/scan_icon_size"
+                    android:src="@drawable/conform_tick"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/galleryLay"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <!--    <androidx.constraintlayout.widget.ConstraintLayout-->
+                <!--        android:id="@+id/scanModeLay"-->
+                <!--        android:layout_width="match_parent"-->
+                <!--        android:layout_height="wrap_content"-->
+                <!--        android:layout_marginBottom="20dp"-->
+                <!--        app:layout_constraintBottom_toBottomOf="parent"-->
+                <!--        app:layout_constraintEnd_toEndOf="parent"-->
+                <!--        app:layout_constraintStart_toStartOf="parent">-->
+
+                <!--        <com.google.android.material.floatingactionbutton.FloatingActionButton-->
+                <!--            android:id="@+id/image_capture_button"-->
+                <!--            android:layout_width="wrap_content"-->
+                <!--            android:layout_height="wrap_content"-->
+                <!--            android:layout_marginStart="10dp"-->
+                <!--            android:layout_marginEnd="10dp"-->
+                <!--            android:backgroundTint="@android:color/white"-->
+                <!--            android:contentDescription="@string/take_scan"-->
+                <!--            android:elevation="2dp"-->
+                <!--            app:fabSize="normal"-->
+                <!--            app:layout_constraintBottom_toBottomOf="parent"-->
+                <!--            app:layout_constraintEnd_toEndOf="parent"-->
+                <!--            app:layout_constraintStart_toStartOf="parent" />-->
+
+                <!--        <androidx.appcompat.widget.AppCompatImageView-->
+                <!--            android:id="@+id/autoManualBtn"-->
+                <!--            android:layout_width="0dp"-->
+                <!--            android:layout_height="wrap_content"-->
+                <!--            android:src="@drawable/ic_manual"-->
+                <!--            app:layout_constraintBottom_toBottomOf="parent"-->
+                <!--            app:layout_constraintEnd_toStartOf="@id/image_capture_button"-->
+                <!--            app:layout_constraintRight_toLeftOf="@id/image_capture_button"-->
+                <!--            app:layout_constraintTop_toTopOf="parent"-->
+                <!--            app:layout_constraintWidth_percent="0.2" />-->
+
+                <!--        <androidx.appcompat.widget.AppCompatImageView-->
+                <!--            android:id="@+id/importBtn"-->
+                <!--            android:layout_width="0dp"-->
+                <!--            android:layout_height="wrap_content"-->
+                <!--            android:src="@drawable/ic_import"-->
+                <!--            app:layout_constraintBottom_toBottomOf="parent"-->
+                <!--            app:layout_constraintStart_toEndOf="@id/image_capture_button"-->
+                <!--            app:layout_constraintTop_toTopOf="parent"-->
+                <!--            app:layout_constraintWidth_percent="0.2" />-->
+
+                <!--    </androidx.constraintlayout.widget.ConstraintLayout>-->
+
+                <!--        <androidx.appcompat.widget.AppCompatImageView-->
+                <!--            android:id="@+id/conformScanBtn"-->
+                <!--            android:layout_width="@dimen/scan_icon_size"-->
+                <!--            android:layout_height="@dimen/scan_icon_size"-->
+                <!--            android:src="@drawable/conform_tick"-->
+                <!--            app:layout_constraintBottom_toBottomOf="parent"-->
+                <!--            app:layout_constraintEnd_toEndOf="parent"-->
+                <!--            app:layout_constraintStart_toEndOf="@id/galleryLay"-->
+                <!--            app:layout_constraintTop_toTopOf="parent" />-->
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/scanTypeLay"
+                style="@style/RoundedTabLayoutStyle"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:layout_marginBottom="@dimen/margin_35dp"
+                android:background="@color/transparent"
+                app:layout_constraintBottom_toTopOf="@id/scanBtnLay"
+                app:tabGravity="fill"
+                app:tabIndicatorColor="@android:color/transparent"
+                app:tabRippleColor="@android:color/transparent"
+                app:tabTextColor="@color/white">
+
+                <com.google.android.material.tabs.TabItem
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ocr" />
+
+                <com.google.android.material.tabs.TabItem
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Document" />
+
+                <com.google.android.material.tabs.TabItem
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Book" />
+
+                <com.google.android.material.tabs.TabItem
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="QR code" />
+            </com.google.android.material.tabs.TabLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/margin_20dp"
+                android:paddingTop="@dimen/padding_15dp"
+                app:layout_constraintBottom_toTopOf="@id/scanTypeLay">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/scanBackBtn"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/height_25dp"
+                    android:onClick="@{(view) -> viewmodel.onresorceClick(view.getId())}"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintWidth_percent="0.33"
+                    app:srcCompat="@drawable/scan_back" />
+
+                <!--        <androidx.appcompat.widget.AppCompatImageView-->
+                <!--            android:id="@+id/switchCamBtn"-->
+                <!--            android:layout_width="0dp"-->
+                <!--            android:layout_height="@dimen/height_25dp"-->
+                <!--            app:layout_constraintStart_toEndOf="@id/scanBackBtn"-->
+                <!--            app:layout_constraintTop_toTopOf="parent"-->
+                <!--            app:layout_constraintWidth_percent="0.2"-->
+                <!--            app:srcCompat="@drawable/switch_cam" />-->
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/gridBtn"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/height_25dp"
+                    android:onClick="@{(view) -> viewmodel.onresorceClick(view.getId())}"
+                    app:layout_constraintStart_toEndOf="@id/scanBackBtn"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintWidth_percent="0.33"
+                    app:srcCompat="@drawable/ic_grid_off" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/flashBtn"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/height_25dp"
+                    android:onClick="@{(view) -> viewmodel.onresorceClick(view.getId())}"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/gridBtn"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintWidth_percent="0.33"
+                    app:srcCompat="@drawable/flash_off" />
+
+                <!--        <androidx.appcompat.widget.AppCompatTextView-->
+                <!--            android:layout_width="wrap_content"-->
+                <!--            android:layout_height="wrap_content"-->
+                <!--            android:gravity="center"-->
+                <!--            android:textSize="@dimen/text_size_18sp"-->
+                <!--            android:textAllCaps="true"-->
+                <!--            android:text="HDR"-->
+                <!--            android:paddingStart="@dimen/padding_10dp"-->
+                <!--            android:paddingEnd="@dimen/padding_10dp"-->
+                <!--            android:textColor="@color/green"-->
+                <!--            android:layout_marginStart="@dimen/margin_10dp"-->
+                <!--            android:background="@drawable/hdr_background"-->
+                <!--            app:layout_constraintStart_toEndOf="@id/flashBtn"-->
+                <!--            app:layout_constraintTop_toTopOf="parent"-->
+                <!--            app:layout_constraintWidth_percent="0.2" />-->
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <RadioGroup
                 android:layout_width="0dp"
-                android:layout_height="@dimen/button_size_small"
-                android:layout_weight="1"
-                android:background="@android:color/transparent"
-                android:src="@drawable/ic_flash_on"
-                tools:ignore="ContentDescription" />
-        </LinearLayout>
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@+id/scanBtnLay"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <RadioButton
+                    android:id="@+id/radioDocument"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="Document"
+                    android:textColor="#FFFFFF" />
+
+                <RadioButton
+                    android:id="@+id/radioIDCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="ID card"
+                    android:textColor="#FFFFFF" />
+
+                <RadioButton
+                    android:id="@+id/radioBook"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Book"
+                    android:textColor="#FFFFFF" />
+            </RadioGroup>
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/vertical_centerline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent=".50" />
+
+            <LinearLayout
+                android:id="@+id/llFlashOptions"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/height_50dp"
+                android:layout_marginBottom="@dimen/margin_8dp"
+                android:background="@color/colorLightTransperatBg"
+                android:clickable="true"
+                android:elevation="3dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                app:layout_constraintBottom_toTopOf="@id/scanTypeLay"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <ImageButton
+                    android:id="@+id/btnFlashOff"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/button_size_small"
+                    android:layout_weight="1"
+                    android:background="@android:color/transparent"
+                    android:onClick="@{(view) -> viewmodel.onresorceClick(view.getId())}"
+                    android:src="@drawable/ic_flash_off"
+                    tools:ignore="ContentDescription" />
+
+                <ImageButton
+                    android:id="@+id/btnFlashAuto"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/button_size_small"
+                    android:layout_weight="1"
+                    android:background="@android:color/transparent"
+                    android:onClick="@{(view) -> viewmodel.onresorceClick(view.getId())}"
+                    android:src="@drawable/ic_flash_auto"
+                    tools:ignore="ContentDescription" />
+
+                <ImageButton
+                    android:id="@+id/btnFlashOn"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/button_size_small"
+                    android:layout_weight="1"
+                    android:background="@android:color/transparent"
+                    android:onClick="@{(view) -> viewmodel.onresorceClick(view.getId())}"
+                    android:src="@drawable/ic_flash_on"
+                    tools:ignore="ContentDescription" />
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
