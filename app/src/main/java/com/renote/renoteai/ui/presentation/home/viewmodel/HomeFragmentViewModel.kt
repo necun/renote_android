@@ -15,7 +15,6 @@ import com.renote.renoteai.database.tables.TagEntity
 import com.renote.renoteai.repository.TagsRepository
 import com.renote.renoteai.ui.presentation.home.adapters.DocumentsDetailsAdapter
 import com.renote.renoteai.ui.presentation.home.adapters.FoldersAdapter
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class HomeFragmentViewModel(private val documentsRepository: DocumentsRepository,private  val foldersRepository: FoldersRepository,private val tagsRepository:TagsRepository): ViewModel() {
@@ -91,10 +90,10 @@ class HomeFragmentViewModel(private val documentsRepository: DocumentsRepository
 
 
 
-
-    fun saveFolderFilesDetails(folder: List<FolderEntity>) = viewModelScope.launch {
-        foldersRepository.saveFolderFiles(folder)
-    }
+//
+//    fun saveFolderFilesDetails(folder: List<FolderEntity>) = viewModelScope.launch {
+//        foldersRepository.saveFolderFiles(folder)
+//    }
 
 
 
