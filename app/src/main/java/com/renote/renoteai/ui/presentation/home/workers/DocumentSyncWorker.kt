@@ -10,15 +10,20 @@ import androidx.work.WorkerParameters
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.api.client.extensions.android.http.AndroidHttp
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
+import com.google.api.client.http.ByteArrayContent
 import com.google.api.client.http.InputStreamContent
 import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.services.drive.DriveScopes
 import com.google.api.services.drive.Drive
+import com.google.gson.Gson
 import com.renote.renoteai.R
 import com.renote.renoteai.database.dao.DocumentDao
 import com.renote.renoteai.database.tables.DocumentEntity
 import com.renote.renoteai.di.provideDocumentDatabase
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.forEach
+import org.json.JSONArray
+import org.json.JSONObject
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.FileInputStream
@@ -39,7 +44,7 @@ class DocumentSyncWorker(
             val documentDao = database.documentDao()
             // Fetch unsynced documents. Assuming getUnsyncedDocuments() returns a Flow, use .first() to get the current list.
             val unsyncedDocuments = documentDao.getAllUnsyncedDocumentIds().first()
-
+          println("adasfsdfs:$unsyncedDocuments")
             unsyncedDocuments.forEach { document ->
                 // Simulate a task like uploading to Google Drive.
 //                if (uploadDocument(document)) {
@@ -47,16 +52,101 @@ class DocumentSyncWorker(
                 if (uploadSuccess && fileId != null) {
                     // Now also passing the fileId to update the record accordingly
                     documentDao.updateDocumentWithDriveId(document.id, fileId)
+                    documentDao.markDocumentAsSynced(document.id)
+                    val documents =
+                        documentDao.getDocumentDetailsForJson()// Fetch your actual data from Room database
+                    println("32334343445:$documents")
+                    val documentsArray = JSONArray()
+                    documents.forEach { document ->
+                        val jsonDocument = JSONObject().apply {
+                            put("id", document.id)
+                            put("name", document.name)
+                            put("createdDate", document.createdDate)
+                            put("updatedDate", document.updatedDate)
+                            put("folderId", document.folderId)
+                            put("isSynced", document.isSynced)
+                            put("isPin", document.isPin)
+                            put("isFavourite", document.isFavourite)
+                            put("fileData", document.fileData)
+                            put("fileDriveId", document.fileDriveId)
+                            put("openCount", document.openCount)
+                            put("localFilePathAndroid", document.localFilePathAndroid)
+                            put("tagId", document.tagId)
+                            put("driveType", document.driveType)
+                            put("fileExtension", document.fileExtension)
+                            // Include other fields as needed
+                        }
+                        documentsArray.put(jsonDocument)
+                    }
+
+                    val documentContainer = JSONObject().apply {
+                        put("documents", documentsArray)
+                    }
+
+
+                    val docArray = documentContainer.toString()
+
+                    val fileQueryResult = driveService.files().list()
+                        .setQ("name = 'schema.json' and mimeType = 'application/json'")
+                        .setSpaces("drive")
+                        .setFields("files(id, name)")
+                        .execute()
+
+                    val files = fileQueryResult.files
+                    if (files == null || files.isEmpty()) {
+                        println("File not found.")
+
+                    } else {
+
+                        // Assuming the first search result is the file we want to update
+                        val fileId = files[0].id
+
+                        // Step 2: Update the file with new JSON data
+                        val fileMetadata = com.google.api.services.drive.model.File()
+                        val contentStream = ByteArrayContent.fromString("application/json", docArray)
+
+                        driveService.files().update(fileId, fileMetadata, contentStream).execute()
+                        println("File updated successfully.")
+                    }
                 }
 
                     // Mark document as synced if upload is successful.
                    // documentDao.updateDocumentWithDriveId(document.id,)
                 //}
             }
+      if(unsyncedDocuments.isNotEmpty()) {
 
+      }
             return Result.success()
         } catch (e: Exception) {
             return Result.failure()
+        }
+    }
+
+    fun uploadJsonToDrive(jsonData: String, driveService: Drive) {
+
+
+        val fileMetadata = com.google.api.services.drive.model.File().apply {
+            name = "schema.json"
+            mimeType = "application/json"
+        }
+
+        // Search for existing file
+        val result = driveService.files().list()
+            .setSpaces("drive")
+            .setQ("name = 'schema.json' and mimeType = 'application/json' and trashed = false")
+            .execute()
+        val files = result.files
+
+        if (files != null && files.isNotEmpty()) {
+            // File exists, update it
+            val fileId = files[0].id
+            val contentStream = ByteArrayContent.fromString("application/json", jsonData)
+            driveService.files().update(fileId, null, contentStream).execute()
+        } else {
+            // File doesn't exist, create it
+            val contentStream = ByteArrayContent.fromString("application/json", jsonData)
+            driveService.files().create(fileMetadata, contentStream).execute()
         }
     }
 
