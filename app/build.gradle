@@ -67,7 +67,11 @@ android {
 chaquopy {
     defaultConfig {
         version = "3.8"
+
         buildPython("C:\\Users\\DELL\\AppData\\Local\\Programs\\Python\\Python39\\python.exe")
+
+      //  buildPython("C:\\Users\\Komal\\AppData\\Local\\Programs\\Python\\Python311\\python.exe")
+
         pip{
               install("opencv-python-headless")
 //            install("pandas")
@@ -179,4 +183,7 @@ dependencies {
     // DocumentSyncWorker Dependencies
 
     implementation "androidx.work:work-runtime-ktx:2.9.0"
+
+    //gson
+    implementation 'com.google.code.gson:gson:2.8.9'
 }

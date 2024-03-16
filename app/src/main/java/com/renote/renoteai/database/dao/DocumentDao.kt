@@ -40,4 +40,7 @@ interface DocumentDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertDocuments(documentEntities: List<DocumentEntity>)
 
+    @Query("SELECT * FROM document_table WHERE isSynced = 1")
+    fun getDocumentDetailsForJson(): List<DocumentEntity>
+
 }

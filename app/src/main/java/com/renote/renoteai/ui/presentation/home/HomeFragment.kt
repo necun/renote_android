@@ -153,6 +153,7 @@ class HomeFragment : Fragment() {
                                 "Files downloaded successfully",
                                 Toast.LENGTH_SHORT
                             ).show()
+                            recreateFragment()
                         }
                     } else {
                         // Handle folder not found
@@ -198,7 +199,7 @@ class HomeFragment : Fragment() {
         binding?.profileIcon?.setOnClickListener {
             if (loginUserGoogleId != null) {
                 lifecycleScope.launch {
-                    updateDocumentInJsonFile("ReNoteAI", "schema.json", newDocumentData)
+                   // updateDocumentInJsonFile("ReNoteAI", "schema.json", newDocumentData)
                 }
             }
             signOutFromGoogle()
@@ -240,6 +241,7 @@ class HomeFragment : Fragment() {
 
         CoroutineScope(Dispatchers.IO).launch {
             database.documentDao().insertDocuments(documentsWrapper.documents)
+            database.folderDao().insertFoldersFromJson(documentsWrapper.folders)
         }
     }
 
@@ -314,31 +316,31 @@ class HomeFragment : Fragment() {
                     actualFolderName?.let {
 
                         folderId = createFolderInGoogleDrive(actualFolderName!!)
-                        val resourceName =
-                            getResourceName(requireActivity(), R.raw.schema) + ".json"
-                        val jsonFileContent = loadJSONFromRaw(requireActivity(), R.raw.schema)
-                        if (folderId != null) {
-                            val uploadedFile =
-                                uploadJsonFileToDrive(folderId!!, resourceName, jsonFileContent!!)
-
-                            if (uploadedFile != null) {
-                                Log.d(
-                                    "Json File uploaded in Google Drive",
-                                    "File ID: ${uploadedFile.id}"
-                                )
-                                // Continue with your logic here
-                            } else {
-                                Log.e(
-                                    "Json File upload in Google Drive Error",
-                                    "Failed to upload file."
-                                )
-                            }
-                        } else {
-                            Log.e(
-                                " ReNote AI Folder Creation in Google Drive Error",
-                                "Failed to create ReNoteAi  folder in Google Drive."
-                            )
-                        }
+//                        val resourceName =
+//                            getResourceName(requireActivity(), R.raw.schema) + ".json"
+//                        val jsonFileContent = loadJSONFromRaw(requireActivity(), R.raw.schema)
+//                        if (folderId != null) {
+//                            val uploadedFile =
+//                                uploadJsonFileToDrive(folderId!!, resourceName, jsonFileContent!!)
+//
+//                            if (uploadedFile != null) {
+//                                Log.d(
+//                                    "Json File uploaded in Google Drive",
+//                                    "File ID: ${uploadedFile.id}"
+//                                )
+//                                // Continue with your logic here
+//                            } else {
+//                                Log.e(
+//                                    "Json File upload in Google Drive Error",
+//                                    "Failed to upload file."
+//                                )
+//                            }
+//                        } else {
+//                            Log.e(
+//                                " ReNote AI Folder Creation in Google Drive Error",
+//                                "Failed to create ReNoteAi  folder in Google Drive."
+//                            )
+//                        }
                     }
                 }
             } else {
@@ -1344,6 +1346,18 @@ class HomeFragment : Fragment() {
         }
 
         return jsonDocument
+    }
+
+    fun recreateFragment() {
+        val fragmentManager = parentFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction()
+        val currentFragment = fragmentManager.findFragmentById(R.id.frameLayout)
+        // Replace the current fragment with a new instance of the same fragment
+        if (currentFragment != null) {
+            fragmentTransaction.remove(currentFragment)
+            fragmentTransaction.add(R.id.frameLayout, currentFragment::class.java, null)
+            fragmentTransaction.commit()
+        }
     }
 
 //    override fun onResume() {

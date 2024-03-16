@@ -76,7 +76,8 @@ class AddFolderBottomSheetFragment : BottomSheetDialogFragment() {
                 if (folderTitle.isEmpty()){
                     Snackbar.make(it, "File name cannot be empty", Snackbar.LENGTH_SHORT).show()
                 }else{
-                    createFolderInInternalStorage(folderTitle)
+                   // createFolderInInternalStorage(folderTitle)
+                    saveToRoom(folderTitle)
                 }
             }
         }
@@ -97,7 +98,7 @@ class AddFolderBottomSheetFragment : BottomSheetDialogFragment() {
         }
         println("directory:$directory")
         //val folderUri = FileProvider.getUriForFile(requireContext(),"com.example.googledriveupload.provider",directory)
-        saveToRoom(folderTitle)
+
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
