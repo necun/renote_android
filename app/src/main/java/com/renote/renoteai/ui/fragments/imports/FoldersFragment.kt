@@ -127,7 +127,7 @@ class FoldersFragment : Fragment() {
                         }
                     }
 
-                    viewModel.saveFolderFilesDetails(folderEntities)
+//                    viewModel.saveFolderDetails(folderEntities)
                 } else {
                     val folderEntities = folders.map { (_, folder) ->
                         FolderEntity(
@@ -143,7 +143,7 @@ class FoldersFragment : Fragment() {
                             driveType = folder.driveType
                         )
                     }
-                    viewModel.saveFolderFilesDetails(folderEntities)
+//                    viewModel.saveFolderDetails(folderEntities)
                 }
             }
         }

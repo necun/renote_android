@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.annotation.RawRes
 import androidx.core.content.ContextCompat
@@ -21,6 +22,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.Constraints
 import androidx.work.Data
+//import android.view.View
+//import androidx.core.view.findViewById
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
@@ -212,9 +215,18 @@ class HomeFragment : Fragment() {
         binding?.etSearch?.setCompoundDrawables(drawable, null, null, null)
 
 
+        if (loginUserGoogleId == null) {
+            binding!!.registerCard.visibility = View.VISIBLE
+        } else {
+            binding!!.registerCard.visibility = View.GONE
+        }
+
+
         binding?.relativeCross?.setOnClickListener {
             binding?.registerCard?.visibility = View.GONE
         }
+
+
 
         initTagsRecyclerview()
         tagsObserveData()

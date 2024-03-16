@@ -9,7 +9,6 @@ import com.renote.renoteai.repository.DocumentsRepository
 import com.renote.renoteai.repository.FoldersRepository
 import com.renote.renoteai.repository.TagsRepository
 import kotlinx.coroutines.launch
-import java.util.Calendar
 
 class CreateTagViewModel(private val documentsRepository: DocumentsRepository, private  val foldersRepository: FoldersRepository, private val tagsRepository: TagsRepository, private val application: Application): BaseViewModel(documentsRepository,foldersRepository,tagsRepository,application) {
 
@@ -27,7 +26,7 @@ class CreateTagViewModel(private val documentsRepository: DocumentsRepository, p
             message.postValue(application.resources.getString(R.string.enter_tag_name_message))
         } else {
             ioScope.launch {
-                val c = tagsRepository.getFoldersWithName(tagName.value!!)
+                val c = tagsRepository.getTagsWithName(tagName.value!!)
                 if (c.size == 1) {
                     message.postValue(tagName.value + " tag is already exists")
                 } else {

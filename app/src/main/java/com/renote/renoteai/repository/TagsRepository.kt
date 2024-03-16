@@ -11,5 +11,5 @@ class TagsRepository(private val dao: TagDao) {
 //    suspend fun deleteNotes(note: List<NoteEntity>) = // populate this list with the IDs of notes you want to delete
 //        dao.deleteNotes(note)
 fun tagIdsFromDB() = dao.getAllTagIds()
-    fun getFoldersWithName(searchWith:String): List<TagEntity> = dao.getFoldersWithName(searchWith)
+    fun getTagsWithName(searchWith:String): List<TagEntity> = dao.getTagsWithName(searchWith)
 }

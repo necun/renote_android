@@ -19,6 +19,6 @@ interface TagDao {
     fun getAllTagIds(): Flow<MutableList<String>>
 
     @Query("SELECT * FROM tag_table WHERE  tagName   LIKE  :searchWith ")
-    fun getFoldersWithName(searchWith:String): List<TagEntity>
+    fun getTagsWithName(searchWith:String): List<TagEntity>
 
 }

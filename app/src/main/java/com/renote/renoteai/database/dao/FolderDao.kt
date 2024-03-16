@@ -6,12 +6,13 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.renote.renoteai.database.tables.DocumentEntity
 import com.renote.renoteai.database.tables.FolderEntity
+import com.renote.renoteai.database.tables.TagEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FolderDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun saveFileFolderDetails(folderEntity: List<FolderEntity>)
+    suspend fun saveFolderDetails(folderEntity: FolderEntity)
 
     @Query("SELECT  * FROM folders_table")
     fun getAllFolders(): Flow<MutableList<FolderEntity>>
@@ -22,6 +23,11 @@ interface FolderDao {
     @Query("SELECT id FROM folders_table")
     fun getAllFolderIds(): Flow<MutableList<String>>
 
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertFoldersFromJson(folderEntities: List<FolderEntity>)
+
+    @Query("SELECT * FROM folders_table WHERE  name LIKE  :searchWith ")
+    fun getFoldersWithName(searchWith:String): List<FolderEntity>
+
 }
