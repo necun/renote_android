@@ -207,7 +207,6 @@ class EmailActivity : AppCompatActivity() {
         val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
         val fileName = "file_$formattedTimestamp.jpg"
 
-
         if (folderName != "ReNoteAI" && folderId != "100"){
             val directory = File(this.filesDir, "ReNoteAI/$folderName") // Directory path within app's internal storage
             if (!directory.exists()) {

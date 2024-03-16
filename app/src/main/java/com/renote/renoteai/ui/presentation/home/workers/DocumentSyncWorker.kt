@@ -47,6 +47,7 @@ class DocumentSyncWorker(
                 if (uploadSuccess && fileId != null) {
                     // Now also passing the fileId to update the record accordingly
                     documentDao.updateDocumentWithDriveId(document.id, fileId)
+                    documentDao.markDocumentAsSynced(document.id)
                 }
 
                     // Mark document as synced if upload is successful.

@@ -1,100 +1,38 @@
 {
-  "tags": {
-    "oa39weoiafk": {
-      "id": "oa39weoiafk",
-      "tagName": "Tag 1"
-    },
-    "afawef09489uew83": {
-      "id": "afawef09489uew83",
-      "tagName": "Tag 2"
-    }
-  },
-  "folders": [
-    {
-      "id": "asdfafewasdfa",
-      "name": "Folder 1",
-      "createdDate": 1709109777943,
-      "updatedDate": 1709109777943,
-      "emailOrPhone": "raju@gmail.com",
-      "isSynced": true,
-      "isPin": true,
-      "isFavourite": true,
-      "fileCount": 60,
-      "driveType": "Google"
-    },
-    {
-      "id": "aewfsdfsfs",
-      "name": "Folder 2",
-      "createdDate": 1709109777943,
-      "updatedDate": 1709109777943,
-      "emailOrPhone": "raju@gmail.com",
-      "isSynced": true,
-      "isPin": false,
-      "isFavourite": false,
-      "fileCount": 199,
-      "driveType": "Google"
-    }
-  ],
   "documents": [
     {
-      "id": "aewfsdfsfs",
-      "name": "Document1",
-      "createdDate": 1709109777943,
-      "updatedDate": 1709109777943,
-      "folderId": "aewfsasdfdfsasfs",
+      "id": "doc_16120810",
+      "name": "file_16120810.jpg",
+      "createdDate": 10005000,
+      "updatedDate": 10005000,
+      "folderId": "100",
       "isSynced": true,
       "isPin": false,
       "isFavourite": false,
-      "fileCount": 199,
-      "driveType": "Google"
+      "fileData": "file:///data/user/0/com.renote.renoteai/files/ReNoteAI/file_16120810.jpg",
+      "fileDriveId": "1JNtc5Bd-snHd147CnnQingKIeTznpTzp",
+      "openCount": 30,
+      "localFilePathAndroid": "/data/data/com.renote.renoteai/files/ReNoteAI/file_16120810.jpg",
+      "tagId": "12345",
+      "driveType": "gDrive",
+      "fileExtension": "jpg"
     },
     {
-      "id": "aewfsdfsfs",
-      "name": "Document 2",
-      "createdDate": 1709109777943,
-      "updatedDate": 1709109777943,
-      "folderId": "aewfsasdfdfsasfs",
+      "id": "doc_16120824",
+      "name": "file_16120824.jpg",
+      "createdDate": 10005000,
+      "updatedDate": 10005000,
+      "folderId": "100",
       "isSynced": true,
       "isPin": false,
       "isFavourite": false,
-      "fileCount": 199,
-      "driveType": "Google"
-    }
-  ],
-  "Files": [
-    {
-      "id": "ifioaefksdlfa",
-      "name": "File 1",
-      "createdDate": 1709109777943,
-      "updatedDate": 1709109777943,
-      "fileData": "",
-      "isSynced": true,
-      "isPin": false,
-      "isFavourite": true,
-      "DocumentId": "aewfsasdfdfsasfs",
-      "openCount": 100,
-      "localFilePathIos": "",
-      "localFilePathAndroid": "",
-      "tagId": "",
-      "driveType": "Google",
-      "fileExtension": "png"
-    },
-    {
-      "id": "ifioaefksdlfa",
-      "name": "File 2",
-      "createdDate": 1709109777943,
-      "updatedDate": 1709109777943,
-      "fileData": "",
-      "isSynced": true,
-      "isPin": false,
-      "isFavourite": true,
-      "DocumentId": "aewfsasdfdfsasfs",
-      "openCount": 100,
-      "localFilePathIos": "",
-      "localFilePathAndroid": "",
-      "tagId": "",
-      "driveType": "Google",
-      "fileExtension": "png"
+      "fileData": "file:///data/user/0/com.renote.renoteai/files/ReNoteAI/file_16120824.jpg",
+      "fileDriveId": "1Xo-vJZgsweYVycHVfN4zBzFSEY6c4n4W",
+      "openCount": 30,
+      "localFilePathAndroid": "/data/data/com.renote.renoteai/files/ReNoteAI/file_16120824.jpg",
+      "tagId": "12345",
+      "driveType": "gDrive",
+      "fileExtension": "jpg"
     }
   ]
 }

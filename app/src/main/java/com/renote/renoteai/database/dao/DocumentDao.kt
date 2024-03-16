@@ -24,13 +24,20 @@ interface DocumentDao {
     fun getAllUnsyncedDocumentIds(): Flow<MutableList<DocumentEntity>>
 
     //after successful uploading the file in drive it will update isSync to true
-//    @Query("UPDATE document_table SET isSynced = 1 WHERE id = :documentId")
-//    suspend fun markDocumentAsSynced(documentId: String)
+    @Query("UPDATE document_table SET isSynced = 1 WHERE id = :documentId")
+    suspend fun markDocumentAsSynced(documentId: String)
 
     @Query("SELECT * FROM document_table WHERE folderId= :folderId")
     fun getDocuments(folderId: String): Flow<MutableList<DocumentEntity>>
 
     @Query("UPDATE document_table SET fileDriveId = :fileId WHERE id = :documentId")
     suspend fun updateDocumentWithDriveId(documentId: String, fileId: String)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertDocument(documentEntity: DocumentEntity)
+
+    // If you need to insert multiple entities at once
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertDocuments(documentEntities: List<DocumentEntity>)
 
 }
