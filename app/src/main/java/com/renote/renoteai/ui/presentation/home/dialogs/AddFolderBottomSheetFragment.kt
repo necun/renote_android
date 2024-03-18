@@ -8,21 +8,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.MutableLiveData
 import com.renote.renoteai.R
 import com.renote.renoteai.database.tables.FolderEntity
-import com.renote.renoteai.ui.presentation.home.viewmodel.HomeFragmentViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.android.material.snackbar.Snackbar
 import com.renote.renoteai.databinding.CreateFolderDataBinding
-import com.renote.renoteai.databinding.CreateTagDataBinding
 import com.renote.renoteai.ui.presentation.home.viewmodel.AddFolderViewModel
 import com.renote.renoteai.utils.CommonUtils
 import org.koin.android.ext.android.inject
@@ -37,22 +32,15 @@ class AddFolderBottomSheetFragment : BottomSheetDialogFragment() {
 
     private var folderTitle = ""
     val folderEntities = mutableListOf<FolderEntity>()
+
     @RequiresApi(Build.VERSION_CODES.O)
     val current = LocalDateTime.now()
+
     @RequiresApi(Build.VERSION_CODES.O)
     val formatter = DateTimeFormatter.ofPattern("ddHHmmss")
+
     @RequiresApi(Build.VERSION_CODES.O)
     val formattedTimestamp = current.format(formatter).toLong()
-
-  //  private val folderEntity by lazy { FolderEntity() }
-
-
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//        arguments?.let {
-//
-//        }
-//    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -64,6 +52,7 @@ class AddFolderBottomSheetFragment : BottomSheetDialogFragment() {
         binding.viewModel = viewModel
         return binding.root
     }
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -74,37 +63,20 @@ class AddFolderBottomSheetFragment : BottomSheetDialogFragment() {
         observeData()
     }
 
-//<<<<<<< HEAD
-//        binding!!.apply {
-//            closeIv.setOnClickListener {
-//                dismiss()
-//            }
-//
-//            btnCreateFolder.setOnClickListener {
-//                folderTitle = binding!!.etFolderName.text.toString().trim()
-//
-//                if (folderTitle.isEmpty()){
-//                    Snackbar.make(it, "File name cannot be empty", Snackbar.LENGTH_SHORT).show()
-//                }else{
-//                   // createFolderInInternalStorage(folderTitle)
-//                    saveToRoom(folderTitle)
-//=======
     @RequiresApi(Build.VERSION_CODES.O)
-    fun observeData(){
+    fun observeData() {
         binding.apply {
             viewModel?.resourseClick?.observe(viewLifecycleOwner) { integer ->
                 when (integer) {
                     R.id.close_iv -> {
                         dismiss()
                     }
+
                     R.id.btnCreateFolder -> {
                         viewModel?.createFolder()
                     }
                 }
             }
-
-
-
 
             viewModel?.message?.observe(viewLifecycleOwner) { message ->
                 if (message != null && message.isNotEmpty()) {
@@ -120,30 +92,21 @@ class AddFolderBottomSheetFragment : BottomSheetDialogFragment() {
                     dismiss()
                 }
             }
-
-            //to display the dropdown menu for selection of accounts
-            val accounts = resources.getStringArray(R.array.sync_options)
-            val arrayAdapter = ArrayAdapter(requireContext(), R.layout.dropdown_item, accounts)
-//            autoCompleteTextView.setAdapter(arrayAdapter)
         }
     }
 
-
-
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun createFolderInInternalStorage(folderTitle:String) {
+    private fun createFolderInInternalStorage(folderTitle: String) {
         val directory = File(requireContext().filesDir, "ReNoteAI/$folderTitle")
         if (!directory.exists()) {
             directory.mkdirs() // Create the directory if it doesn't exist
         }
         println("directory:$directory")
-        //val folderUri = FileProvider.getUriForFile(requireContext(),"com.example.googledriveupload.provider",directory)
         saveToRoom(folderTitle)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun saveToRoom(folderTitle: String){
-
+    private fun saveToRoom(folderTitle: String) {
         folderEntities.add(
             FolderEntity(
                 id = "folder_${formattedTimestamp}",
@@ -159,8 +122,7 @@ class AddFolderBottomSheetFragment : BottomSheetDialogFragment() {
             )
         )
 //        viewModel.saveFolderDetails(folderEntities)
-
-        Toast.makeText(requireContext(),"Folder Created",Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(), "Folder Created", Toast.LENGTH_SHORT).show()
         dismiss()
     }
 
@@ -173,7 +135,5 @@ class AddFolderBottomSheetFragment : BottomSheetDialogFragment() {
     override fun getTheme(): Int {
         return R.style.AppBottomSheetDialogTheme
     }
-
-
 
 }

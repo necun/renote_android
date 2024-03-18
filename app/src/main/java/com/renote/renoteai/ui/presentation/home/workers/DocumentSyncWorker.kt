@@ -137,13 +137,6 @@ class DocumentSyncWorker(
                         foldersArray.put(jsonFolder)
                     }
 
-//                    val combinedJson = JSONObject().apply {
-//                        put("documents", documentsArray)
-//                        if (foldersArray!= null){
-//                            put("folders", foldersArray)
-//                        }
-//                    }
-
                     val combinedJson = JSONObject().apply {
                         put("documents", documentsArray)
 
@@ -156,18 +149,9 @@ class DocumentSyncWorker(
                     val jsonContent = combinedJson.toString()
                     updateFolderAndDocToJson(jsonContent)
 
-//                    val foldersContainer = JSONObject().apply {
-//                        put("folders", foldersArray)
-//                    }
-//
-//                    val folderArray = foldersContainer.toString()
-
-                   // updateFolderAndDocToJson(folderArray)
                 }
 
-                // Mark document as synced if upload is successful.
-                // documentDao.updateDocumentWithDriveId(document.id,)
-                //}
+
             }
             if (unsyncedDocuments.isNotEmpty()) {
 
@@ -204,65 +188,6 @@ class DocumentSyncWorker(
         }
     }
 
-//    private fun updateFolderAndDocToJson(array: String) {
-//        val fileQueryResult = driveService.files().list()
-//            .setQ("name = 'schema.json' and mimeType = 'application/json'")
-//            .setSpaces("drive")
-//            .setFields("files(id, name)")
-//            .execute()
-//
-//        val files = fileQueryResult.files
-//        if (files == null || files.isEmpty()) {
-//            println("File not found.")
-//        } else {
-//            // Assuming the first search result is the file we want to update
-//            val fileId = files[0].id
-//
-//            // Step 1: Retrieve existing JSON content from the file
-//            val file = driveService.files().get(fileId).execute()
-//            val inputStream = ByteArrayOutputStream()
-//            driveService.files().get(fileId).executeMediaAndDownloadTo(inputStream)
-//            val existingContent = inputStream.toString()
-//
-//            // Step 2: Combine existing JSON content with new JSON array
-//            val combinedContent = combineJsonContent(existingContent, array)
-//
-//            // Step 3: Update the file with the combined JSON data
-//            val fileMetadata = com.google.api.services.drive.model.File()
-//            val contentStream = ByteArrayContent.fromString("application/json", combinedContent)
-//
-//            driveService.files().update(fileId, fileMetadata, contentStream).execute()
-//            println("File updated successfully.")
-//        }
-//    }
-
-    // Function to combine existing JSON content with new JSON array
-//    private fun combineJsonContent(existingContent: String, newArray: String): String {
-//        val existingJson = JSONObject(existingContent)
-//        val newJson = JSONObject(newArray)
-//
-//        // Merge the new array with existing JSON content
-//        existingJson.putAll(newJson)
-//
-//        return existingJson.toString()
-//    }
-
-//    private fun combineJsonContent(existingContent: String, newArray: String): String {
-//        val existingJson = JSONObject(existingContent)
-//        val newJson = JSONObject(newArray)
-//
-//        // Iterate through the keys of the new JSON object and add them to the existing JSON object
-//        val keys = newJson.keys()
-//        while (keys.hasNext()) {
-//            val key = keys.next() as String
-//            existingJson.put(key, newJson[key])
-//        }
-//
-//        return existingJson.toString()
-//    }
-
-
-
     fun getResourceName(context: Context, @RawRes resId: Int): String {
         return context.resources.getResourceEntryName(resId)
     }
@@ -276,50 +201,6 @@ class DocumentSyncWorker(
             null
         }
     }
-
-//    suspend fun uploadJsonFileToDrive(
-//        folderId: String, fileName: String, fileContent: String
-//    ): com.google.api.services.drive.model.File? {
-//        return withContext(Dispatchers.IO) {
-//            try {
-//                val fileCheck = driveService?.files()!!.list()
-//                    .setQ("name = '$fileName' and '$folderId' in parents and trashed = false")
-//                    .setSpaces("drive").setFields("files(id, name)").execute()
-//
-//                if (fileCheck.files.isNotEmpty()) {
-//                    // A file with the same name exists, update its content
-//                    val file = fileCheck.files[0]
-//                    Log.d("Google Drive", "File already exists: ${file.name} (${file.id})")
-//
-//                    val updatedFileMetadata = com.google.api.services.drive.model.File()
-//                    val mediaContent = ByteArrayContent.fromString("application/json", fileContent)
-//                    val updatedFile =
-//                        driveService!!.files().update(file.id, updatedFileMetadata, mediaContent)
-//                            .execute()
-//
-//                    Log.d("Google Drive", "File updated: ${updatedFile.name} (${updatedFile.id})")
-//                    return@withContext updatedFile
-//                } else {
-//                    val fileMetadata = com.google.api.services.drive.model.File()
-//                    fileMetadata.name = fileName
-//                    fileMetadata.parents = listOf(folderId)
-//
-//                    val mediaContent = ByteArrayContent.fromString("application/json", fileContent)
-//                    val uploadedFile =
-//                        driveService!!.files().create(fileMetadata, mediaContent).setFields("id, parents")
-//                            .execute()
-//
-//                    Log.d(
-//                        "Google Drive", "File uploaded: ${uploadedFile.name} (${uploadedFile.id})"
-//                    )
-//                    return@withContext uploadedFile
-//                }
-//            } catch (e: IOException) {
-//                Log.e("Google Drive", "Error uploading or updating json file", e)
-//                return@withContext null
-//            }
-//        }
-//    }
 
     suspend fun uploadJsonFileToDrive(
         fileName: String,
@@ -395,61 +276,6 @@ class DocumentSyncWorker(
         var tempDrive: Drive
         return tempDrive
     }
-
-//    private suspend fun uploadDocument(
-//        document: DocumentEntity
-//    ): Pair<Boolean, String?> {
-//        return try {
-//            // Get the file path from the document entity
-//            val filePath = document.fileData
-//
-//            println("filePath:$filePath")
-//            // Get the file content from the file path
-//            val fileContent = getFileContentFromPath(filePath, applicationContext)
-//            println("fileContent:$fileContent")
-//
-//            if (fileContent != null) {
-//                // The MIME type of the folder
-//                val folderMimeType = "application/vnd.google-apps.folder"
-//                // Search for the ReNoteAI folder
-//                val folderSearchQuery =
-//                    "name = 'ReNoteAI' and mimeType = '$folderMimeType' and trashed = false"
-//                val folderSearch = driveService.files().list().setQ(folderSearchQuery).execute()
-//                var folderId: String? = folderSearch.files.firstOrNull()?.id
-//
-//                // If the ReNoteAI folder doesn't exist, create it
-//                if (folderId == null) {
-//                    val folderMetadata = com.google.api.services.drive.model.File().apply {
-//                        name = "ReNoteAI"
-//                        mimeType = folderMimeType
-//                    }
-//                    folderId = driveService.files().create(folderMetadata).execute().id
-//                }
-//
-//                // Prepare the file to be uploaded
-//                val fileMetadata = com.google.api.services.drive.model.File().apply {
-//                    name = document.name
-//                    parents = listOf(folderId)
-//                }
-//
-//                val mediaContent = InputStreamContent(null, ByteArrayInputStream(fileContent))
-//
-//                // Upload the file
-//                val uploadFile = driveService.files().create(fileMetadata, mediaContent).execute()
-//                Pair(true, uploadFile.id)
-//
-//                //true // Return true if upload succeeds
-//            } else {
-//                Pair(false, null)
-//                // false // Return false if file content is null or cannot be obtained
-//            }
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//            // false // Return false if upload fails
-//            Pair(false, null)
-//
-//        }
-//    }
 
     private suspend fun uploadDocument(
         document: DocumentEntity
