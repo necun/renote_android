@@ -158,7 +158,7 @@ class HomeFragment : Fragment() {
         binding?.profileIcon?.setOnClickListener {
             if (loginUserGoogleId != null) {
                 lifecycleScope.launch {
-                    updateDocumentInJsonFile("ReNoteAI", "schema.json", newDocumentData)
+                    //updateDocumentInJsonFile("ReNoteAI", "schema.json")
                 }
             }
             signOutFromGoogle()
