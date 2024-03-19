@@ -7,6 +7,8 @@ import androidx.annotation.RawRes
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.api.client.extensions.android.http.AndroidHttp
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
 import com.google.api.client.http.ByteArrayContent
@@ -14,6 +16,8 @@ import com.google.api.client.http.InputStreamContent
 import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.services.drive.DriveScopes
 import com.google.api.services.drive.Drive
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import com.renote.renoteai.R
 import com.renote.renoteai.database.tables.DocumentEntity
 import com.renote.renoteai.di.provideDocumentDatabase
@@ -36,9 +40,21 @@ class DocumentSyncWorker(
 
     //private val driveService: Drive = getDriveService(context)
     private val driveService: Drive = getDriveService(context)
+    private lateinit var mGoogleSignInClient: GoogleSignInClient
+    var loginUserGoogleId: String? = null
 
     override suspend fun doWork(): Result {
         try {
+
+            val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(applicationContext.resources.getString(R.string.default_web_client_id))
+                .requestEmail().build()
+            mGoogleSignInClient = GoogleSignIn.getClient(applicationContext, gso)
+            val auth = Firebase.auth
+            val user = auth.currentUser
+            loginUserGoogleId = user?.email
+
+
             //  val documentDao = DatabaseBuilder.getInstance(applicationContext).documentDao()
             val database = provideDocumentDatabase(applicationContext)
             val documentDao = database.documentDao()
@@ -46,6 +62,7 @@ class DocumentSyncWorker(
 
             // Fetch unsynced documents. Assuming getUnsyncedDocuments() returns a Flow, use .first() to get the current list.
             val unsyncedDocuments = documentDao.getAllUnsyncedDocumentIds().first()
+
             println("adasfsdfs:$unsyncedDocuments")
             unsyncedDocuments.forEach { document ->
                 // Simulate a task like uploading to Google Drive.
@@ -141,7 +158,7 @@ class DocumentSyncWorker(
                         put("documents", documentsArray)
 
                         // Include foldersArray only if it's not empty or documentsArray has content
-                        if (foldersArray.length()>0) {
+                        if (foldersArray.length() > 0) {
                             put("folders", foldersArray)
                         }
                     }
@@ -150,9 +167,15 @@ class DocumentSyncWorker(
                     updateFolderAndDocToJson(jsonContent)
 
                 }
-
-
             }
+
+            val foldersWithoutMail = folderDao.getFoldersWhereEmailIsNull().first()
+            if (loginUserGoogleId != null) {
+                foldersWithoutMail.forEach { folders ->
+                    folderDao.updateEmail(folders.id, loginUserGoogleId.toString())
+                }
+            }
+
             if (unsyncedDocuments.isNotEmpty()) {
 
             }

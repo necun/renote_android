@@ -42,8 +42,10 @@ import org.koin.android.ext.android.inject
 import java.io.FileOutputStream
 import java.io.IOException
 import java.text.SimpleDateFormat
+import java.time.Instant
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 import java.util.Date
 import java.util.Locale
 
@@ -59,14 +61,7 @@ class EmailActivity : AppCompatActivity() {
     private lateinit var viewBinding: EmailDataBinding
     private lateinit var folderId:String
     private lateinit var folderName:String
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    val current = LocalDateTime.now()
-    @RequiresApi(Build.VERSION_CODES.O)
-    val formatter = DateTimeFormatter.ofPattern("ddHHmmss")
-    @RequiresApi(Build.VERSION_CODES.O)
-    val formattedTimestamp = current.format(formatter).toLong()
-
+    val currentTimestamp: Long = System.currentTimeMillis()
     private val viewModelHome: HomeFragmentViewModel by inject()
     val docEntities = mutableListOf<DocumentEntity>()
     @RequiresApi(Build.VERSION_CODES.O)
@@ -204,8 +199,8 @@ class EmailActivity : AppCompatActivity() {
                 .toString() + "/CameraX-Image-Output/"
         val file = File(output_path, "$enhancedImageType.jpg")
 
-        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-        val fileName = "file_$formattedTimestamp.jpg"
+
+        val fileName = "file_$currentTimestamp.jpg"
 
 //        if (folderName != "ReNoteAI" && folderId != "100"){
 //            val directory = File(this.filesDir, "ReNoteAI/$folderName") // Directory path within app's internal storage
@@ -271,10 +266,10 @@ class EmailActivity : AppCompatActivity() {
        // println("")
         docEntities.add(
             DocumentEntity(
-                id = "doc_$formattedTimestamp",
+                id = "doc_$currentTimestamp",
                 name = fileName,
-                createdDate = 10005000,
-                updatedDate = 10005000,
+                createdDate = currentTimestamp,
+                updatedDate = currentTimestamp,
                 fileData = fileUri.toString(),
                 fileDriveId = "",
                 isSynced = false,
@@ -288,6 +283,8 @@ class EmailActivity : AppCompatActivity() {
                 fileExtension = fileType
             )
         )
+
+
 
         println("savedFileUri:$fileUri")
         viewModelHome.saveDocumentsDetails(docEntities)

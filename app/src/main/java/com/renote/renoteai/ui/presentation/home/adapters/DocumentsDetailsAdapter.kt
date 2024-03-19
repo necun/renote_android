@@ -12,24 +12,20 @@ import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-
 import androidx.recyclerview.widget.RecyclerView
 import com.renote.renoteai.R
 import com.renote.renoteai.database.tables.DocumentEntity
 import com.renote.renoteai.databinding.DocumentsItemBinding
 import java.io.File
-
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-
 
 class DocumentsDetailsAdapter(private val context: Context) :
     ListAdapter<DocumentEntity, DocumentsDetailsAdapter.DocumentsHolder>(diffUtil) {
     val arrayList = ArrayList<DocumentEntity>()
     val selectList = ArrayList<DocumentEntity>()
     private lateinit var binding: DocumentsItemBinding
-
     var isEnable = false
     var isSelectAll = false
 
@@ -48,7 +44,6 @@ class DocumentsDetailsAdapter(private val context: Context) :
         holder.onBind(getItem(position), position)
 
     }
-
 
     inner class DocumentsHolder(private val binding: DocumentsItemBinding, private val pos: Int) :
         RecyclerView.ViewHolder(binding.root) {
@@ -69,7 +64,7 @@ class DocumentsDetailsAdapter(private val context: Context) :
     }
 
     fun convertTimestampToDateAndTime(timestamp: Long): String {
-        val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+        val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
         val date = Date(timestamp)
         return sdf.format(date)
     }
@@ -90,7 +85,8 @@ class DocumentsDetailsAdapter(private val context: Context) :
                 Toast.makeText(context, "No app found to open this file", Toast.LENGTH_SHORT).show()
             }
         } catch (exception: Exception) {
-            Toast.makeText(context, "Error opening file: ${exception.message}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Error opening file: ${exception.message}", Toast.LENGTH_SHORT)
+                .show()
             println("Error opening file: ${exception.message}")
             exception.printStackTrace()
         }

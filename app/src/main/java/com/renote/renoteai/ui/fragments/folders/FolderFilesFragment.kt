@@ -46,8 +46,6 @@ class FolderFilesFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
 
-
-
         val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.img_search)
         drawable?.setBounds(0, 0, 40, 40) // Set the desired width and height
         binding?.etSearch?.setCompoundDrawables(drawable, null, null, null)
@@ -67,9 +65,14 @@ class FolderFilesFragment : Fragment() {
 
         binding!!.tvBreadcrumbs.setOnClickListener {
             val intent = Intent(requireContext(), MainActivity::class.java)
+            val sharedPreferences = requireContext().getSharedPreferences("PREFERENCE_NAME", Context.MODE_PRIVATE)
+            with(sharedPreferences.edit()) {
+                putString("folderId", "100")
+                putString("folderName", "ReNoteAI")
+                apply() // apply() is asynchronous, use commit() if you need synchronous operation
+            }
             startActivity(intent)
         }
-
 
     }
 

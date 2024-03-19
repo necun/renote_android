@@ -23,11 +23,16 @@ interface FolderDao {
     @Query("SELECT id FROM folders_table")
     fun getAllFolderIds(): Flow<MutableList<String>>
 
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertFoldersFromJson(folderEntities: List<FolderEntity>)
 
     @Query("SELECT * FROM folders_table WHERE  name LIKE  :searchWith ")
-    fun getFoldersWithName(searchWith:String): List<FolderEntity>
+    fun getFoldersWithName(searchWith: String): List<FolderEntity>
+
+    @Query("SELECT * FROM folders_table WHERE emailOrPhone= 'youremail@gmail.com' ")
+    fun getFoldersWhereEmailIsNull(): Flow<MutableList<FolderEntity>>
+
+    @Query("UPDATE folders_table SET emailOrPhone=:loginUserId WHERE id = :folderId")
+    suspend fun updateEmail(folderId: String, loginUserId: String)
 
 }

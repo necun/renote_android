@@ -22,6 +22,8 @@ import com.renote.renoteai.ui.presentation.home.HomeFragment
 import com.renote.renoteai.ui.fragments.imports.ImportFragment
 import com.renote.renoteai.ui.presentation.home.viewmodel.HomeFragmentViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.crashlytics.ktx.crashlytics
+import com.google.firebase.ktx.Firebase
 import com.renote.renoteai.database.dao.DocumentDao
 import com.renote.renoteai.databinding.ActivityMainBinding
 import com.renote.renoteai.ui.presentation.home.workers.DocumentSyncWorker
@@ -54,6 +56,10 @@ class MainActivity : AppCompatActivity() {
 
         println(currentFragment)
 
+
+
+        Firebase.crashlytics.setCrashlyticsCollectionEnabled(true)
+
 //        val constraints = Constraints.Builder()
 //            .setRequiredNetworkType(NetworkType.CONNECTED) // Example constraint: require network connectivity
 //            .build()
@@ -81,6 +87,7 @@ class MainActivity : AppCompatActivity() {
         navView.setOnItemSelectedListener {
             when (it.itemId) {
                 R.id.navImport -> {
+
                     if (currentFragment !is ImportFragment) {
                         //recyclerView.visibility = View.GONE
                         // Replace Toast with Fragment transaction
@@ -95,6 +102,10 @@ class MainActivity : AppCompatActivity() {
                             .commit()
 //                    recyclerView.visibility = View.GONE
                         currentFragment = importFragment
+                        Firebase.crashlytics.log("This is a test log message.")
+                        Firebase.crashlytics.setCustomKey("UserId", "12345")
+                        Firebase.crashlytics.setCustomKey("SubscriptionType", "Premium")
+                        throw RuntimeException("Test Crash")
                     }
                 }
 
@@ -281,8 +292,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-//    override fun onResume() {
-//        super.onResume()
+    override fun onResume() {
+        super.onResume()
+       // recreate()
 //        startDocumentSyncWorker()
 //    }
 
@@ -294,5 +306,5 @@ class MainActivity : AppCompatActivity() {
 //
 //        // Enqueue WorkRequest
 //        WorkManager.getInstance(this).enqueue(workRequest)
-//    }
+    }
 }

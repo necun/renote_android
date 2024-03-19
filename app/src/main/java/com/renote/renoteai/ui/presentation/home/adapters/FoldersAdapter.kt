@@ -63,7 +63,6 @@ class FoldersAdapter(private val context: Context, private val userEmailId: Stri
                     val folderId = data.id
                     val folderName = data.name
 
-
                     val sharedPreference =
 
                         context.getSharedPreferences("PREFERENCE_NAME", Context.MODE_PRIVATE)
