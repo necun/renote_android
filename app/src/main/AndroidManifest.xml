@@ -7,15 +7,14 @@
         android:targetSdkVersion="34" />
 
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-feature android:name="android.hardware.camera.any" />
 
+    <uses-feature android:name="android.hardware.camera.any" />
     <uses-feature
         android:name="android.hardware.camera"
         android:required="true" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
 
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-
     <uses-permission android:name="android.permission.STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -40,6 +39,12 @@
         android:theme="@style/Theme.CameraXApp"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+        <activity
+            android:name=".ui.activities.cropedit.CropEditActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activities.filteredit.FilterEditActivity"
+            android:exported="false" />
         <activity
             android:name=".ui.main.MainActivity"
             android:exported="true"
@@ -67,13 +72,11 @@
             android:name=".ui.splash.SplashActivity"
             android:exported="true"
             android:launchMode="singleTop">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
         <activity
             android:name=".ui.activities.camera.OCRResultViewer"
@@ -92,7 +95,7 @@
             android:exported="false"
             android:launchMode="singleTop" />
         <activity
-            android:name=".ui.activities.camera.ImageFilter"
+            android:name=".ui.activities.edit.EditActivity"
             android:exported="false"
             android:launchMode="singleTop" />
         <activity
@@ -102,9 +105,7 @@
         <activity
             android:name=".ui.activities.camera.CameraActivity"
             android:exported="true"
-            android:launchMode="singleTop">
-
-        </activity>
+            android:launchMode="singleTop"></activity>
 
         <meta-data
             android:name="com.google.mlkit.vision.DEPENDENCIES"

@@ -3,26 +3,31 @@ package com.renote.renoteai.ui.presentation.home.workers
 import android.content.Context
 import android.net.Uri
 import android.util.Log
-import android.widget.Toast
+import androidx.annotation.RawRes
 import androidx.work.CoroutineWorker
-import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.api.client.extensions.android.http.AndroidHttp
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
+import com.google.api.client.http.ByteArrayContent
 import com.google.api.client.http.InputStreamContent
 import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.services.drive.DriveScopes
 import com.google.api.services.drive.Drive
 import com.renote.renoteai.R
-import com.renote.renoteai.database.dao.DocumentDao
 import com.renote.renoteai.database.tables.DocumentEntity
 import com.renote.renoteai.di.provideDocumentDatabase
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withContext
+import org.json.JSONArray
+import org.json.JSONObject
 import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
+import java.io.IOException
 
 class DocumentSyncWorker(
     context: Context,
@@ -37,26 +42,221 @@ class DocumentSyncWorker(
             //  val documentDao = DatabaseBuilder.getInstance(applicationContext).documentDao()
             val database = provideDocumentDatabase(applicationContext)
             val documentDao = database.documentDao()
+            val folderDao = database.folderDao()
+
             // Fetch unsynced documents. Assuming getUnsyncedDocuments() returns a Flow, use .first() to get the current list.
             val unsyncedDocuments = documentDao.getAllUnsyncedDocumentIds().first()
-
+            println("adasfsdfs:$unsyncedDocuments")
             unsyncedDocuments.forEach { document ->
                 // Simulate a task like uploading to Google Drive.
 //                if (uploadDocument(document)) {
-                    val (uploadSuccess, fileId) = uploadDocument(document)
+                val (uploadSuccess, fileId) = uploadDocument(document)
                 if (uploadSuccess && fileId != null) {
                     // Now also passing the fileId to update the record accordingly
                     documentDao.updateDocumentWithDriveId(document.id, fileId)
+                    documentDao.markDocumentAsSynced(document.id)
+
+                    val resourceName =
+                        getResourceName(applicationContext, R.raw.schema) + ".json"
+                    val jsonFileContent = loadJSONFromRaw(applicationContext, R.raw.schema)
+
+                    val uploadedFile =
+                        uploadJsonFileToDrive(resourceName, jsonFileContent!!)
+
+                    if (uploadedFile != null) {
+                        Log.d(
+                            "Json File uploaded in Google Drive",
+                            "File ID: ${uploadedFile.id}"
+                        )
+                        // Continue with your logic here
+                    } else {
+                        Log.e(
+                            "Json File upload in Google Drive Error",
+                            "Failed to upload file."
+                        )
+                    }
+//                     else {
+//                        Log.e(
+//                            " ReNote AI Folder Creation in Google Drive Error",
+//                            "Failed to create ReNoteAi  folder in Google Drive."
+//                        )
+//                    }
+
+                    val documents =
+                        documentDao.getDocumentDetailsForJson()// Fetch your actual data from Room database
+                    println("32334343445:$documents")
+                    val documentsArray = JSONArray()
+                    documents.forEach { document ->
+                        val jsonDocument = JSONObject().apply {
+                            put("id", document.id)
+                            put("name", document.name)
+                            put("createdDate", document.createdDate)
+                            put("updatedDate", document.updatedDate)
+                            put("folderId", document.folderId)
+                            put("isSynced", document.isSynced)
+                            put("isPin", document.isPin)
+                            put("isFavourite", document.isFavourite)
+                            put("fileData", document.fileData)
+                            put("fileDriveId", document.fileDriveId)
+                            put("openCount", document.openCount)
+                            put("localFilePathAndroid", document.localFilePathAndroid)
+                            put("tagId", document.tagId)
+                            put("driveType", document.driveType)
+                            put("fileExtension", document.fileExtension)
+                            // Include other fields as needed
+                        }
+                        documentsArray.put(jsonDocument)
+                    }
+
+//                    val documentContainer = JSONObject().apply {
+//                        put("documents", documentsArray)
+//                    }
+
+//                    val docArray = documentContainer.toString()
+//                    updateFolderAndDocToJson(docArray)
+
+                    ///adding folders to json......
+                    val folders =
+                        folderDao.getAllFoldersForJson()
+                    println("323343434455555:$folders")
+                    val foldersArray = JSONArray()
+                    folders.forEach { folder ->
+                        val jsonFolder = JSONObject().apply {
+                            put("id", folder.id)
+                            put("name", folder.name)
+                            put("createdDate", folder.createdDate)
+                            put("updatedDate", folder.updatedDate)
+                            put("emailOrPhone", folder.emailOrPhone)
+                            put("isSynced", folder.isSynced)
+                            put("isPin", folder.isPin)
+                            put("isFavourite", folder.isFavourite)
+                            put("fileCount", folder.fileCount)
+                            put("driveType", folder.driveType)
+                            // Include other fields as needed
+                        }
+                        foldersArray.put(jsonFolder)
+                    }
+
+                    val combinedJson = JSONObject().apply {
+                        put("documents", documentsArray)
+
+                        // Include foldersArray only if it's not empty or documentsArray has content
+                        if (foldersArray.length()>0) {
+                            put("folders", foldersArray)
+                        }
+                    }
+
+                    val jsonContent = combinedJson.toString()
+                    updateFolderAndDocToJson(jsonContent)
+
                 }
 
-                    // Mark document as synced if upload is successful.
-                   // documentDao.updateDocumentWithDriveId(document.id,)
-                //}
-            }
 
+            }
+            if (unsyncedDocuments.isNotEmpty()) {
+
+            }
             return Result.success()
         } catch (e: Exception) {
             return Result.failure()
+        }
+    }
+
+    private fun updateFolderAndDocToJson(array: String) {
+        val fileQueryResult = driveService.files().list()
+            .setQ("name = 'schema.json' and mimeType = 'application/json'")
+            .setSpaces("drive")
+            .setFields("files(id, name)")
+            .execute()
+
+        val files = fileQueryResult.files
+        if (files == null || files.isEmpty()) {
+            println("File not found.")
+
+        } else {
+
+            // Assuming the first search result is the file we want to update
+            val fileId = files[0].id
+
+            // Step 2: Update the file with new JSON data
+            val fileMetadata = com.google.api.services.drive.model.File()
+            val contentStream =
+                ByteArrayContent.fromString("application/json", array)
+
+            driveService.files().update(fileId, fileMetadata, contentStream).execute()
+            println("File updated successfully.")
+        }
+    }
+
+    fun getResourceName(context: Context, @RawRes resId: Int): String {
+        return context.resources.getResourceEntryName(resId)
+    }
+
+    fun loadJSONFromRaw(context: Context, @RawRes resourceId: Int): String? {
+        return try {
+            val inputStream = context.resources.openRawResource(resourceId)
+            inputStream.bufferedReader().use { it.readText() }
+        } catch (e: IOException) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    suspend fun uploadJsonFileToDrive(
+        fileName: String,
+        fileContent: String
+    ): com.google.api.services.drive.model.File? {
+        return withContext(Dispatchers.IO) {
+            try {
+                // Search for the folder named "ReNoteAI"
+                val folderQuery = driveService.files().list()
+                    .setQ("name = 'ReNoteAI' and mimeType = 'application/vnd.google-apps.folder' and trashed = false")
+                    .setSpaces("drive")
+                    .setFields("files(id, name)")
+                    .execute()
+
+                if (folderQuery.files.isNotEmpty()) {
+                    val folderId = folderQuery.files[0].id
+
+                    // Check if the file already exists in the "ReNoteAI" folder
+                    val fileCheck = driveService.files().list()
+                        .setQ("name = '$fileName' and '$folderId' in parents and trashed = false")
+                        .setSpaces("drive")
+                        .setFields("files(id, name)")
+                        .execute()
+
+                    if (fileCheck.files.isNotEmpty()) {
+                        // A file with the same name exists, log and return
+                        val file = fileCheck.files[0]
+                        Log.d("Google Drive", "File already exists: ${file.name} (${file.id})")
+                        return@withContext file
+                    } else {
+                        // Create a new file in the "ReNoteAI" folder
+                        val fileMetadata = com.google.api.services.drive.model.File()
+                        fileMetadata.name = fileName
+                        fileMetadata.parents = listOf(folderId)
+
+                        val mediaContent =
+                            ByteArrayContent.fromString("application/json", fileContent)
+                        val uploadedFile =
+                            driveService.files().create(fileMetadata, mediaContent)
+                                .setFields("id, parents")
+                                .execute()
+
+                        Log.d(
+                            "Google Drive",
+                            "File uploaded: ${uploadedFile.name} (${uploadedFile.id})"
+                        )
+                        return@withContext uploadedFile
+                    }
+                } else {
+                    Log.e("Google Drive", "Folder 'ReNoteAI' not found")
+                    return@withContext null
+                }
+            } catch (e: IOException) {
+                Log.e("Google Drive", "Error uploading or updating json file", e)
+                return@withContext null
+            }
         }
     }
 
@@ -98,13 +298,10 @@ class DocumentSyncWorker(
                 val folderSearch = driveService.files().list().setQ(folderSearchQuery).execute()
                 var folderId: String? = folderSearch.files.firstOrNull()?.id
 
-                // If the ReNoteAI folder doesn't exist, create it
+                // If the ReNoteAI folder doesn't exist, log an error and return
                 if (folderId == null) {
-                    val folderMetadata = com.google.api.services.drive.model.File().apply {
-                        name = "ReNoteAI"
-                        mimeType = folderMimeType
-                    }
-                    folderId = driveService.files().create(folderMetadata).execute().id
+                    println("ReNoteAI folder not found in Google Drive")
+                    return Pair(false, null)
                 }
 
                 // Prepare the file to be uploaded
@@ -116,21 +313,22 @@ class DocumentSyncWorker(
                 val mediaContent = InputStreamContent(null, ByteArrayInputStream(fileContent))
 
                 // Upload the file
-               val uploadFile =  driveService.files().create(fileMetadata, mediaContent).execute()
-                Pair(true,uploadFile.id)
+                val uploadFile = driveService.files().create(fileMetadata, mediaContent).execute()
+                Pair(true, uploadFile.id)
 
                 //true // Return true if upload succeeds
             } else {
                 Pair(false, null)
-               // false // Return false if file content is null or cannot be obtained
+                // false // Return false if file content is null or cannot be obtained
             }
         } catch (e: Exception) {
             e.printStackTrace()
-           // false // Return false if upload fails
+            // false // Return false if upload fails
             Pair(false, null)
 
         }
     }
+
 
     // Function to get file content from path
     private fun getFileContentFromPath(filePath: String, context: Context): ByteArray? {

@@ -227,8 +227,8 @@
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/conformScanBtn"
-                    android:layout_width="@dimen/scan_icon_size"
-                    android:layout_height="@dimen/scan_icon_size"
+                    android:layout_width="19dp"
+                    android:layout_height="18dp"
                     android:src="@drawable/conform_tick"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"

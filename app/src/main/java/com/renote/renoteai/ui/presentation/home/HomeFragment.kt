@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.annotation.RawRes
 import androidx.core.content.ContextCompat
@@ -21,6 +22,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.Constraints
 import androidx.work.Data
+//import android.view.View
+//import androidx.core.view.findViewById
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
@@ -60,7 +63,12 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.api.client.http.InputStreamContent
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import com.google.gson.reflect.TypeToken
+import com.renote.renoteai.database.source.DocumentDatabase
+import com.renote.renoteai.di.provideDocumentDatabase
+import com.renote.renoteai.ui.activities.camera.DocumentsWrapper
 import com.renote.renoteai.ui.presentation.home.workers.DocumentSyncWorker
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -68,24 +76,24 @@ import org.json.JSONObject
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.FileNotFoundException
+import java.io.FileOutputStream
 import java.io.IOException
+import java.io.OutputStream
 import java.util.concurrent.TimeUnit
 
 class HomeFragment : Fragment() {
+
     var mContext: Context? = null
     var mDrive: Drive? = null
     private lateinit var auth: FirebaseAuth
     val authh = FirebaseAuth.getInstance()
     private lateinit var mGoogleSignInClient: GoogleSignInClient
-
     var binding: HomeFragmentDataBinding? = null
-
     private val viewModel: HomeFragmentViewModel by inject()
-
     var folderId: String? = null
-
     var actualFolderName: String? = null
     var loginUserGoogleId: String? = null
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
@@ -95,8 +103,6 @@ class HomeFragment : Fragment() {
         binding?.lifecycleOwner = this
         binding?.viewModel = viewModel
         return binding!!.root
-
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -116,11 +122,6 @@ class HomeFragment : Fragment() {
         val auth = Firebase.auth
         val user = auth.currentUser
 
-
-
-
-
-
         loginUserGoogleId = user?.email
 
         createReNoteAiFolderInGoogleDrive()
@@ -132,33 +133,80 @@ class HomeFragment : Fragment() {
             )
         }
 
-        binding?.adTag?.setOnClickListener {
-            CreateTagBottomSheetFragment().show(childFragmentManager, CreateTagBottomSheetFragment().tag)
+        val driveService = getDriveService(requireContext())
+
+        binding?.imgSync?.setOnClickListener {
+            Thread {
+                try {
+                    val folderId = findFolderId(driveService!!, "ReNoteAI")
+                    if (folderId != null) {
+                        val files = listFilesInFolder(driveService, folderId)
+                        for (file in files) {
+                            saveFileToInternalStorage(
+                                requireContext(),
+                                driveService,
+                                file,
+                                "ReNoteAI"
+                            )
+                        }
+                        // Notify user of success on the UI thread
+                        activity?.runOnUiThread {
+                            Toast.makeText(
+                                requireContext(),
+                                "Files downloaded successfully",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            recreateFragment()
+                        }
+                    } else {
+                        // Handle folder not found
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    // Handle errors (e.g., network issues, permission issues) appropriately
+                }
+            }.start()
         }
 
-            syncDocuments()
 
-//
-//        val workRequest = OneTimeWorkRequest.Builder(DocumentSyncWorker::class.java).build()
-//
-//// Enqueue the WorkRequest
-//        WorkManager.getInstance(requireContext()).enqueue(workRequest)
+        binding?.adTag?.setOnClickListener {
+            CreateTagBottomSheetFragment().show(
+                childFragmentManager,
+                CreateTagBottomSheetFragment().tag
+            )
+        }
 
+        syncDocuments()
 
-        val jsonString = loadJSONFromRaw(
-            requireActivity(), R.raw.schema
-        )
+        val jsonString = readJsonFromFile(requireContext(), "ReNoteAI/schema.json")
+        val database = provideDocumentDatabase(requireContext())
+       // val documentDao = database.documentDao()
+//        if (jsonString != null) {
+//            parseJsonAndInsert(jsonString, database)
+//        }
+
+        jsonString?.let {
+            parseJsonAndInsert(it, database)
+        }
+
+//        val jsonString = loadJSONFromRaw(
+//            requireActivity(), R.raw.schema
+//        )
         //tags
 
-        viewModel.saveTagDetails(TagEntity("1000","All"))
-        viewModel.saveTagDetails(TagEntity("2000","Starred"))
-        viewModel.saveTagDetails(TagEntity("3000","Most Viewed"))
+        viewModel.saveTagDetails(TagEntity("1000", "All"))
+        viewModel.saveTagDetails(TagEntity("2000", "Starred"))
+        viewModel.saveTagDetails(TagEntity("3000", "Most Viewed"))
 
 
         binding?.profileIcon?.setOnClickListener {
             if (loginUserGoogleId != null) {
                 lifecycleScope.launch {
+
                     //updateDocumentInJsonFile("ReNoteAI", "schema.json")
+
+                   // updateDocumentInJsonFile("ReNoteAI", "schema.json", newDocumentData)
+
                 }
             }
             signOutFromGoogle()
@@ -166,21 +214,26 @@ class HomeFragment : Fragment() {
             startActivity(i)
         }
 
-//        binding?.imgSync?.setOnClickListener {
-//            signOutFromGoogle()
-//        }
-
         val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.img_search)
         drawable?.setBounds(0, 0, 40, 40) // Set the desired width and height
         binding?.etSearch?.setCompoundDrawables(drawable, null, null, null)
+
+
+        if (loginUserGoogleId == null) {
+            binding!!.registerCard.visibility = View.VISIBLE
+        } else {
+            binding!!.registerCard.visibility = View.GONE
+        }
 
 
         binding?.relativeCross?.setOnClickListener {
             binding?.registerCard?.visibility = View.GONE
         }
 
+
+
         initTagsRecyclerview()
-       tagsObserveData()
+        tagsObserveData()
         initFoldersRecyclerView()
         foldersObserveData()
         initDocumentsRecyclerView()
@@ -197,6 +250,78 @@ class HomeFragment : Fragment() {
         WorkManager.getInstance(requireContext()).enqueue(syncWorkRequest)
     }
 
+    fun parseJsonAndInsert(jsonString: String, database: DocumentDatabase) {
+        val gson = Gson()
+        val wrapperType = object : TypeToken<DocumentsWrapper>() {}.type
+        val documentsWrapper: DocumentsWrapper = gson.fromJson(jsonString, wrapperType)
+
+        CoroutineScope(Dispatchers.IO).launch {
+            database.documentDao().insertDocuments(documentsWrapper.documents)
+            database.folderDao().insertFoldersFromJson(documentsWrapper.folders)
+        }
+    }
+
+    fun readJsonFromFile(context: Context, filePath: String): String? {
+        return try {
+            val file = File(context.filesDir, filePath)
+            file.bufferedReader().use { it.readText() }
+        } catch (e: IOException) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+
+    fun findFolderId(driveService: Drive, folderName: String): String? {
+        val query =
+            "mimeType = 'application/vnd.google-apps.folder' and name = '$folderName' and trashed = false"
+        val result = driveService.files().list().setQ(query).setSpaces("drive").execute()
+        for (file in result.files) {
+            return file.id
+        }
+        return null
+    }
+
+    fun listFilesInFolder(
+        driveService: Drive,
+        folderId: String
+    ): List<com.google.api.services.drive.model.File> {
+        val query = "'$folderId' in parents and trashed = false"
+        val result = driveService.files().list().setQ(query).execute()
+        return result.files
+    }
+
+    private fun saveFileToInternalStorage(
+        context: Context,
+        driveService: Drive,
+        file: com.google.api.services.drive.model.File,
+        folderName: String // Add a parameter for the folder name
+    ) {
+        // Get or create the directory within internal storage
+        val directory = File(context.filesDir, folderName)
+        if (!directory.exists()) {
+            directory.mkdir()
+        }
+
+        // Create a file within the specified directory
+        val fileWithinDir = File(directory, file.name)
+
+        try {
+            // Use a FileOutputStream to write to the file
+            FileOutputStream(fileWithinDir).use { fos ->
+                downloadFile(driveService, file.id, fos)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            // Handle exceptions appropriately (e.g., file write errors, download issues)
+        }
+    }
+
+
+    fun downloadFile(driveService: Drive, fileId: String, outputStream: OutputStream) {
+        driveService.files().get(fileId).executeMediaAndDownloadTo(outputStream)
+    }
+
     fun createReNoteAiFolderInGoogleDrive() {
         try {
             if (loginUserGoogleId != null) {
@@ -207,31 +332,31 @@ class HomeFragment : Fragment() {
                     actualFolderName?.let {
 
                         folderId = createFolderInGoogleDrive(actualFolderName!!)
-                        val resourceName =
-                            getResourceName(requireActivity(), R.raw.schema) + ".json"
-                        val jsonFileContent = loadJSONFromRaw(requireActivity(), R.raw.schema)
-                        if (folderId != null) {
-                            val uploadedFile =
-                                uploadJsonFileToDrive(folderId!!, resourceName, jsonFileContent!!)
-
-                            if (uploadedFile != null) {
-                                Log.d(
-                                    "Json File uploaded in Google Drive",
-                                    "File ID: ${uploadedFile.id}"
-                                )
-                                // Continue with your logic here
-                            } else {
-                                Log.e(
-                                    "Json File upload in Google Drive Error",
-                                    "Failed to upload file."
-                                )
-                            }
-                        } else {
-                            Log.e(
-                                " ReNote AI Folder Creation in Google Drive Error",
-                                "Failed to create ReNoteAi  folder in Google Drive."
-                            )
-                        }
+//                        val resourceName =
+//                            getResourceName(requireActivity(), R.raw.schema) + ".json"
+//                        val jsonFileContent = loadJSONFromRaw(requireActivity(), R.raw.schema)
+//                        if (folderId != null) {
+//                            val uploadedFile =
+//                                uploadJsonFileToDrive(folderId!!, resourceName, jsonFileContent!!)
+//
+//                            if (uploadedFile != null) {
+//                                Log.d(
+//                                    "Json File uploaded in Google Drive",
+//                                    "File ID: ${uploadedFile.id}"
+//                                )
+//                                // Continue with your logic here
+//                            } else {
+//                                Log.e(
+//                                    "Json File upload in Google Drive Error",
+//                                    "Failed to upload file."
+//                                )
+//                            }
+//                        } else {
+//                            Log.e(
+//                                " ReNote AI Folder Creation in Google Drive Error",
+//                                "Failed to create ReNoteAi  folder in Google Drive."
+//                            )
+//                        }
                     }
                 }
             } else {
@@ -1237,6 +1362,18 @@ class HomeFragment : Fragment() {
         }
 
         return jsonDocument
+    }
+
+    fun recreateFragment() {
+        val fragmentManager = parentFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction()
+        val currentFragment = fragmentManager.findFragmentById(R.id.frameLayout)
+        // Replace the current fragment with a new instance of the same fragment
+        if (currentFragment != null) {
+            fragmentTransaction.remove(currentFragment)
+            fragmentTransaction.add(R.id.frameLayout, currentFragment::class.java, null)
+            fragmentTransaction.commit()
+        }
     }
 
 //    override fun onResume() {

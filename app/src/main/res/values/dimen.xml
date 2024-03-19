@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <dimen name="padding_8dp">8dp</dimen>
+    <dimen name="padding_2dp">2dp</dimen>
+    <dimen name="width_30dp">30dp</dimen>
+    <dimen name="height_30dp">30dp</dimen>
+
     <dimen name="view_padding_20">20dp</dimen>
     <dimen name="view_padding_30">30dp</dimen>
     <dimen name="iconSize">30dp</dimen>
