@@ -14,16 +14,19 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white"
+        android:background="@color/black"
         tools:context=".ui.activities.camera.CameraActivity">
 
         <androidx.camera.view.PreviewView
             android:id="@+id/viewFinder"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
+            android:layout_margin="8dp"
+            android:layout_marginBottom="15dp"
             android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/featureLay"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:scaleType="fitCenter" />
@@ -38,8 +41,16 @@
         <com.renote.renoteai.ui.activities.camera.scanutil.RectOverlay
             android:id="@+id/rectOverlay"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@android:color/transparent" />
+            android:layout_height="0dp"
+            android:layout_margin="8dp"
+            android:layout_marginBottom="15dp"
+            android:background="@android:color/transparent"
+            android:visibility="visible"
+            app:layout_constraintBottom_toTopOf="@id/featureLay"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <View
             android:id="@+id/dashedLine"
@@ -57,10 +68,11 @@
             android:id="@+id/gridVertical1"
             android:layout_width="1dp"
             android:layout_height="0dp"
+            android:layout_marginBottom="15dp"
             android:alpha="0.5"
             android:background="@android:color/white"
             android:elevation="2dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/featureLay"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.33"
             app:layout_constraintStart_toStartOf="parent"
@@ -70,10 +82,11 @@
             android:id="@+id/gridVertical2"
             android:layout_width="1dp"
             android:layout_height="0dp"
+            android:layout_marginBottom="15dp"
             android:alpha="0.5"
             android:background="@android:color/white"
             android:elevation="2dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/featureLay"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.66"
             app:layout_constraintStart_toStartOf="parent"
@@ -83,10 +96,11 @@
             android:id="@+id/gridHorizontal1"
             android:layout_width="0dp"
             android:layout_height="1dp"
+            android:layout_marginBottom="15dp"
             android:alpha="0.5"
             android:background="@android:color/white"
             android:elevation="2dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/featureLay"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -96,10 +110,11 @@
             android:id="@+id/gridHorizontal2"
             android:layout_width="0dp"
             android:layout_height="1dp"
+            android:layout_marginBottom="15dp"
             android:alpha="0.5"
             android:background="@android:color/white"
             android:elevation="2dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/featureLay"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -113,6 +128,7 @@
             app:constraint_referenced_ids="gridVertical1,gridVertical2,gridHorizontal1,gridHorizontal2" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/featureLay"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/colorTransperatDark"
@@ -227,8 +243,8 @@
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/conformScanBtn"
-                    android:layout_width="@dimen/scan_icon_size"
-                    android:layout_height="@dimen/scan_icon_size"
+                    android:layout_width="19dp"
+                    android:layout_height="18dp"
                     android:src="@drawable/conform_tick"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -328,6 +344,7 @@
             </com.google.android.material.tabs.TabLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/toolsLay"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/margin_20dp"

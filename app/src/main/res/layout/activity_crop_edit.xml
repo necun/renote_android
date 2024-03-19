@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+   >
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/cropImage"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/colorButtonGreyBg"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.renote.renoteai.ui.activities.camera.scanutil.BorderOverlay
+        android:id="@+id/borderOverlay"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clickable="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/dashedLine"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_marginBottom="10dp"
+        android:visibility="gone"
+        android:background="@drawable/dashed_line"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ProgressBar
+        android:id="@+id/loadingBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:indeterminateTint="@color/green"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"  />
+
+
+    <FrameLayout
+        android:id="@+id/backBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_10dp"
+        android:padding="@dimen/padding_8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="@dimen/filter_icon_size"
+            android:layout_height="@dimen/filter_icon_size"
+            android:padding="@dimen/padding_2dp"
+            app:srcCompat="@drawable/ic_crop_cross" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/cropBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_10dp"
+        android:padding="@dimen/padding_8dp"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/backBtn"
+        app:layout_constraintEnd_toStartOf="@id/rotateRightBtn">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="@dimen/filter_icon_size"
+            android:layout_height="@dimen/filter_icon_size"
+            android:padding="@dimen/padding_2dp"
+            app:srcCompat="@drawable/ic_crop__icon" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/rotateRightBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_10dp"
+        android:padding="@dimen/padding_8dp"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/cropBtn"
+        app:layout_constraintEnd_toStartOf="@id/rotateLeftBtn">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="@dimen/filter_icon_size"
+            android:layout_height="@dimen/filter_icon_size"
+            android:padding="@dimen/padding_2dp"
+            app:srcCompat="@drawable/ic_rotate_right" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/rotateLeftBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_10dp"
+        android:padding="@dimen/padding_8dp"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/rotateRightBtn"
+        app:layout_constraintEnd_toStartOf="@id/continueBtn">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="@dimen/filter_icon_size"
+            android:layout_height="@dimen/filter_icon_size"
+            android:padding="@dimen/padding_2dp"
+            app:srcCompat="@drawable/ic_rotate_right" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/continueBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_10dp"
+        android:padding="@dimen/padding_8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="@dimen/height_30dp"
+            android:layout_height="@dimen/height_30dp"
+            app:srcCompat="@drawable/ic_arrow_right" />
+
+    </FrameLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

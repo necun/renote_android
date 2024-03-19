@@ -1,7 +1,8 @@
-package com.renote.renoteai.ui.activities.camera
+package com.renote.renoteai.ui.activities.edit
 
 import android.annotation.SuppressLint
 import android.content.ContentValues
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
@@ -10,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
 import android.widget.Toast
-import com.renote.renoteai.databinding.ActivityImageFilterBinding
+
 import org.opencv.android.Utils
 import org.opencv.core.Mat
 import org.opencv.imgproc.Imgproc
@@ -29,18 +30,34 @@ import android.view.WindowManager
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.databinding.DataBindingUtil
 import com.chaquo.python.Python
 import com.chaquo.python.android.AndroidPlatform
 import com.renote.renoteai.R
+
+import com.renote.renoteai.databinding.EditActivityDataBinding
+import com.renote.renoteai.ui.activities.camera.CameraActivity
+import com.renote.renoteai.ui.activities.camera.EXTRA_PICTURE_TYPE
+import com.renote.renoteai.ui.activities.camera.EXTRA_PICTURE_URI
+import com.renote.renoteai.ui.activities.camera.EmailActivity
+import com.renote.renoteai.ui.activities.camera.OCRResultViewer
 import com.renote.renoteai.ui.activities.camera.libs.CVLib
+import com.renote.renoteai.ui.activities.cropedit.CropEditActivity
+import com.renote.renoteai.ui.activities.edit.viewmodel.EditViewModel
+import com.renote.renoteai.ui.activities.filteredit.FilterEditActivity
+import com.renote.renoteai.ui.activities.signup.SignUpActivity
+import com.renote.renoteai.ui.presentation.home.viewmodel.HomeFragmentViewModel
+import org.koin.android.ext.android.inject
 import java.io.File
 import java.io.FileInputStream
 
 
 const val EXTRA_OCR_TEXT = "com.example.cameraxapp.OCR_TEXT"
 
-class ImageFilter : AppCompatActivity() {
-    private lateinit var viewBinding: ActivityImageFilterBinding
+class EditActivity : AppCompatActivity() {
+    private lateinit var binding: EditActivityDataBinding
+    private val viewModel: EditViewModel by inject()
+    var mContext: Context? = null
     private var original: Mat? = null
     private var result: Mat? = null
 
@@ -57,8 +74,11 @@ class ImageFilter : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewBinding = ActivityImageFilterBinding.inflate(layoutInflater)
-        setContentView(viewBinding.root)
+        binding = DataBindingUtil.setContentView(
+            this@EditActivity, R.layout.activity_edit
+        )
+        binding.lifecycleOwner = this
+        binding.viewModel = viewModel
         supportActionBar?.hide()
 
         val uri = Uri.parse(intent.getStringExtra(EXTRA_PICTURE_URI))
@@ -78,14 +98,14 @@ class ImageFilter : AppCompatActivity() {
         )
 
         //deleteInternalStorageDirectoryy()
-        viewBinding.aiFilterImgBtn.setOnClickListener {
+        binding.aiFilterImgBtn.setOnClickListener {
             ai.visibility = View.VISIBLE
 
             bw.visibility = View.GONE
             org.visibility = View.GONE
             grey.visibility = View.GONE
             soft.visibility = View.GONE
-            viewBinding.aiFilterProgressbar.visibility = View.VISIBLE
+            binding.aiFilterProgressbar.visibility = View.VISIBLE
             deleteInternalStorageDirectoryy()
 
 
@@ -97,7 +117,7 @@ class ImageFilter : AppCompatActivity() {
             doSaveGetSave()
             aiFilter()
         }
-        viewBinding.greyFilterImgBtn.setOnClickListener {
+        binding.greyFilterImgBtn.setOnClickListener {
             grey.visibility = View.VISIBLE
 
             bw.visibility = View.GONE
@@ -114,7 +134,7 @@ class ImageFilter : AppCompatActivity() {
             doSaveGetSave()
             greyFilter()
         }
-        viewBinding.softFilterImgBtn.setOnClickListener {
+        binding.softFilterImgBtn.setOnClickListener {
             soft.visibility = View.VISIBLE
 
             bw.visibility = View.GONE
@@ -131,14 +151,14 @@ class ImageFilter : AppCompatActivity() {
             doSaveGetSave()
             softFilter()
         }
-        viewBinding.blackAndWhiteFilterImgBtn.setOnClickListener {
+        binding.blackAndWhiteFilterImgBtn.setOnClickListener {
             bw.visibility = View.VISIBLE
 
             ai.visibility = View.GONE
             org.visibility = View.GONE
             grey.visibility = View.GONE
             soft.visibility = View.GONE
-            viewBinding.blackAndWhiteFilterProgressbar.visibility = View.VISIBLE
+            binding.blackAndWhiteFilterProgressbar.visibility = View.VISIBLE
             deleteInternalStorageDirectoryy()
 
 //      viewBinding.originalFilterImageView.setImageResource(R.drawable.ic_no_picture)
@@ -181,12 +201,12 @@ class ImageFilter : AppCompatActivity() {
 //    viewBinding.SaveButton.setOnClickListener {
 //      doSave()
 //    }
-        viewBinding.tickMarkImageView.setOnClickListener {
+        binding.tickMarkImageView.setOnClickListener {
             doSave()
         }
 
-        viewBinding.cameraRetakeImageView.setOnClickListener {
-            val intent = Intent(this@ImageFilter, CameraActivity::class.java)
+        binding.cameraRetakeImageView.setOnClickListener {
+            val intent = Intent(this@EditActivity, CameraActivity::class.java)
             startActivity(intent)
             deleteInternalStorageDirectoryy()
             finishAffinity()
@@ -194,7 +214,7 @@ class ImageFilter : AppCompatActivity() {
 //    viewBinding.SoftFilterButton.setOnClickListener {
 //      doSoftFilter()
 //    }
-        viewBinding.originalFilterImgBtn.setOnClickListener {
+        binding.originalFilterImgBtn.setOnClickListener {
             org.visibility = View.VISIBLE
 
             bw.visibility = View.GONE
@@ -270,7 +290,7 @@ class ImageFilter : AppCompatActivity() {
 
         doSaveGetSave()
         blackAndWhiteFilter()
-
+          observeData()
         //doSaveGetSave()
         // doNoFilter()
         //aiFilter()
@@ -280,6 +300,23 @@ class ImageFilter : AppCompatActivity() {
         // viewBinding.imageView2.setImageBitmap(resultBitmap)
     }
 
+    fun observeData() {
+        viewModel.resourseClick.observe(this) { integer ->
+            when (integer) {
+                R.id.cropBtn-> {
+                    startActivity(Intent(this@EditActivity, CropEditActivity::class.java))
+                }
+
+                R.id.filterBtn -> {
+
+                    startActivity(Intent(this@EditActivity, FilterEditActivity::class.java))
+                }
+
+
+
+            }
+        }
+    }
     override fun onDestroy() {
         super.onDestroy()
         deleteInternalStorageDirectoryy()
@@ -315,11 +352,11 @@ class ImageFilter : AppCompatActivity() {
         val b = BitmapFactory.decodeStream(FileInputStream(f))
         if (b != null) {
             enhancedImageType = "ai_filter_image"
-            viewBinding.aiFilterProgressbar.visibility = View.GONE
+            binding.aiFilterProgressbar.visibility = View.GONE
             //viewBinding.aiFilterImageView.setImageBitmap(b)
-            viewBinding.imageView2.setImageBitmap(b)
+            binding.imageView2.setImageBitmap(b)
         } else {
-            viewBinding.aiFilterProgressbar.visibility = View.VISIBLE
+            binding.aiFilterProgressbar.visibility = View.VISIBLE
             // viewBinding.aiFilterImageView.setImageResource(R.drawable.ic_no_picture)
         }
 
@@ -354,13 +391,13 @@ class ImageFilter : AppCompatActivity() {
         val b = BitmapFactory.decodeStream(FileInputStream(f))
         if (b != null) {
             enhancedImageType = "grey_filter_image"
-            viewBinding.imageView2.setImageBitmap(b)
+            binding.imageView2.setImageBitmap(b)
             //viewBinding.greyFilterImageView.setImageBitmap(b)
-            viewBinding.greyFilterProgressbar.visibility = View.GONE
+            binding.greyFilterProgressbar.visibility = View.GONE
 
 
         } else {
-            viewBinding.greyFilterProgressbar.visibility = View.VISIBLE
+            binding.greyFilterProgressbar.visibility = View.VISIBLE
             //viewBinding.greyFilterImageView.setImageResource(R.drawable.ic_no_picture)
         }
 
@@ -396,12 +433,12 @@ class ImageFilter : AppCompatActivity() {
         val b = BitmapFactory.decodeStream(FileInputStream(f))
         if (b != null) {
             enhancedImageType = "soft_filter_image"
-            viewBinding.imageView2.setImageBitmap(b)
+            binding.imageView2.setImageBitmap(b)
             // viewBinding.softFilterImageView.setImageBitmap(b)
-            viewBinding.softFilterProgressbar.visibility = View.GONE
+            binding.softFilterProgressbar.visibility = View.GONE
         } else {
             // viewBinding.softFilterImageView.setImageResource(R.drawable.ic_no_picture);
-            viewBinding.softFilterProgressbar.visibility = View.VISIBLE
+            binding.softFilterProgressbar.visibility = View.VISIBLE
 
         }
     }
@@ -435,13 +472,13 @@ class ImageFilter : AppCompatActivity() {
         val b = BitmapFactory.decodeStream(FileInputStream(f))
         if (b != null) {
             enhancedImageType = "black_and_white_filter_image"
-            viewBinding.imageView2.setImageBitmap(b)
+            binding.imageView2.setImageBitmap(b)
             //viewBinding.blackAndWhiteFilterImageView.setImageBitmap(b)
-            viewBinding.blackAndWhiteFilterProgressbar.visibility = View.GONE
+            binding.blackAndWhiteFilterProgressbar.visibility = View.GONE
 
 
         } else {
-            viewBinding.blackAndWhiteFilterProgressbar.visibility = View.VISIBLE
+            binding.blackAndWhiteFilterProgressbar.visibility = View.VISIBLE
             //viewBinding.blackAndWhiteFilterImageView.setImageResource(R.drawable.ic_no_picture)
         }
 
@@ -476,7 +513,7 @@ class ImageFilter : AppCompatActivity() {
         System.out.println("122334465=")
         val b = BitmapFactory.decodeStream(FileInputStream(f))
 
-        viewBinding.imageView2.setImageBitmap(b)
+        binding.imageView2.setImageBitmap(b)
     }
 
     private fun doBWFilter() {
@@ -486,7 +523,7 @@ class ImageFilter : AppCompatActivity() {
         val resultBitmap =
             Bitmap.createBitmap(result.cols(), result.rows(), Bitmap.Config.ARGB_8888)
         Utils.matToBitmap(result, resultBitmap)
-        viewBinding.imageView2.setImageBitmap(resultBitmap)
+        binding.imageView2.setImageBitmap(resultBitmap)
     }
 
     private fun doGrayscaleFilter() {
@@ -496,7 +533,7 @@ class ImageFilter : AppCompatActivity() {
         val resultBitmap =
             Bitmap.createBitmap(result.cols(), result.rows(), Bitmap.Config.ARGB_8888)
         Utils.matToBitmap(result, resultBitmap)
-        viewBinding.imageView2.setImageBitmap(resultBitmap)
+        binding.imageView2.setImageBitmap(resultBitmap)
     }
 
     private fun doEnhanceFilter() {
@@ -506,7 +543,7 @@ class ImageFilter : AppCompatActivity() {
         val resultBitmap =
             Bitmap.createBitmap(result.cols(), result.rows(), Bitmap.Config.ARGB_8888)
         Utils.matToBitmap(result, resultBitmap)
-        viewBinding.imageView2.setImageBitmap(resultBitmap)
+        binding.imageView2.setImageBitmap(resultBitmap)
     }
 
     private fun doSoftFilter() {
@@ -516,7 +553,7 @@ class ImageFilter : AppCompatActivity() {
         val resultBitmap =
             Bitmap.createBitmap(result.cols(), result.rows(), Bitmap.Config.ARGB_8888)
         Utils.matToBitmap(result, resultBitmap)
-        viewBinding.imageView2.setImageBitmap(resultBitmap)
+        binding.imageView2.setImageBitmap(resultBitmap)
     }
 
     private fun doNoFilter() {
@@ -527,13 +564,13 @@ class ImageFilter : AppCompatActivity() {
         Utils.matToBitmap(original, resultBitmap)
         if (resultBitmap != null) {
             enhancedImageType = "no_filter_image"
-            viewBinding.imageView2.setImageBitmap(resultBitmap)
+            binding.imageView2.setImageBitmap(resultBitmap)
             //  viewBinding.originalFilterImageView.setImageBitmap(resultBitmap)
-            viewBinding.originalFilterProgressbar.visibility = View.GONE
+            binding.originalFilterProgressbar.visibility = View.GONE
 
 
         } else {
-            viewBinding.originalFilterProgressbar.visibility = View.VISIBLE
+            binding.originalFilterProgressbar.visibility = View.VISIBLE
 //      viewBinding.originalFilterImageView.setImageResource(R.drawable.ic_no_picture)
         }
 
@@ -595,7 +632,7 @@ class ImageFilter : AppCompatActivity() {
         // Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
         println("enhancedImageTypenhancedImageTyp:$enhancedImageType")
 
-        val intent = Intent(this@ImageFilter, EmailActivity::class.java)
+        val intent = Intent(this@EditActivity, EmailActivity::class.java)
         intent.putExtra("enhancedImageType", enhancedImageType)
         startActivity(intent)
     }
@@ -644,7 +681,7 @@ class ImageFilter : AppCompatActivity() {
 
     fun deleteInternalStorageDirectoryy() {
         if (ContextCompat.checkSelfPermission(
-                this@ImageFilter,
+                this@EditActivity,
                 android.Manifest.permission.READ_EXTERNAL_STORAGE
             ) == PackageManager.PERMISSION_DENIED
         ) {
@@ -679,12 +716,12 @@ class ImageFilter : AppCompatActivity() {
 
     private fun requestRuntimePermissionn(): Boolean {
         if (ActivityCompat.checkSelfPermission(
-                this@ImageFilter,
+                this@EditActivity,
                 android.Manifest.permission.READ_EXTERNAL_STORAGE
             ) != PackageManager.PERMISSION_GRANTED
         ) {
             ActivityCompat.requestPermissions(
-                this@ImageFilter,
+                this@EditActivity,
                 arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE),
                 14
             )
@@ -702,11 +739,11 @@ class ImageFilter : AppCompatActivity() {
         when (requestCode) {
             14 -> {
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(this@ImageFilter, "Permission Granted", Toast.LENGTH_LONG)
+                    Toast.makeText(this@EditActivity, "Permission Granted", Toast.LENGTH_LONG)
                         .show()
                 } else {
                     ActivityCompat.requestPermissions(
-                        this@ImageFilter,
+                        this@EditActivity,
                         arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE),
                         14
                     )

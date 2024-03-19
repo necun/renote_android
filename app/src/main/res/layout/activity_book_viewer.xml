@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.activities.camera.ImageFilter">
+    tools:context=".ui.activities.edit.EditActivity">
 
     <com.jsibbold.zoomage.ZoomageView
         android:id="@+id/imageView2"

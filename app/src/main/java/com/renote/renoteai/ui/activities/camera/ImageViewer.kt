@@ -21,6 +21,7 @@ import com.renote.renoteai.databinding.ActivityImageViewerBinding
 import com.renote.renoteai.ui.activities.camera.libs.CVLib
 import com.renote.renoteai.ui.activities.camera.libs.DocLib
 import com.renote.renoteai.ui.activities.camera.scanutil.DocumentBorders
+import com.renote.renoteai.ui.activities.edit.EditActivity
 import org.opencv.android.Utils
 import org.opencv.core.Mat
 import org.opencv.imgproc.Imgproc
@@ -135,7 +136,7 @@ class ImageViewer : AppCompatActivity() {
         startActivity(intent)
 
       } else {
-        val intent = Intent(this, ImageFilter::class.java).apply {
+        val intent = Intent(this, EditActivity::class.java).apply {
           putExtra(EXTRA_PICTURE_URI, uri.toString())
         }
         startActivity(intent)
