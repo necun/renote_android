@@ -11,14 +11,12 @@ import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.navArgs
 
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.renote.renoteai.R
 import com.renote.renoteai.databinding.FolderFilesFragmentDataBinding
 import com.renote.renoteai.ui.fragments.folders.viewmodel.FolderFilesViewModel
 import com.renote.renoteai.ui.main.MainActivity
-import com.renote.renoteai.ui.presentation.home.HomeFragment
 import com.renote.renoteai.ui.presentation.home.adapters.DocumentsDetailsAdapter
 import org.koin.android.ext.android.inject
 
@@ -44,6 +42,9 @@ class FolderFilesFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+
+
 
 
 

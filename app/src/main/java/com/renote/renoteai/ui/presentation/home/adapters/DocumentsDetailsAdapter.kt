@@ -7,8 +7,8 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
-import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.renote.renoteai.R
 import com.renote.renoteai.database.tables.DocumentEntity
 import com.renote.renoteai.databinding.DocumentsItemBinding
+import com.renote.renoteai.ui.fragments.folders.MultipleFilesFragment
 import java.io.File
 
 import java.text.SimpleDateFormat
@@ -60,10 +61,21 @@ class DocumentsDetailsAdapter(private val context: Context) :
                 binding.dateAndTime.text = convertTimestampToDateAndTime(data.createdDate)
                 binding.executePendingBindings()
 
+
                 binding.docRelativeLayout.setOnClickListener {
-                    Toast.makeText(context, data.fileDriveId, Toast.LENGTH_SHORT).show()
-                    openFileFromUri(data.fileData.toUri())
+//                    Toast.makeText(context, data.fileDriveId, Toast.LENGTH_SHORT).show()
+//                    openFileFromUri(data.fileData.toUri())
+                    val context = binding.root.context
+                    if (context is AppCompatActivity) {
+                        val fragmentManager = context.supportFragmentManager
+                        val transaction = fragmentManager.beginTransaction()
+                        transaction.replace(R.id.frameLayout, MultipleFilesFragment())
+                        transaction.addToBackStack(null)  // Optional: Add to back stack to enable back navigation
+                        transaction.commit()
+                    }
+
                 }
+
             }
         }
     }
@@ -90,7 +102,8 @@ class DocumentsDetailsAdapter(private val context: Context) :
                 Toast.makeText(context, "No app found to open this file", Toast.LENGTH_SHORT).show()
             }
         } catch (exception: Exception) {
-            Toast.makeText(context, "Error opening file: ${exception.message}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Error opening file: ${exception.message}", Toast.LENGTH_SHORT)
+                .show()
             println("Error opening file: ${exception.message}")
             exception.printStackTrace()
         }

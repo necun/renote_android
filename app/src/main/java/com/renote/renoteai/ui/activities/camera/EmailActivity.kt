@@ -21,6 +21,8 @@ import com.renote.renoteai.R
 import com.renote.renoteai.UploadResponse
 import com.renote.renoteai.api
 import com.renote.renoteai.database.tables.DocumentEntity
+import com.renote.renoteai.database.tables.FileEntity
+import com.renote.renoteai.database.tables.FolderEntity
 import com.renote.renoteai.databinding.EmailDataBinding
 import com.renote.renoteai.ui.activities.camera.viewmodel.EmailViewModel
 import com.renote.renoteai.ui.main.MainActivity
@@ -69,6 +71,7 @@ class EmailActivity : AppCompatActivity() {
 
     private val viewModelHome: HomeFragmentViewModel by inject()
     val docEntities = mutableListOf<DocumentEntity>()
+    val fileEntity = mutableListOf<FileEntity>()
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -275,7 +278,7 @@ class EmailActivity : AppCompatActivity() {
                 name = fileName,
                 createdDate = 10005000,
                 updatedDate = 10005000,
-                fileData = fileUri.toString(),
+                fileData = "",
                 fileDriveId = "",
                 isSynced = false,
                 isPin = false,
@@ -284,6 +287,25 @@ class EmailActivity : AppCompatActivity() {
                 openCount = 30,
                 localFilePathAndroid = "ssssssssssssss",
                 tagId = "12345",
+                driveType = "gDrive",
+                fileExtension = fileType
+            )
+        )
+
+        fileEntity.add(
+            FileEntity(
+                id = "file_$formattedTimestamp",
+                name = fileName,
+                createdDate = 10005000,
+                updatedDate = 10005000,
+                documentId = "doc_$formattedTimestamp",
+                isSynced = false,
+                isPin = false,
+                isFavourite = false,
+                fileData = fileUri.toString(),
+                openCount = 30,
+                localFilePathAndroid = "dfjahdbc",
+                tagId = "34543",
                 driveType = "gDrive",
                 fileExtension = fileType
             )
@@ -433,3 +455,4 @@ class EmailActivity : AppCompatActivity() {
 
     }
 }
+
