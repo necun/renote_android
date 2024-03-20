@@ -199,36 +199,7 @@ class EmailActivity : AppCompatActivity() {
                 .toString() + "/CameraX-Image-Output/"
         val file = File(output_path, "$enhancedImageType.jpg")
 
-
         val fileName = "file_$currentTimestamp.jpg"
-
-//        if (folderName != "ReNoteAI" && folderId != "100"){
-//            val directory = File(this.filesDir, "ReNoteAI/$folderName") // Directory path within app's internal storage
-//            if (!directory.exists()) {
-//                directory.mkdirs() // Create the directory if it doesn't exist
-//            }
-//                val newFile = File(directory, fileName)
-//                val fileUri:Uri = Uri.fromFile(newFile)
-//                try {
-//                    val inputStream = FileInputStream(file)
-//                    val outputStream = FileOutputStream(newFile)
-//                    val buffer = ByteArray(1024)
-//                    var length: Int
-//                    while (inputStream.read(buffer).also { length = it } > 0) {
-//                        outputStream.write(buffer, 0, length)
-//                    }
-//                    outputStream.flush()
-//                    outputStream.close()
-//                    inputStream.close()
-//                    // Now 'newFile' contains the copied image file in the internal storage of your app
-//                    Toast.makeText(this@EmailActivity,"Image Saved",Toast.LENGTH_SHORT).show()
-//                    saveToRoom(fileUri,fileName,folderId)
-//                } catch (e: IOException) {
-//                    e.printStackTrace()
-//                    // Handle error
-//                }
-//
-//        } else {
             val directory =
                 File(this.filesDir, "ReNoteAI") // Directory path within app's internal storage
             if (!directory.exists()) {
@@ -283,8 +254,6 @@ class EmailActivity : AppCompatActivity() {
                 fileExtension = fileType
             )
         )
-
-
 
         println("savedFileUri:$fileUri")
         viewModelHome.saveDocumentsDetails(docEntities)

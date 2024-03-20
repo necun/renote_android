@@ -124,7 +124,6 @@ class HomeFragment : Fragment() {
         }
 
 
-
         val driveService = getDriveService(requireContext())
 
         binding?.imgSync?.setOnClickListener {
@@ -172,10 +171,6 @@ class HomeFragment : Fragment() {
 
         val jsonString = readJsonFromFile(requireContext(), "ReNoteAI/schema.json")
         val database = provideDocumentDatabase(requireContext())
-        // val documentDao = database.documentDao()
-//        if (jsonString != null) {
-//            parseJsonAndInsert(jsonString, database)
-//        }
 
         jsonString?.let {
             parseJsonAndInsert(it, database)
@@ -198,7 +193,7 @@ class HomeFragment : Fragment() {
         }
 
         binding?.btnRegister?.setOnClickListener {
-            startActivity(Intent(requireActivity(),RegistrationActivity::class.java))
+            startActivity(Intent(requireActivity(), RegistrationActivity::class.java))
         }
 
         val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.img_search)
@@ -241,8 +236,15 @@ class HomeFragment : Fragment() {
         val documentsWrapper: DocumentsWrapper = gson.fromJson(jsonString, wrapperType)
 
         CoroutineScope(Dispatchers.IO).launch {
-            database.documentDao().insertDocuments(documentsWrapper.documents)
-            database.folderDao().insertFoldersFromJson(documentsWrapper.folders)
+            documentsWrapper?.let { wrapper ->
+                wrapper.documents?.takeIf { it.isNotEmpty() }?.let { documents ->
+                    database.documentDao().insertDocuments(documents)
+                }
+
+                wrapper.folders?.takeIf { it.isNotEmpty() }?.let { folders ->
+                    database.folderDao().insertFoldersFromJson(folders)
+                }
+            }
         }
     }
 
@@ -809,57 +811,57 @@ class HomeFragment : Fragment() {
         }
     }
 
+//
+//    val newDocumentData = mapOf(
+//        "id" to "aaaaaaaaaaaaa",
+//        "name" to "Document5555",
+//        "createdDate" to 3434356545677,
+//        "updatedDate" to 4344454545455,
+//        "fileData" to "",
+//        "isSynced" to true,
+//        "isPin" to false,
+//        "isFavourite" to false,
+//        "folderId" to "aewfsasdfdfsasfs", // Assuming it's being added to the same folder
+//        "openCount" to 50,
+//        "localFilePathIos" to "",
+//        "localFilePathAndroid" to "",
+//        "tagId" to "oa39weoiafk", // Example tag ID, assuming you're tagging it with an existing tag
+//        "driveType" to "Google",
+//        "fileExtension" to "pdf"
+//    )
 
-    val newDocumentData = mapOf(
-        "id" to "aaaaaaaaaaaaa",
-        "name" to "Document5555",
-        "createdDate" to 3434356545677,
-        "updatedDate" to 4344454545455,
-        "fileData" to "",
-        "isSynced" to true,
-        "isPin" to false,
-        "isFavourite" to false,
-        "folderId" to "aewfsasdfdfsasfs", // Assuming it's being added to the same folder
-        "openCount" to 50,
-        "localFilePathIos" to "",
-        "localFilePathAndroid" to "",
-        "tagId" to "oa39weoiafk", // Example tag ID, assuming you're tagging it with an existing tag
-        "driveType" to "Google",
-        "fileExtension" to "pdf"
-    )
-
-    fun createJsonDocument(): JSONObject {
-        // Document details as a JSONObject
-        val documentDetails = JSONObject().apply {
-            put("id", "ererdfdfddftyrtgu")
-            put("name", "Document3")
-            put("createdDate", 1709509777943)
-            put("updatedDate", 1709809777943)
-            put("fileData", "")
-            put("isSynced", true)
-            put("isPin", false)
-            put("isFavourite", true)
-            put("folderId", "aewfsasdfdfsfgh")
-            put("openCount", 100)
-            put("localFilePathIos", "")
-            put("localFilePathAndroid", "")
-            put("tagId", "")
-            put("driveType", "Google")
-            put("fileExtension", "png")
-        }
-
-        // Wrapping the document details in a "documents" JSONObject
-        val documentsObject = JSONObject().apply {
-            put("ererdfdfddftyrtgu", documentDetails)
-        }
-
-        // The entire JSON structure
-        val jsonDocument = JSONObject().apply {
-            put("documents", documentsObject)
-        }
-
-        return jsonDocument
-    }
+//    fun createJsonDocument(): JSONObject {
+//        // Document details as a JSONObject
+//        val documentDetails = JSONObject().apply {
+//            put("id", "ererdfdfddftyrtgu")
+//            put("name", "Document3")
+//            put("createdDate", 1709509777943)
+//            put("updatedDate", 1709809777943)
+//            put("fileData", "")
+//            put("isSynced", true)
+//            put("isPin", false)
+//            put("isFavourite", true)
+//            put("folderId", "aewfsasdfdfsfgh")
+//            put("openCount", 100)
+//            put("localFilePathIos", "")
+//            put("localFilePathAndroid", "")
+//            put("tagId", "")
+//            put("driveType", "Google")
+//            put("fileExtension", "png")
+//        }
+//
+//        // Wrapping the document details in a "documents" JSONObject
+//        val documentsObject = JSONObject().apply {
+//            put("ererdfdfddftyrtgu", documentDetails)
+//        }
+//
+//        // The entire JSON structure
+//        val jsonDocument = JSONObject().apply {
+//            put("documents", documentsObject)
+//        }
+//
+//        return jsonDocument
+//    }
 
     fun recreateFragment() {
         val fragmentManager = parentFragmentManager

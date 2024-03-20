@@ -31,4 +31,6 @@
     <color name="colorTransperatDark">#50000000</color>
     <color name="colorLightTransperatBg">#BB000000</color>
     <color name="colorTransperatGray">#20000000</color>
+
+    <color name="edit_screen_text">#323131</color>
 </resources>

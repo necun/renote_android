@@ -24,6 +24,7 @@ import com.renote.renoteai.ui.presentation.home.viewmodel.HomeFragmentViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.remoteconfig.ktx.remoteConfig
 import com.renote.renoteai.database.dao.DocumentDao
 import com.renote.renoteai.databinding.ActivityMainBinding
 import com.renote.renoteai.ui.presentation.home.workers.DocumentSyncWorker
@@ -56,21 +57,9 @@ class MainActivity : AppCompatActivity() {
 
         println(currentFragment)
 
-
+        fetchRemoteConfig()
 
         Firebase.crashlytics.setCrashlyticsCollectionEnabled(true)
-
-//        val constraints = Constraints.Builder()
-//            .setRequiredNetworkType(NetworkType.CONNECTED) // Example constraint: require network connectivity
-//            .build()
-//
-//// Create WorkRequest
-//        val workRequest = OneTimeWorkRequest.Builder(DocumentSyncWorker::class.java)
-//            .setConstraints(constraints) // Optional: apply constraints
-//            .build()
-//
-//// Enqueue WorkRequest
-//        WorkManager.getInstance(this).enqueue(workRequest)
 
         val homeFragment = HomeFragment()
         supportFragmentManager.beginTransaction()
@@ -88,25 +77,26 @@ class MainActivity : AppCompatActivity() {
             when (it.itemId) {
                 R.id.navImport -> {
 
-                    if (currentFragment !is ImportFragment) {
-                        //recyclerView.visibility = View.GONE
-                        // Replace Toast with Fragment transaction
-                        val importFragment = ImportFragment()
-                        supportFragmentManager.beginTransaction()
-                            .replace(
-                                R.id.frameLayout,
-                                importFragment
-                            ) // Ensure you have a FrameLayout in your layout where the fragment should be placed
-                            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                            //.addToBackStack(null) // Optional: Add transaction to the back stack
-                            .commit()
-//                    recyclerView.visibility = View.GONE
-                        currentFragment = importFragment
-                        Firebase.crashlytics.log("This is a test log message.")
-                        Firebase.crashlytics.setCustomKey("UserId", "12345")
-                        Firebase.crashlytics.setCustomKey("SubscriptionType", "Premium")
-                        throw RuntimeException("Test Crash")
-                    }
+//                    if (currentFragment !is ImportFragment) {
+//                        //recyclerView.visibility = View.GONE
+//                        // Replace Toast with Fragment transaction
+//                        val importFragment = ImportFragment()
+//                        supportFragmentManager.beginTransaction()
+//                            .replace(
+//                                R.id.frameLayout,
+//                                importFragment
+//                            ) // Ensure you have a FrameLayout in your layout where the fragment should be placed
+//                            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+//                            //.addToBackStack(null) // Optional: Add transaction to the back stack
+//                            .commit()
+////                    recyclerView.visibility = View.GONE
+//                        currentFragment = importFragment
+//                        Firebase.crashlytics.log("This is a test log message.")
+//                        Firebase.crashlytics.setCustomKey("UserId", "12345")
+//                        Firebase.crashlytics.setCustomKey("SubscriptionType", "Premium")
+//                        throw RuntimeException("Test Crash")
+                        decideActionBasedOnRemoteConfig()
+                  //  }
                 }
 
                 R.id.navHome -> {
@@ -125,158 +115,59 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
-
             true
         }
-
-//        binding!!.btnCamNav.setOnClickListener {
-//            if (currentFragment !is CameraFragment){
-//                val cameraFragment = CameraFragment()
-//                supportFragmentManager.beginTransaction()
-//                    .replace(
-//                        R.id.frameLayout,
-//                        cameraFragment
-//                    )
-//                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-//                    .commit()
-//
-//                currentFragment = cameraFragment
-//            }
-//        }
 
         binding!!.btnCamNav.setOnClickListener {
             startActivity(Intent(this@MainActivity, CameraActivity::class.java))
             finish()
         }
 
-//        binding!!.btnCamNav.setOnClickListener {
-//            val cameraIntent = Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE)
-//            startActivity(cameraIntent)
-//        }
-
-
-//        btnProfile.setOnClickListener {
-//            val i = Intent(this@MainActivity, RegistrationActivity::class.java)
-//            startActivity(i)
-//        }
-
-
-        // binding!!.apply {
-//            addfile.setOnClickListener {
-//                AddNoteFragment().show(supportFragmentManager, AddNoteFragment().tag)
-//            }
-
-//            viewModel.getAllNote()
-//            viewModel.noteList.observe(this@MainActivity) {
-//                if (it.isNotEmpty()) {
-//                    showEmpty(true)
-//                    noteAdapter.differ.submitList(it)
-//                    recycleview.apply {
-//                        layoutManager = LinearLayoutManager(this@MainActivity)
-//                        adapter = noteAdapter
-//                    }
-//                } else {
-//                    showEmpty(false)
-//                }
-//            }
-
-        //  }
     }
 
-//    private fun showEmpty(isShown: Boolean) {
-//        binding!!.apply {
-//            if (isShown) {
-//                recycleview.visibility = View.VISIBLE
-//                //tvEmptyText.visibility = View.GONE
-//            } else {
-//                recycleview.visibility = View.GONE
-//               // tvEmptyText.visibility = View.VISIBLE
-//            }
-//        }
-//    }
+    private fun fetchRemoteConfig() {
+        Firebase.remoteConfig.fetchAndActivate().addOnCompleteListener(this) { task ->
+            if (task.isSuccessful) {
+                val updated = task.result
+                println("Config params updated: $updated")
+            } else {
+                println("Fetch failed")
+            }
+        }
+    }
 
-//    override fun onResume() {
-//        super.onResume()
-//        if (_binding == null) {
-//            _binding = ActivityMainBinding.inflate(layoutInflater)
-//            setContentView(binding!!.root)
-//
-//            binding!!.apply {
-//                addfile.setOnClickListener {
-//                    AddNoteFragment().show(supportFragmentManager, AddNoteFragment().tag)
-//                }
-//
-////                viewModel.getAllNote()
-////                viewModel.noteList.observe(this@MainActivity) {
-////                    if (it.isNotEmpty()) {
-////                        showEmpty(true)
-////                        noteAdapter.differ.submitList(it)
-////                        recycleview.apply {
-////                            layoutManager = LinearLayoutManager(this@MainActivity)
-////                            adapter = noteAdapter
-////                        }
-////                    } else {
-////                        showEmpty(false)
-////                    }
-////                }
-//
-//                binding!!.profileIcon.setOnClickListener {
-//                    startActivity(Intent(this@MainActivity,RegistrationActivity::class.java))
-//                }
-//
-//                binding!!.bottomNavigationView.setOnItemSelectedListener {
-//                    when(it.itemId){
-//                        R.id.navImport -> {
-//                            //recyclerView.visibility = View.GONE
-//                            // Replace Toast with Fragment transaction
-//                            val importFragment = ImportFragment()
-//                            supportFragmentManager.beginTransaction()
-//                                .replace(R.id.frameLayout, importFragment) // Ensure you have a FrameLayout in your layout where the fragment should be placed
-//                                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-//                                .addToBackStack(null) // Optional: Add transaction to the back stack
-//                                .commit()
-////                    recyclerView.visibility = View.GONE
-//                        }
-//
-//                        R.id.navHome -> {
-//                            val homeFragment = HomeFragment()
-//                            supportFragmentManager.beginTransaction()
-//                                .replace(R.id.frameLayout,homeFragment ) // Ensure you have a FrameLayout in your layout where the fragment should be placed
-//                                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-//                                .addToBackStack(null) // Optional: Add transaction to the back stack
-//                                .commit()
-//                        }
-//                    }
-//
-//                    true
-//                }
-//
-//                val homeFragment = HomeFragment()
-//                supportFragmentManager.beginTransaction()
-//                    .replace(R.id.frameLayout,homeFragment ) // Ensure you have a FrameLayout in your layout where the fragment should be placed
-//                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-//                    .addToBackStack(null) // Optional: Add transaction to the back stack
-//                    .commit()
-//
-//            }
-//        }
-//
-//    }
+    private fun decideActionBasedOnRemoteConfig() {
+        val featureEnableToast = Firebase.remoteConfig.getBoolean("feature_enable_toast")
+        if (featureEnableToast) {
+            // Show toast message from Remote Config
+            val toastMessage = Firebase.remoteConfig.getString("toast_message")
+            Toast.makeText(this, toastMessage, Toast.LENGTH_LONG).show()
+        } else {
+            // Navigate to a new screen
+//            val intent = Intent(this, NewActivity::class.java) // Replace NewActivity with your target activity
+//            startActivity(intent)
+            if (currentFragment !is ImportFragment) {
+                //recyclerView.visibility = View.GONE
+                // Replace Toast with Fragment transaction
+                val importFragment = ImportFragment()
+                supportFragmentManager.beginTransaction()
+                    .replace(
+                        R.id.frameLayout,
+                        importFragment
+                    ) // Ensure you have a FrameLayout in your layout where the fragment should be placed
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                    //.addToBackStack(null) // Optional: Add transaction to the back stack
+                    .commit()
+//                    recyclerView.visibility = View.GONE
+                currentFragment = importFragment
+                Firebase.crashlytics.log("This is a test log message.")
+                Firebase.crashlytics.setCustomKey("UserId", "12345")
+                Firebase.crashlytics.setCustomKey("SubscriptionType", "Premium")
+               // throw RuntimeException("Test Crash")
+            }
 
-//    override fun onStop() {
-//        super.onStop()
-//        _binding = null
-//    }
-
-//    override fun onBackPressed() {
-//        super.onBackPressed()
-//    }
-
-//    override fun onItemClick(note: NoteEntity, fileUriString: String) {
-//        val fileUri = Uri.parse(note.fileUri)
-//        openFile(fileUri)
-//
-//    }
+        }
+    }
 
 
     private fun openFile(fileUri: Uri) {
@@ -292,19 +183,4 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-       // recreate()
-//        startDocumentSyncWorker()
-//    }
-
-//    private fun startDocumentSyncWorker() {
-//        val workRequest = OneTimeWorkRequest.Builder(DocumentSyncWorker::class.java)
-//            // Optional: apply constraints
-//            //.setConstraints(constraints)
-//            .build()
-//
-//        // Enqueue WorkRequest
-//        WorkManager.getInstance(this).enqueue(workRequest)
-    }
 }

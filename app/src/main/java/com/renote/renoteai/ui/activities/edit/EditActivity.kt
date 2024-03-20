@@ -1,5 +1,6 @@
 package com.renote.renoteai.ui.activities.edit
 
+import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
@@ -25,9 +26,11 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.os.Environment
+import android.util.DisplayMetrics
 import android.view.View
 import android.view.WindowManager
 import androidx.annotation.RequiresApi
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
@@ -69,6 +72,7 @@ class EditActivity : AppCompatActivity() {
     private var pictureType: String? = ""
 
     var enhancedImageType: String = ""
+    private var currentRotation = 0f
 
     @SuppressLint("WrongThread")
     @RequiresApi(Build.VERSION_CODES.P)
@@ -96,6 +100,17 @@ class EditActivity : AppCompatActivity() {
             WindowManager.LayoutParams.FLAG_SECURE,
             WindowManager.LayoutParams.FLAG_SECURE
         )
+
+//        val imageView = binding.imageView2
+//
+//        val displayMetrics = DisplayMetrics()
+//        windowManager.defaultDisplay.getMetrics(displayMetrics)
+//        val screenWidth = displayMetrics.widthPixels
+//
+//        // Set aspect ratio based on screen width
+//        val layoutParams = imageView.layoutParams as ConstraintLayout.LayoutParams
+//        layoutParams.dimensionRatio = "$screenWidth:1"
+//        imageView.layoutParams = layoutParams
 
         //deleteInternalStorageDirectoryy()
         binding.aiFilterImgBtn.setOnClickListener {
@@ -290,7 +305,7 @@ class EditActivity : AppCompatActivity() {
 
         doSaveGetSave()
         blackAndWhiteFilter()
-          observeData()
+        observeData()
         //doSaveGetSave()
         // doNoFilter()
         //aiFilter()
@@ -303,8 +318,11 @@ class EditActivity : AppCompatActivity() {
     fun observeData() {
         viewModel.resourseClick.observe(this) { integer ->
             when (integer) {
-                R.id.cropBtn-> {
-                    startActivity(Intent(this@EditActivity, CropEditActivity::class.java))
+                R.id.cropBtn -> {
+                    val intent =
+                        Intent(this@EditActivity, CropEditActivity::class.java)
+                    intent.putExtra("enhancedImageType", enhancedImageType)
+                    startActivity(intent)
                 }
 
                 R.id.filterBtn -> {
@@ -312,11 +330,73 @@ class EditActivity : AppCompatActivity() {
                     startActivity(Intent(this@EditActivity, FilterEditActivity::class.java))
                 }
 
+                R.id.rotateBtn -> {
+                    rotateImageView()
+                }
 
 
             }
         }
     }
+
+    private fun rotateImageView() {
+        currentRotation += 90f
+        if (currentRotation >= 360f) currentRotation = 0f
+        val imageView = binding.imageView2
+
+        val displayMetrics = DisplayMetrics()
+        windowManager.defaultDisplay.getMetrics(displayMetrics)
+        val screenWidth = displayMetrics.widthPixels
+
+        // Set the height of the imageView to match the width of the screen
+        imageView.layoutParams.height = screenWidth
+
+        val rotationAnimator =
+            ObjectAnimator.ofFloat(imageView, "rotation", imageView.rotation, currentRotation)
+        rotationAnimator.duration = 500 // 500 milliseconds
+        rotationAnimator.start()
+
+//        currentRotation += 90f
+//        if (currentRotation >= 360f) currentRotation = 0f // Reset rotation if full circle
+//
+//        val imageView = binding.imageView2
+//
+//        val displayMetrics = DisplayMetrics()
+//        windowManager.defaultDisplay.getMetrics(displayMetrics)
+//        val screenWidth = displayMetrics.widthPixels
+//        val screenHeight = displayMetrics.heightPixels
+//
+//        // Assuming the original dimensions of the imageView represent its aspect ratio
+//        val originalWidth = imageView.width
+//        val originalHeight = imageView.height
+//
+//        // Determine new dimensions based on current rotation
+//        val isLandscape = currentRotation % 180 != 0f
+//        val newWidth: Int
+//        val newHeight: Int
+//
+//        if (isLandscape) {
+//            // When the image is rotated "landscape", match screen height to imageView's height and adjust width to maintain aspect ratio
+//            newHeight = screenHeight
+//            newWidth = (originalWidth.toFloat() / originalHeight.toFloat() * newHeight).toInt()
+//        } else {
+//            // When the image is back to "portrait", match screen width to imageView's width and adjust height to maintain aspect ratio
+//            newWidth = screenWidth
+//            newHeight = (originalHeight.toFloat() / originalWidth.toFloat() * newWidth).toInt()
+//        }
+//
+//        // Adjust imageView's layoutParams
+//        val layoutParams = imageView.layoutParams
+//        layoutParams.width = newWidth
+//        layoutParams.height = newHeight
+//        imageView.layoutParams = layoutParams
+//
+//        // Rotate the imageView with animation
+//        val rotationAnimator = ObjectAnimator.ofFloat(imageView, "rotation", imageView.rotation, currentRotation)
+//        rotationAnimator.duration = 500 // 500 milliseconds
+//        rotationAnimator.start()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         deleteInternalStorageDirectoryy()
