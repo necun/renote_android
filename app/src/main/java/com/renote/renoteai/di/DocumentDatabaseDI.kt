@@ -16,3 +16,4 @@ fun provideDocumentDao(db: DocumentDatabase) = db.documentDao()
 fun provideFolderDao(db: DocumentDatabase) = db.folderDao()
 
 fun provideTagDao(db: DocumentDatabase) = db.tagDao()
+fun provideFileDao(db: DocumentDatabase) = db.fileDao()

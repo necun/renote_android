@@ -31,9 +31,24 @@
         android:contentDescription="button"
         android:elevation="2dp"
         android:padding="15dp"
+        android:layout_marginEnd="30dp"
         android:src="@drawable/baseline_check_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+         />
+    <ImageView
+        android:id="@+id/retakeButton"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginBottom="13dp"
+       android:scaleType="centerCrop"
+        android:contentDescription="button"
+        android:elevation="2dp"
+
+        android:layout_marginStart="30dp"
+        android:src="@drawable/camera_retake"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

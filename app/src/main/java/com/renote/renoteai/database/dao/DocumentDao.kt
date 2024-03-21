@@ -43,4 +43,8 @@ interface DocumentDao {
     @Query("SELECT * FROM document_table WHERE isSynced = 1")
     fun getDocumentDetailsForJson(): List<DocumentEntity>
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun saveDocumentDetail(documentEntity: DocumentEntity)
+    @Query("SELECT id FROM document_table WHERE folderId = '100' ORDER BY createdDate DESC LIMIT 1")
+    fun getRecentDocumentId(): Flow<String>
 }

@@ -9,7 +9,9 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.graphics.ImageDecoder
 import android.graphics.ImageFormat
 import android.media.Image
 import android.graphics.Paint
@@ -47,37 +49,53 @@ import java.util.concurrent.Executors
 import android.provider.Settings
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.compose.ui.graphics.Canvas
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
 import com.google.android.material.tabs.TabLayout
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.renote.renoteai.ui.activities.camera.libs.CVLib
 import com.renote.renoteai.ui.activities.camera.scanutil.DocumentBorders
 import org.koin.android.ext.android.inject
 import com.renote.renoteai.ui.activities.camera.extension.toggleButton
 import com.renote.renoteai.ui.main.MainActivity
 import com.renote.renoteai.R
+import com.renote.renoteai.database.tables.DocumentEntity
+import com.renote.renoteai.database.tables.FileEntity
 import com.renote.renoteai.databinding.CameraDataBinding
 import com.renote.renoteai.ui.activities.camera.extension.circularClose
 import com.renote.renoteai.ui.activities.camera.extension.circularReveal
+import com.renote.renoteai.ui.activities.camera.libs.DocLib
 import com.renote.renoteai.ui.activities.camera.scanutil.ScanType
 import com.renote.renoteai.ui.activities.camera.viewmodel.CameraViewModel
+import com.renote.renoteai.ui.activities.edit.EditActivity
+import com.renote.renoteai.ui.presentation.home.viewmodel.HomeFragmentViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.Date
 import kotlin.properties.Delegates
 
 
 typealias CVAnalyzerListener = () -> Unit
 
-const val EXTRA_PICTURE_URI = "com.example.cameraxapp.PICTURE_URI"
-const val EXTRA_PICTURE_TYPE = "com.example.cameraxapp.PICTURE_TYPE"
+const val EXTRA_PICTURE_URI = "com.example.renoteaiapp.PICTURE_URI"
+const val EXTRA_PICTURE_TYPE = "com.example.renoteaiapp.PICTURE_TYPE"
 
 class CameraActivity : AppCompatActivity() {
+    var pictureType = ""
+    var mContext: Context? = null
 
+    private var original: Mat? = null
     val viewModel: CameraViewModel by inject()
+    val fileEntities = mutableListOf<FileEntity>()
     private lateinit var viewBinding: CameraDataBinding
 
     private var imageCapture: ImageCapture? = null
@@ -102,7 +120,7 @@ class CameraActivity : AppCompatActivity() {
 
     private lateinit var txtLogout: TextView
 
-    private var activeScanType = ScanType.DOCUMENT_TYPE
+    private var activeScanType = ""
 
     //new variables
     private var hasGrid = false
@@ -145,12 +163,18 @@ class CameraActivity : AppCompatActivity() {
 
         viewBinding.scanTypeLay.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
-                if (activeScanType == tab?.position) return
+                when(tab?.position){
+                    ScanType.OCR ->{activeScanType = "ocr" }
+                    ScanType.DOCUMENT_TYPE->{activeScanType = "document"}
+                    ScanType.BOOK_TYPE-> {activeScanType = "book"}
+                    ScanType.QR_CODE -> {activeScanType = "qrcode"}
+                }
+
 
 //                if (viewModel.getPreviousScans().value?.isNotEmpty() == true) {
 //                    basicAlert()
 //                } else {
-//                    changeScanType(tab?.position)
+//                    chang+eScanType(tab?.position)
 //                }
             }
 
@@ -176,12 +200,14 @@ class CameraActivity : AppCompatActivity() {
         viewModel.resourseClick.observe(this) { integer ->
             when (integer) {
                 R.id.image_capture_button -> {
+
                     takePhoto()
                     hasGrid = false
                 }
 
                 R.id.scanBackBtn -> {
                     onBackPressed()
+
                 }
 
                 R.id.gridBtn -> {
@@ -203,11 +229,92 @@ class CameraActivity : AppCompatActivity() {
                 R.id.btnFlashAuto -> {
                     closeFlashAndSelect(ImageCapture.FLASH_MODE_AUTO)
                 }
+                R.id.conformScanBtn->{
+                    saveCapturedImagesToRoomAndNavigateToEditScreen()
+                }
 
             }
         }
     }
 
+    private fun saveCapturedImagesToRoomAndNavigateToEditScreen() {
+       val getFileEntities = getFileEntities(this@CameraActivity)
+        println("getFileEntities:$getFileEntities")
+
+        viewModel.saveFilesDetails(getFileEntities)
+
+       val currentDateAndTime=convertTimestampToDateAndTime(currentTimestamp)
+        val documentEntity= DocumentEntity("document_$currentTimestamp","ReNoteAI_$currentDateAndTime",currentTimestamp,0L,"100",false,false,false,"","",0,"","","gDrive","")
+        viewModel.saveDocumentDetail(documentEntity)
+        documentObserveData()
+        }
+
+
+    fun documentObserveData() {
+//        //  if (loginUserGoogleId != null) {
+//
+            viewModel.getRecentDocumentId()
+//
+//
+       viewModel.recentDocumentId.observe(this@CameraActivity) {
+            if (it != null) {
+//
+               println("23213324324324dsd:" + viewModel.recentDocumentId)
+
+
+                val getFileEntities = getFileEntities(this@CameraActivity)
+                getFileEntities.forEach { fileEntity ->
+                    // Perform operations on each FileEntity object
+                    println("File ID: ${fileEntity.id}")
+                   println("File Name: ${fileEntity.name}")
+                    println("Timestamp: ${fileEntity.createdDate}")
+//                    // Add more properties as needed
+//
+//                    // Access the document ID if it's set
+                    if (fileEntity.documentId.isNotEmpty()) {
+                       //
+                        println("document ID associated with this file")
+                    } else {
+                        println("No document ID associated with this file")
+                        val recentDocumentId = it
+                        println("Recent Document ID: $recentDocumentId")
+                            viewModel.updateDocumentIdInFileEntity(fileEntity.id, recentDocumentId)
+
+                        clearAllPreferences(this@CameraActivity)
+                        val intent =Intent(this@CameraActivity,EditActivity::class.java)
+                        intent.putExtra("recentdocumentid",recentDocumentId)
+                        startActivity(intent)
+                    }
+
+//                    // Add any other operations you want to perform on each FileEntity
+                }
+            } else {
+//
+            }
+        }
+    }
+
+
+    fun clearAllPreferences(context: Context) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val editor = prefs.edit()
+        editor.clear() // Clear all data
+        editor.apply() // Apply the changes
+    }
+fun getFileEntities(context: Context): List<FileEntity> {
+    val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    val gson = Gson()
+    // Retrieve the JSON string of file entities from shared preferences
+    val fileEntitiesJson = prefs.getString(FILE_ENTITIES_KEY, null)
+    // Check if the string is null. If it's not, convert the JSON string back into a list of FileEntity objects
+    return if (fileEntitiesJson != null) {
+        // Convert the JSON string back into an Array of FileEntity objects and then to a list
+        gson.fromJson(fileEntitiesJson, Array<FileEntity>::class.java).toList()
+    } else {
+        // Return an empty list if there are no saved file entities
+        emptyList()
+    }
+}
     //function to toggle grid view
     private fun toggleGrid() {
         viewBinding.gridBtn.toggleButton(
@@ -221,6 +328,7 @@ class CameraActivity : AppCompatActivity() {
             viewBinding.groupGridLines.visibility = if (flag) View.VISIBLE else View.GONE
         }
     }
+
 
     //function that will opens menu to select flashLight options to the user
     private fun selectFlash() = viewBinding.llFlashOptions.circularReveal(viewBinding.flashBtn)
@@ -246,10 +354,10 @@ class CameraActivity : AppCompatActivity() {
         // Create time stamped name and MediaStore entry.
         val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US).format(System.currentTimeMillis())
         val contentValues = ContentValues().apply {
-            put(MediaStore.MediaColumns.DISPLAY_NAME, name)
+            put(MediaStore.MediaColumns.DISPLAY_NAME, "captured_image")
             put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/CameraX-Image")
+                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/ReNoteAI-Image")
             }
         }
 
@@ -267,6 +375,7 @@ class CameraActivity : AppCompatActivity() {
                     Log.e(TAG, "Photo capture failed: ${exc.message}", exc)
                 }
 
+                @RequiresApi(Build.VERSION_CODES.P)
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
                     val msg = "Photo capture succeeded: ${output.savedUri}"
                     // Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
@@ -277,26 +386,29 @@ class CameraActivity : AppCompatActivity() {
             })
     }
 
+    @RequiresApi(Build.VERSION_CODES.P)
     private fun startViewer(uri: Uri) {
-        var pictureType = ""
-        if (viewBinding.radioDocument.isChecked) {
-            pictureType = "document"
-        }
+//        var pictureType = ""
+//        if (viewBinding.radioDocument.isChecked) {
+//            pictureType = "document"
+//        }
+//
+//        if (viewBinding.radioIDCard.isChecked) {
+//            pictureType = "idcard"
+//        }
+//
+//        if (viewBinding.radioBook.isChecked) {
+//            pictureType = "book"
+//        }
 
-        if (viewBinding.radioIDCard.isChecked) {
-            pictureType = "idcard"
-        }
-
-        if (viewBinding.radioBook.isChecked) {
-            pictureType = "book"
-        }
-
-        val intent = Intent(this, ImageViewer::class.java).apply {
+         val intent = Intent(this, ImageViewer::class.java).apply {
             putExtra(EXTRA_PICTURE_URI, uri.toString())
-            putExtra(EXTRA_PICTURE_TYPE, pictureType)
+            putExtra(EXTRA_PICTURE_TYPE, activeScanType)
         }
         startActivity(intent)
+
     }
+
 
     private fun captureVideo() {}
 
@@ -629,8 +741,10 @@ class CameraActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val TAG = "CameraXApp"
-        private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
+        private const val PREFS_NAME = "MyAppPrefs"
+        private const val FILE_ENTITIES_KEY = "fileEntities"
+        private const val TAG = "ReNoteAI"
+        private const val FILENAME_FORMAT = "yyyy_MM_dd_HH_mm_ss_SSS"
         private const val REQUEST_CODE_PERMISSIONS = 10
         private val REQUIRED_PERMISSIONS = mutableListOf(
             Manifest.permission.CAMERA,
@@ -666,6 +780,12 @@ class CameraActivity : AppCompatActivity() {
 
         // Base64 encode the SHA1 hash
         return Base64.encodeToString(sha1Digest, Base64.NO_WRAP)
+    }
+    val currentTimestamp: Long = System.currentTimeMillis()
+    fun convertTimestampToDateAndTime(timestamp: Long): String {
+        val sdf = SimpleDateFormat("yyyy_MM_dd_HH_mm_ss_SSS", Locale.getDefault())
+        val date = Date(timestamp)
+        return sdf.format(date)
     }
 }
 
