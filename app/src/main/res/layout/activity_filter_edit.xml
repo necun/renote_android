@@ -1,11 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:background="#000000"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    android:layout_height="match_parent">
+    <data class="FilterEditActivityDataBinding">
+
+        <variable
+            name="viewModel"
+            type="com.renote.renoteai.ui.activities.filteredit.FilterEditViewModel" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#000000">
+
+        <com.jsibbold.zoomage.ZoomageView
+            android:id="@+id/imageView2"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_margin="@dimen/margin_8dp"
+            android:layout_marginBottom="8dp"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
+            app:layout_constraintBottom_toTopOf="@id/seekBar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:srcCompat="@tools:sample/avatars" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/bottomLay"
@@ -41,6 +65,7 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/filter_img_bg"
                     android:orientation="vertical"
+                    android:onClick="@{(view) -> viewModel.onresorceClick(view.getId())}"
                     app:layout_constraintEnd_toStartOf="@id/magicImgBtn"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
@@ -74,6 +99,7 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/filter_img_bg"
                     android:orientation="vertical"
+                    android:onClick="@{(view) -> viewModel.onresorceClick(view.getId())}"
                     app:layout_constraintEnd_toStartOf="@id/softImgBtn"
                     app:layout_constraintStart_toEndOf="@id/originalImg"
                     app:layout_constraintTop_toTopOf="parent">
@@ -124,6 +150,7 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/filter_img_bg"
                     android:orientation="vertical"
+                    android:onClick="@{(view) -> viewModel.onresorceClick(view.getId())}"
                     app:layout_constraintEnd_toStartOf="@id/grayImgBtn"
                     app:layout_constraintStart_toEndOf="@id/magicImgBtn"
                     app:layout_constraintTop_toTopOf="parent">
@@ -172,7 +199,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/filter_img_bg"
-                    android:orientation="vertical"
+                    android:orientation="vertical" android:onClick="@{(view) -> viewModel.onresorceClick(view.getId())}"
                     app:layout_constraintEnd_toStartOf="@id/blackWhiteImgBtn"
                     app:layout_constraintStart_toEndOf="@id/softImgBtn"
                     app:layout_constraintTop_toTopOf="parent">
@@ -222,6 +249,7 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/filter_img_bg"
                     android:orientation="vertical"
+                    android:onClick="@{(view) -> viewModel.onresorceClick(view.getId())}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/grayImgBtn"
                     app:layout_constraintTop_toTopOf="parent">
@@ -377,4 +405,6 @@
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/bottomLay"/>
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

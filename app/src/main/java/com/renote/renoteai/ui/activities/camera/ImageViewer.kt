@@ -36,8 +36,6 @@ class ImageViewer : AppCompatActivity() {
     private lateinit var viewBinding: ActivityImageViewerBinding
     private var original: Mat? = null
     private var pictureType: String? = ""
-    private lateinit var byteArray: ByteArray
-
     @SuppressLint("WrongThread")
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?) {

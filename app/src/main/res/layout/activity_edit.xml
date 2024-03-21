@@ -18,7 +18,7 @@
         android:background="@color/black"
         tools:context=".ui.activities.edit.EditActivity">
 
-        <ImageView
+        <com.jsibbold.zoomage.ZoomageView
             android:id="@+id/imageView2"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -103,9 +103,9 @@
                         <androidx.appcompat.widget.AppCompatTextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:fontFamily="@font/red_hat_display"
                             android:padding="@dimen/padding_5dp"
                             android:text="@string/auto"
-                            android:fontFamily="@font/red_hat_display"
                             android:textColor="@color/green"
                             android:textSize="@dimen/filter_text_size" />
 

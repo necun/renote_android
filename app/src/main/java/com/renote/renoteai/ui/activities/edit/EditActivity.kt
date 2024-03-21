@@ -56,6 +56,8 @@ import java.io.FileInputStream
 
 
 const val EXTRA_OCR_TEXT = "com.example.cameraxapp.OCR_TEXT"
+const val EXTRA_PICTURE_URI = "com.example.cameraxapp.PICTURE_URI"
+
 
 class EditActivity : AppCompatActivity() {
     private lateinit var binding: EditActivityDataBinding
@@ -73,6 +75,7 @@ class EditActivity : AppCompatActivity() {
 
     var enhancedImageType: String = ""
     private var currentRotation = 0f
+    private lateinit var uri: Uri
 
     @SuppressLint("WrongThread")
     @RequiresApi(Build.VERSION_CODES.P)
@@ -85,7 +88,8 @@ class EditActivity : AppCompatActivity() {
         binding.viewModel = viewModel
         supportActionBar?.hide()
 
-        val uri = Uri.parse(intent.getStringExtra(EXTRA_PICTURE_URI))
+        uri = Uri.parse(intent.getStringExtra(EXTRA_PICTURE_URI))
+        println("uri in EditActivity:$uri")
         pictureType = intent.getStringExtra(EXTRA_PICTURE_TYPE)
 
         org = findViewById(R.id.viewOrg)
@@ -97,20 +101,8 @@ class EditActivity : AppCompatActivity() {
         bw.visibility = View.VISIBLE
 
         window.setFlags(
-            WindowManager.LayoutParams.FLAG_SECURE,
-            WindowManager.LayoutParams.FLAG_SECURE
+            WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE
         )
-
-//        val imageView = binding.imageView2
-//
-//        val displayMetrics = DisplayMetrics()
-//        windowManager.defaultDisplay.getMetrics(displayMetrics)
-//        val screenWidth = displayMetrics.widthPixels
-//
-//        // Set aspect ratio based on screen width
-//        val layoutParams = imageView.layoutParams as ConstraintLayout.LayoutParams
-//        layoutParams.dimensionRatio = "$screenWidth:1"
-//        imageView.layoutParams = layoutParams
 
         //deleteInternalStorageDirectoryy()
         binding.aiFilterImgBtn.setOnClickListener {
@@ -274,9 +266,8 @@ class EditActivity : AppCompatActivity() {
 //    stream.write(byteBuffer.array())
 //
 //    stream.close()
-            val stream =
-                contentResolver.openOutputStream(uri)
-                    ?: throw IOException("Could not open output stream")
+            val stream = contentResolver.openOutputStream(uri)
+                ?: throw IOException("Could not open output stream")
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
             stream.close()
 //val msg = "Save succeeded: ${uri.getPath()}"
@@ -288,7 +279,7 @@ class EditActivity : AppCompatActivity() {
 //      doOCR()
 //    }
 
-        //  val uri = Uri.parse(intent.getStringExtra(EXTRA_PICTURE_URI))
+       // val uri = Uri.parse(intent.getStringExtra(EXTRA_PICTURE_URI))
         val imageDecoder = ImageDecoder.createSource(contentResolver, uri)
         val bitmap = ImageDecoder.decodeBitmap(imageDecoder)
         val bmp32 = bitmap.copy(Bitmap.Config.ARGB_8888, true);
@@ -304,7 +295,8 @@ class EditActivity : AppCompatActivity() {
         Utils.matToBitmap(mat, resultBitmap)
 
         doSaveGetSave()
-        blackAndWhiteFilter()
+      //  blackAndWhiteFilter()
+        aiFilter()
         observeData()
         //doSaveGetSave()
         // doNoFilter()
@@ -319,15 +311,16 @@ class EditActivity : AppCompatActivity() {
         viewModel.resourseClick.observe(this) { integer ->
             when (integer) {
                 R.id.cropBtn -> {
-                    val intent =
-                        Intent(this@EditActivity, CropEditActivity::class.java)
+                    val intent = Intent(this@EditActivity, CropEditActivity::class.java)
                     intent.putExtra("enhancedImageType", enhancedImageType)
                     startActivity(intent)
                 }
 
                 R.id.filterBtn -> {
-
-                    startActivity(Intent(this@EditActivity, FilterEditActivity::class.java))
+                    val intent = Intent(this@EditActivity, FilterEditActivity::class.java)
+                    intent.putExtra("URI", uri.toString())
+                   // deleteInternalStorageDirectoryy()
+                    startActivity(intent)
                 }
 
                 R.id.rotateBtn -> {
@@ -664,8 +657,7 @@ class EditActivity : AppCompatActivity() {
 // https://developers.google.com/ml-kit/vision/text-recognition/android
         val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
         val image = InputImage.fromBitmap(resultBitmap, 0)
-        recognizer.process(image)
-            .addOnSuccessListener { visionText ->
+        recognizer.process(image).addOnSuccessListener { visionText ->
 // Task completed successfully
 // ...
                 val msg = "Recognition success!"
@@ -674,8 +666,7 @@ class EditActivity : AppCompatActivity() {
                     putExtra(EXTRA_OCR_TEXT, visionText.getText())
                 }
                 startActivity(intent)
-            }
-            .addOnFailureListener { e ->
+            }.addOnFailureListener { e ->
 // Task failed with an exception
 // ...
                 val msg = "Recognition failed: ${e}"
@@ -687,8 +678,7 @@ class EditActivity : AppCompatActivity() {
         val result = result ?: return
         val bitmap = Bitmap.createBitmap(result.cols(), result.rows(), Bitmap.Config.ARGB_8888)
         Utils.matToBitmap(result, bitmap)
-        val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
-            .format(System.currentTimeMillis())
+        val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US).format(System.currentTimeMillis())
         val contentValues = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, name)
             put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
@@ -697,12 +687,10 @@ class EditActivity : AppCompatActivity() {
             }
         }
         val uri = contentResolver.insert(
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-            contentValues
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues
         ) ?: throw IOException("Could not open uri")
-        val stream =
-            contentResolver.openOutputStream(uri)
-                ?: throw IOException("Could not open output stream")
+        val stream = contentResolver.openOutputStream(uri)
+            ?: throw IOException("Could not open output stream")
         bitmap.compress(Bitmap.CompressFormat.JPEG, 50, stream)
 
 
@@ -721,8 +709,7 @@ class EditActivity : AppCompatActivity() {
 
         val original = original ?: return
         result = original.clone()
-        val bitmap =
-            Bitmap.createBitmap(original.cols(), original.rows(), Bitmap.Config.ARGB_8888)
+        val bitmap = Bitmap.createBitmap(original.cols(), original.rows(), Bitmap.Config.ARGB_8888)
         Utils.matToBitmap(original, bitmap)
 
         val name = "cropped_image"
@@ -749,9 +736,8 @@ class EditActivity : AppCompatActivity() {
 //    stream.write(byteBuffer.array())
 //
 //    stream.close()
-        val stream =
-            contentResolver.openOutputStream(uri)
-                ?: throw IOException("Could not open output stream")
+        val stream = contentResolver.openOutputStream(uri)
+            ?: throw IOException("Could not open output stream")
         bitmap.compress(Bitmap.CompressFormat.JPEG, 50, stream)
         //bitmap.compress(Bitmap.CompressFormat.JPEG, 90, stream)
         stream.close()
@@ -761,8 +747,7 @@ class EditActivity : AppCompatActivity() {
 
     fun deleteInternalStorageDirectoryy() {
         if (ContextCompat.checkSelfPermission(
-                this@EditActivity,
-                android.Manifest.permission.READ_EXTERNAL_STORAGE
+                this@EditActivity, android.Manifest.permission.READ_EXTERNAL_STORAGE
             ) == PackageManager.PERMISSION_DENIED
         ) {
             val input_pathh = File(
@@ -796,14 +781,11 @@ class EditActivity : AppCompatActivity() {
 
     private fun requestRuntimePermissionn(): Boolean {
         if (ActivityCompat.checkSelfPermission(
-                this@EditActivity,
-                android.Manifest.permission.READ_EXTERNAL_STORAGE
+                this@EditActivity, android.Manifest.permission.READ_EXTERNAL_STORAGE
             ) != PackageManager.PERMISSION_GRANTED
         ) {
             ActivityCompat.requestPermissions(
-                this@EditActivity,
-                arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE),
-                14
+                this@EditActivity, arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE), 14
             )
             return false
         }
@@ -811,9 +793,7 @@ class EditActivity : AppCompatActivity() {
     }
 
     override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
+        requestCode: Int, permissions: Array<out String>, grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
@@ -847,5 +827,10 @@ class EditActivity : AppCompatActivity() {
     companion object {
         private const val TAG = "CameraXApp"
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
+    }
+
+    override fun onResume() {
+        super.onResume()
+       // deleteInternalStorageDirectoryy()
     }
 }
