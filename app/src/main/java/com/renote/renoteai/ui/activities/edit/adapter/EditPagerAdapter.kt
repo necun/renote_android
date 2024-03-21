@@ -1,6 +1,7 @@
 package com.renote.renoteai.ui.activities.edit.adapter
 
-import android.graphics.BitmapFactory
+import android.content.Context
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,15 +11,14 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import coil.load
+import com.bumptech.glide.Glide
 import com.renote.renoteai.R
 import com.renote.renoteai.database.tables.FileEntity
-import com.renote.renoteai.databinding.DocumentsItemBinding
 import com.renote.renoteai.databinding.EditPagerItemBinding
 
 
 typealias OnTextChangeListener<T> = (position: Int, data: T) -> Unit
-class EditPagerAdapter() :
+class EditPagerAdapter(private val context: Context) :
     ListAdapter<FileEntity, EditPagerAdapter.PreviewHolder>(MediaDiffUtill) {
     lateinit var onTextChanged: OnTextChangeListener<String>
     var showEditTitle = false
@@ -46,13 +46,11 @@ class EditPagerAdapter() :
                 binding.toolbarLay.visibility = View.VISIBLE
             }
 
-            val absoluteFilePath = media.fileData.removePrefix("file://")
 
-// Decode the file path into a Bitmap
-            val bitmap = BitmapFactory.decodeFile(absoluteFilePath)
+            Glide.with(context)
+                .load(Uri.parse(media.fileData))
+                .into(binding.previewImg)
 
-// Set the Bitmap on the ImageView
-            binding.previewImg.setImageBitmap(bitmap)
             println("loading path ${media.fileData.toUri()}")
             binding.countTxt.text = buildString {
                 append(adapterPosition+1)
@@ -80,4 +78,6 @@ class EditPagerAdapter() :
         }
 
     }
+
+
 }

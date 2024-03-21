@@ -3,55 +3,45 @@ package com.renote.renoteai.ui.activities.edit
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.ImageDecoder
-import android.net.Uri
-import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
-import android.provider.MediaStore
-import android.widget.Toast
-
-import org.opencv.android.Utils
-import org.opencv.core.Mat
-import org.opencv.imgproc.Imgproc
-import java.io.IOException
-import java.text.SimpleDateFormat
-import java.util.*
-import com.google.mlkit.vision.common.InputImage
-import com.google.mlkit.vision.text.TextRecognition
-import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.os.Build
+import android.os.Bundle
 import android.os.Environment
+import android.provider.MediaStore
 import android.view.View
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.chaquo.python.Python
 import com.chaquo.python.android.AndroidPlatform
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.text.TextRecognition
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import com.renote.renoteai.R
-
 import com.renote.renoteai.databinding.EditActivityDataBinding
 import com.renote.renoteai.ui.activities.camera.CameraActivity
-import com.renote.renoteai.ui.activities.camera.EXTRA_PICTURE_TYPE
-import com.renote.renoteai.ui.activities.camera.EXTRA_PICTURE_URI
 import com.renote.renoteai.ui.activities.camera.EmailActivity
 import com.renote.renoteai.ui.activities.camera.OCRResultViewer
 import com.renote.renoteai.ui.activities.camera.libs.CVLib
-import com.renote.renoteai.ui.activities.camera.viewmodel.CameraViewModel
 import com.renote.renoteai.ui.activities.cropedit.CropEditActivity
 import com.renote.renoteai.ui.activities.edit.adapter.EditPagerAdapter
 import com.renote.renoteai.ui.activities.edit.viewmodel.EditViewModel
 import com.renote.renoteai.ui.activities.filteredit.FilterEditActivity
-import com.renote.renoteai.ui.activities.signup.SignUpActivity
-import com.renote.renoteai.ui.presentation.home.viewmodel.HomeFragmentViewModel
 import org.koin.android.ext.android.inject
+import org.opencv.android.Utils
+import org.opencv.core.Mat
 import java.io.File
 import java.io.FileInputStream
+import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 const val EXTRA_OCR_TEXT = "com.example.cameraxapp.OCR_TEXT"
@@ -83,7 +73,7 @@ class EditActivity : AppCompatActivity() {
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
         supportActionBar?.hide()
-        editPagerAdapter = EditPagerAdapter()
+        editPagerAdapter = EditPagerAdapter(this@EditActivity)
         editPagerAdapter.showEditTitle = true
         recentDocumentId =  intent.getStringExtra("recentdocumentid").toString()
         println("343refewr5:$recentDocumentId")

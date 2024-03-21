@@ -4,7 +4,6 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.renote.renoteai.database.tables.DocumentEntity
 import com.renote.renoteai.database.tables.FileEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -18,6 +17,6 @@ interface FileDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun saveFilesDetails(fileEntity: List<FileEntity>)
 
-    @Query("SELECT * FROM file_table WHERE id = :recentDocumentId")
-     fun getRecentFileDetailsByRecentDocumentId(recentDocumentId:String): Flow<List<FileEntity>>
+    @Query("SELECT * FROM file_table WHERE documentId = :recentDocumentId")
+     fun getRecentFileDetailsByRecentDocumentId(recentDocumentId:String): Flow<MutableList<FileEntity>>
 }

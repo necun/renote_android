@@ -9,13 +9,13 @@ import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.gson.Gson
@@ -24,7 +24,6 @@ import com.renote.renoteai.databinding.ActivityImageViewerBinding
 import com.renote.renoteai.ui.activities.camera.libs.CVLib
 import com.renote.renoteai.ui.activities.camera.libs.DocLib
 import com.renote.renoteai.ui.activities.camera.scanutil.DocumentBorders
-import com.renote.renoteai.ui.activities.edit.EditActivity
 import org.opencv.android.Utils
 import org.opencv.core.Mat
 import org.opencv.imgproc.Imgproc
@@ -58,9 +57,8 @@ class ImageViewer : AppCompatActivity() {
         warpImage()
       }
     viewBinding.retakeButton.setOnClickListener{
-      val intent = Intent(this, CameraActivity::class.java).apply {
-
-      }
+      deleteInternalStorageDirectoryy()
+      val intent = Intent(this, CameraActivity::class.java)
       startActivity(intent)
     }
 //
