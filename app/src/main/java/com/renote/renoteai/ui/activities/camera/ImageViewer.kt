@@ -18,6 +18,8 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.chaquo.python.Python
+import com.chaquo.python.android.AndroidPlatform
 import com.google.gson.Gson
 import com.renote.renoteai.database.tables.FileEntity
 import com.renote.renoteai.databinding.ActivityImageViewerBinding
@@ -95,6 +97,8 @@ class ImageViewer : AppCompatActivity() {
     viewBinding.imageView.setImageBitmap(result)
   }
 
+
+
   @SuppressLint("SuspiciousIndentation")
   private fun warpImage()
   {
@@ -146,10 +150,30 @@ class ImageViewer : AppCompatActivity() {
         startActivity(intent)
 //
       } else {
-        val output_path =
+        val input_path =
           Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
             .toString() + "/ReNoteAI-Image/"
-        val file = File(output_path, "captured_image.jpg")
+        val output_path =
+          Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+            .toString() + "/ReNoteAI-Image-Output/"
+        val file = File(
+          Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+            .toString() + "/ReNoteAI-Image-Output/"
+        )
+        if (!file.exists()) {
+          file.mkdirs()
+        }
+        val input = input_path + "captured_image" + ".jpg"
+        if (!Python.isStarted()) {
+          Python.start(AndroidPlatform(this))
+        }
+        val py = Python.getInstance()
+        val module = py.getModule("script")
+
+        val fact = module["ai_filter"]
+        fact?.call(input, output_path)
+        val f = File(output_path, "ai_filter_image.jpg")
+        //val filee = File(output_path, "captured_image.jpg")
              var fileEntities = mutableListOf<FileEntity>()
         val currentTmStmp=convertTimestampToDateAndTime(timestamp = currentTimestamp)
         val fileName = "RenoteAI_${currentTmStmp}"
@@ -163,7 +187,7 @@ class ImageViewer : AppCompatActivity() {
         val newFile = File(directory, fileName)
         val fileUri:Uri = Uri.fromFile(newFile)
         try {
-          val inputStream = FileInputStream(file)
+          val inputStream = FileInputStream(f)
           val outputStream = FileOutputStream(newFile)
           val buffer = ByteArray(1024)
           var length: Int
@@ -225,6 +249,7 @@ class ImageViewer : AppCompatActivity() {
       requestRuntimePermissionn()
     }
   }
+
 
 
   private fun requestRuntimePermissionn(): Boolean {

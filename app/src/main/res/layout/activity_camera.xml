@@ -261,15 +261,15 @@
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/conformScanBtn"
-                    android:layout_width="19dp"
-                    android:layout_height="18dp"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:onClick="@{(view) -> viewmodel.onresorceClick(view.getId())}"
                     android:src="@drawable/conform_tick"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/galleryLay"
                     app:layout_constraintTop_toTopOf="parent"
-                    android:onClick="@{(view) -> viewmodel.onresorceClick(view.getId())}"
-                    />
+                    android:visibility="gone"/>
 
                 <!--    <androidx.constraintlayout.widget.ConstraintLayout-->
                 <!--        android:id="@+id/scanModeLay"-->
