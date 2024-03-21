@@ -18,7 +18,7 @@ val viewModelModule = module {
     viewModel{ RegistrationViewModel() }
 
     viewModel { EmailViewModel() }
-    viewModel { CameraViewModel() }
+    viewModel { CameraViewModel(get(),get()) }
     viewModel{FolderFilesViewModel(get(),get(),get())}
     viewModel{CreateTagViewModel(get(),get(),get(),get())}
     viewModel{AddFolderViewModel(get(),get(),get(),get())}

@@ -42,7 +42,9 @@ import com.renote.renoteai.ui.activities.camera.EXTRA_PICTURE_URI
 import com.renote.renoteai.ui.activities.camera.EmailActivity
 import com.renote.renoteai.ui.activities.camera.OCRResultViewer
 import com.renote.renoteai.ui.activities.camera.libs.CVLib
+import com.renote.renoteai.ui.activities.camera.viewmodel.CameraViewModel
 import com.renote.renoteai.ui.activities.cropedit.CropEditActivity
+import com.renote.renoteai.ui.activities.edit.adapter.EditPagerAdapter
 import com.renote.renoteai.ui.activities.edit.viewmodel.EditViewModel
 import com.renote.renoteai.ui.activities.filteredit.FilterEditActivity
 import com.renote.renoteai.ui.activities.signup.SignUpActivity
@@ -69,7 +71,8 @@ class EditActivity : AppCompatActivity() {
     private var pictureType: String? = ""
 
     var enhancedImageType: String = ""
-
+    lateinit var editPagerAdapter: EditPagerAdapter
+    var recentDocumentId:String=""
     @SuppressLint("WrongThread")
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,9 +83,15 @@ class EditActivity : AppCompatActivity() {
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
         supportActionBar?.hide()
-
-        val uri = Uri.parse(intent.getStringExtra(EXTRA_PICTURE_URI))
-        pictureType = intent.getStringExtra(EXTRA_PICTURE_TYPE)
+        editPagerAdapter = EditPagerAdapter()
+        editPagerAdapter.showEditTitle = true
+        recentDocumentId =  intent.getStringExtra("recentdocumentid").toString()
+        println("343refewr5:$recentDocumentId")
+        binding.imageView2.apply {
+            adapter = editPagerAdapter
+        }
+//        val uri = Uri.parse(intent.getStringExtra(EXTRA_PICTURE_URI))
+//        pictureType = intent.getStringExtra(EXTRA_PICTURE_TYPE)
 
         org = findViewById(R.id.viewOrg)
         ai = findViewById(R.id.viewAI)
@@ -274,22 +283,22 @@ class EditActivity : AppCompatActivity() {
 //    }
 
         //  val uri = Uri.parse(intent.getStringExtra(EXTRA_PICTURE_URI))
-        val imageDecoder = ImageDecoder.createSource(contentResolver, uri)
-        val bitmap = ImageDecoder.decodeBitmap(imageDecoder)
-        val bmp32 = bitmap.copy(Bitmap.Config.ARGB_8888, true);
-        contentResolver.delete(uri, null, null)
+//        val imageDecoder = ImageDecoder.createSource(contentResolver, uri)
+//        val bitmap = ImageDecoder.decodeBitmap(imageDecoder)
+//        val bmp32 = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+//        contentResolver.delete(uri, null, null)
 
-        val mat = Mat()
-        Utils.bitmapToMat(bmp32, mat)
-// get current camera frame as OpenCV Mat object
-        Imgproc.cvtColor(mat, mat, Imgproc.COLOR_RGBA2RGB)
-        original = mat.clone()
-        result = mat.clone()
-        val resultBitmap = Bitmap.createBitmap(mat.cols(), mat.rows(), Bitmap.Config.ARGB_8888)
-        Utils.matToBitmap(mat, resultBitmap)
+//        val mat = Mat()
+//        Utils.bitmapToMat(bmp32, mat)
+//// get current camera frame as OpenCV Mat object
+//        Imgproc.cvtColor(mat, mat, Imgproc.COLOR_RGBA2RGB)
+//        original = mat.clone()
+//        result = mat.clone()
+//        val resultBitmap = Bitmap.createBitmap(mat.cols(), mat.rows(), Bitmap.Config.ARGB_8888)
+//        Utils.matToBitmap(mat, resultBitmap)
 
-        doSaveGetSave()
-        blackAndWhiteFilter()
+//        doSaveGetSave()
+//        blackAndWhiteFilter()
           observeData()
         //doSaveGetSave()
         // doNoFilter()
@@ -298,6 +307,30 @@ class EditActivity : AppCompatActivity() {
         //greyFilter()
         //softFilter()
         // viewBinding.imageView2.setImageBitmap(resultBitmap)
+        progressBarObserveData()
+        recentFileDetailsByRecentDocumentIdObserveData()
+        editPagerAdapter.onTextChanged = { position, data ->
+            //cropScanList[position].fileName = data
+        }
+    }
+
+    private fun recentFileDetailsByRecentDocumentIdObserveData() {
+        println("43rgty6uj:$recentDocumentId")
+        viewModel.getRecentFileDetailsByDocumentId(recentDocumentId)
+        viewModel.recentFileDetails.observe(this@EditActivity){
+            println("343refe4:$it")
+            editPagerAdapter.submitList(it)
+        }
+    }
+
+    private fun progressBarObserveData() {
+        viewModel.showLoading.observe(this) {
+            if (it == true) {
+                binding.progressbar.visibility = View.VISIBLE
+            } else {
+                binding.progressbar.visibility = View.GONE
+            }
+        }
     }
 
     fun observeData() {
@@ -354,7 +387,7 @@ class EditActivity : AppCompatActivity() {
             enhancedImageType = "ai_filter_image"
             binding.aiFilterProgressbar.visibility = View.GONE
             //viewBinding.aiFilterImageView.setImageBitmap(b)
-            binding.imageView2.setImageBitmap(b)
+           // binding.imageView2.setImageBitmap(b)
         } else {
             binding.aiFilterProgressbar.visibility = View.VISIBLE
             // viewBinding.aiFilterImageView.setImageResource(R.drawable.ic_no_picture)
@@ -391,7 +424,7 @@ class EditActivity : AppCompatActivity() {
         val b = BitmapFactory.decodeStream(FileInputStream(f))
         if (b != null) {
             enhancedImageType = "grey_filter_image"
-            binding.imageView2.setImageBitmap(b)
+            //binding.imageView2.setImageBitmap(b)
             //viewBinding.greyFilterImageView.setImageBitmap(b)
             binding.greyFilterProgressbar.visibility = View.GONE
 
@@ -433,7 +466,7 @@ class EditActivity : AppCompatActivity() {
         val b = BitmapFactory.decodeStream(FileInputStream(f))
         if (b != null) {
             enhancedImageType = "soft_filter_image"
-            binding.imageView2.setImageBitmap(b)
+            ////binding.imageView2.setImageBitmap(b)
             // viewBinding.softFilterImageView.setImageBitmap(b)
             binding.softFilterProgressbar.visibility = View.GONE
         } else {
@@ -472,7 +505,7 @@ class EditActivity : AppCompatActivity() {
         val b = BitmapFactory.decodeStream(FileInputStream(f))
         if (b != null) {
             enhancedImageType = "black_and_white_filter_image"
-            binding.imageView2.setImageBitmap(b)
+            ////binding.imageView2.setImageBitmap(b)
             //viewBinding.blackAndWhiteFilterImageView.setImageBitmap(b)
             binding.blackAndWhiteFilterProgressbar.visibility = View.GONE
 
@@ -513,7 +546,7 @@ class EditActivity : AppCompatActivity() {
         System.out.println("122334465=")
         val b = BitmapFactory.decodeStream(FileInputStream(f))
 
-        binding.imageView2.setImageBitmap(b)
+       //// binding.imageView2.setImageBitmap(b)
     }
 
     private fun doBWFilter() {
@@ -523,9 +556,9 @@ class EditActivity : AppCompatActivity() {
         val resultBitmap =
             Bitmap.createBitmap(result.cols(), result.rows(), Bitmap.Config.ARGB_8888)
         Utils.matToBitmap(result, resultBitmap)
-        binding.imageView2.setImageBitmap(resultBitmap)
+       //// binding.imageView2.setImageBitmap(resultBitmap)
     }
-
+//
     private fun doGrayscaleFilter() {
         val original = original ?: return
         val result = result ?: return
@@ -533,7 +566,7 @@ class EditActivity : AppCompatActivity() {
         val resultBitmap =
             Bitmap.createBitmap(result.cols(), result.rows(), Bitmap.Config.ARGB_8888)
         Utils.matToBitmap(result, resultBitmap)
-        binding.imageView2.setImageBitmap(resultBitmap)
+        ////binding.imageView2.setImageBitmap(resultBitmap)
     }
 
     private fun doEnhanceFilter() {
@@ -543,7 +576,7 @@ class EditActivity : AppCompatActivity() {
         val resultBitmap =
             Bitmap.createBitmap(result.cols(), result.rows(), Bitmap.Config.ARGB_8888)
         Utils.matToBitmap(result, resultBitmap)
-        binding.imageView2.setImageBitmap(resultBitmap)
+       //// binding.imageView2.setImageBitmap(resultBitmap)
     }
 
     private fun doSoftFilter() {
@@ -553,7 +586,7 @@ class EditActivity : AppCompatActivity() {
         val resultBitmap =
             Bitmap.createBitmap(result.cols(), result.rows(), Bitmap.Config.ARGB_8888)
         Utils.matToBitmap(result, resultBitmap)
-        binding.imageView2.setImageBitmap(resultBitmap)
+        ////binding.imageView2.setImageBitmap(resultBitmap)
     }
 
     private fun doNoFilter() {
@@ -564,7 +597,7 @@ class EditActivity : AppCompatActivity() {
         Utils.matToBitmap(original, resultBitmap)
         if (resultBitmap != null) {
             enhancedImageType = "no_filter_image"
-            binding.imageView2.setImageBitmap(resultBitmap)
+           //// binding.imageView2.setImageBitmap(resultBitmap)
             //  viewBinding.originalFilterImageView.setImageBitmap(resultBitmap)
             binding.originalFilterProgressbar.visibility = View.GONE
 
