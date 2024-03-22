@@ -71,7 +71,6 @@ class DocumentsDetailsAdapter(private val context: Context) :
 
     private fun openFileFromUri(uri: Uri) {
         try {
-
             val file = File(uri.path ?: return)
             val fileUri = FileProvider.getUriForFile(context, "com.renote.renoteai.provider", file)
 

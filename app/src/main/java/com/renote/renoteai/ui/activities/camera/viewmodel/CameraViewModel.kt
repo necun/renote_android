@@ -21,6 +21,7 @@ class CameraViewModel(private val documentsRepository: DocumentsRepository,priva
     fun onresorceClick(viewId: Int) {
         resourseClick.postValue(viewId)
     }
+
     fun saveDocumentDetail(document: DocumentEntity) = viewModelScope.launch {
         documentsRepository.saveDocumentDetail(document)
     }

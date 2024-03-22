@@ -33,13 +33,14 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
+import java.nio.channels.FileChannel
 import java.text.SimpleDateFormat
 import java.util.*
 
 class ImageViewer : AppCompatActivity() {
     private lateinit var viewBinding: ActivityImageViewerBinding
-    private var original : Mat? = null
-    private var pictureType : String? = ""
+    private var original: Mat? = null
+    private var pictureType: String? = ""
 
     @SuppressLint("WrongThread")
     @RequiresApi(Build.VERSION_CODES.P)
@@ -58,7 +59,7 @@ class ImageViewer : AppCompatActivity() {
             deleteInternalStorageDirectoryy()
             warpImage()
         }
-        viewBinding.retakeButton.setOnClickListener{
+        viewBinding.retakeButton.setOnClickListener {
             deleteInternalStorageDirectoryy()
             val intent = Intent(this, CameraActivity::class.java)
             startActivity(intent)
@@ -86,9 +87,13 @@ class ImageViewer : AppCompatActivity() {
 //
         viewBinding.borderOverlay.post(Runnable {
             val approxCnt = DocLib.detect(mat)
-            if(approxCnt != null) {
+            if (approxCnt != null) {
                 val documentBorders = DocumentBorders(approxCnt)
-                viewBinding.borderOverlay.setDocumentBorders(documentBorders, mat.cols(), mat.rows())
+                viewBinding.borderOverlay.setDocumentBorders(
+                    documentBorders,
+                    mat.cols(),
+                    mat.rows()
+                )
             }
         })
 //
@@ -98,18 +103,17 @@ class ImageViewer : AppCompatActivity() {
     }
 
 
-
     @SuppressLint("SuspiciousIndentation")
-    private fun warpImage()
-    {
+    private fun warpImage() {
         val border = viewBinding.borderOverlay.getDocumentBorders()
         val mat = original
-        if(mat != null && border != null) {
+        if (mat != null && border != null) {
             border.rescaleSpecial(
                 viewBinding.borderOverlay.getWidth().toFloat(),
                 viewBinding.borderOverlay.getHeight().toFloat(),
                 mat.cols().toFloat(),
-                mat.rows().toFloat(), mat.rows() > mat.cols() )
+                mat.rows().toFloat(), mat.rows() > mat.cols()
+            )
             val cnt = border.toMat()
             val warped = Mat()
             CVLib.getDocumentWarped(mat.nativeObjAddr, warped.nativeObjAddr, cnt.nativeObjAddr)
@@ -122,7 +126,7 @@ class ImageViewer : AppCompatActivity() {
             val contentValues = ContentValues().apply {
                 put(MediaStore.MediaColumns.DISPLAY_NAME, "captured_image")
                 put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
-                if(Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
                     put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/ReNoteAI-Image")
                 }
             }
@@ -132,24 +136,27 @@ class ImageViewer : AppCompatActivity() {
                 contentValues
             ) ?: throw IOException("Could not open uri")
 //
-            val stream = contentResolver.openOutputStream(uri) ?: throw IOException("Could not open output stream")
+            val stream = contentResolver.openOutputStream(uri)
+                ?: throw IOException("Could not open output stream")
 //
             result.compress(Bitmap.CompressFormat.JPEG, 50, stream)
             stream.close()
 //
-            if(pictureType == "book") {
+            if (pictureType == "book") {
                 val intent = Intent(this, BookViewer::class.java).apply {
                     // putExtra(EXTRA_PICTURE_URI, uri.toString())
                 }
                 startActivity(intent)
 //
-            } else if(pictureType == "idcard") {
+            } else if (pictureType == "idcard") {
                 val intent = Intent(this, IDCardViewer::class.java).apply {
                     // putExtra(EXTRA_PICTURE_URI, uri.toString())
                 }
                 startActivity(intent)
 //
             } else {
+
+
                 val input_path =
                     Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
                         .toString() + "/ReNoteAI-Image/"
@@ -164,6 +171,7 @@ class ImageViewer : AppCompatActivity() {
                     file.mkdirs()
                 }
                 val input = input_path + "captured_image" + ".jpg"
+
                 if (!Python.isStarted()) {
                     Python.start(AndroidPlatform(this))
                 }
@@ -172,11 +180,14 @@ class ImageViewer : AppCompatActivity() {
 
                 val fact = module["ai_filter"]
                 fact?.call(input, output_path)
-                val f = File(output_path, "ai_filter_image.jpg")
+                val f = File(output_path, "filter_image.jpg")
                 //val filee = File(output_path, "captured_image.jpg")
                 var fileEntities = mutableListOf<FileEntity>()
-                val currentTmStmp=convertTimestampToDateAndTime(timestamp = currentTimestamp)
-                val fileName = "RenoteAI_${currentTmStmp}"
+                val currentTmStmp = convertTimestampToDateAndTime(timestamp = currentTimestamp)
+
+                saveOriginalToStorage(this@ImageViewer,currentTmStmp)
+
+                val fileName = "RenoteAI_${currentTmStmp}.jpg"
 
                 val directory =
                     File(this.filesDir, "ReNoteAI") // Directory path within app's internal storage
@@ -185,7 +196,7 @@ class ImageViewer : AppCompatActivity() {
                 }
 
                 val newFile = File(directory, fileName)
-                val fileUri:Uri = Uri.fromFile(newFile)
+                val fileUri: Uri = Uri.fromFile(newFile)
                 try {
                     val inputStream = FileInputStream(f)
                     val outputStream = FileOutputStream(newFile)
@@ -203,17 +214,59 @@ class ImageViewer : AppCompatActivity() {
                 }
 
 
-
-
                 //fileEntities.add(FileEntity("file_$currentTimestamp",fileName,currentTimestamp,0L,"",false,false,false,fileUri.toString(),0,"","","gDrive","jpg"))
-                val fileEntity = FileEntity("file_$currentTimestamp",fileName,currentTimestamp,0L,"",false,false,false,fileUri.toString(),0,"","","gDrive","jpg")
-                saveFileEntities(this@ImageViewer,fileEntity)
+                val fileEntity = FileEntity(
+                    "file_$currentTimestamp",
+                    fileName,
+                    currentTimestamp,
+                    0L,
+                    "",
+                    false,
+                    false,
+                    false,
+                    fileUri.toString(),
+                    0,
+                    "",
+                    "",
+                    "gDrive",
+                    "jpg"
+                )
+                saveFileEntities(this@ImageViewer, fileEntity)
                 val intent = Intent(this, CameraActivity::class.java)
                 startActivity(intent)
 
 
             }
         }
+    }
+
+    private fun saveOriginalToStorage(context: Context, currentTmStmp: String) {
+        val input_path =
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+                .toString() + "/ReNoteAI-Image/"
+        val input = input_path + "captured_image" + ".jpg"
+
+        val remoteAIDirectory = File(
+            context.getExternalFilesDir(Environment.DIRECTORY_PICTURES),
+            "ReNoteAI-Image-Original"
+        )
+        if (!remoteAIDirectory.exists()) {
+            remoteAIDirectory.mkdirs() // Create the directory if it doesn't exist
+        }
+        val outputFile = File(remoteAIDirectory, "RenoteAI_${currentTmStmp}.jpg")
+
+        var inputChannel: FileChannel? = null
+        var outputChannel: FileChannel? = null
+
+        try {
+            inputChannel = FileInputStream(input).channel
+            outputChannel = FileOutputStream(outputFile).channel
+            outputChannel.transferFrom(inputChannel, 0, inputChannel.size())
+        } finally {
+            inputChannel?.close()
+            outputChannel?.close()
+        }
+
     }
 
     fun deleteInternalStorageDirectoryy() {
@@ -249,7 +302,6 @@ class ImageViewer : AppCompatActivity() {
             requestRuntimePermissionn()
         }
     }
-
 
 
     private fun requestRuntimePermissionn(): Boolean {
@@ -290,6 +342,7 @@ class ImageViewer : AppCompatActivity() {
         }
     }
 
+
     fun saveFileEntities(context: Context, newFileEntity: FileEntity) {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val gson = Gson()
@@ -328,10 +381,12 @@ class ImageViewer : AppCompatActivity() {
         private const val FILE_ENTITIES_KEY = "fileEntities"
 
     }
+
     fun convertTimestampToDateAndTime(timestamp: Long): String {
         val sdf = SimpleDateFormat("yyyy_MM_dd_HH_mm_ss_SSS", Locale.getDefault())
         val date = Date(timestamp)
         return sdf.format(date)
     }
+
     val currentTimestamp: Long = System.currentTimeMillis()
 }

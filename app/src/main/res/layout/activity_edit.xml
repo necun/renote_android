@@ -363,6 +363,7 @@
                             android:id="@+id/tickMarkImageView"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:onClick="@{(view) -> viewModel.onresorceClick(view.getId())}"
                             android:gravity="center"
                             android:orientation="vertical"
                             android:padding="@dimen/padding_5dp"

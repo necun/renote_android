@@ -14,6 +14,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.util.DisplayMetrics
 import android.provider.MediaStore
+import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
@@ -23,12 +24,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.RecyclerView
 import com.chaquo.python.Python
 import com.chaquo.python.android.AndroidPlatform
+import com.google.gson.Gson
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import com.renote.renoteai.R
+import com.renote.renoteai.database.tables.DocumentEntity
+import com.renote.renoteai.database.tables.FileEntity
 import com.renote.renoteai.databinding.EditActivityDataBinding
 import com.renote.renoteai.ui.activities.camera.CameraActivity
 import com.renote.renoteai.ui.activities.camera.EXTRA_PICTURE_TYPE
@@ -39,6 +44,7 @@ import com.renote.renoteai.ui.activities.cropedit.CropEditActivity
 import com.renote.renoteai.ui.activities.edit.adapter.EditPagerAdapter
 import com.renote.renoteai.ui.activities.edit.viewmodel.EditViewModel
 import com.renote.renoteai.ui.activities.filteredit.FilterEditActivity
+import com.renote.renoteai.ui.main.MainActivity
 import org.koin.android.ext.android.inject
 import org.opencv.android.Utils
 import org.opencv.core.Mat
@@ -221,7 +227,7 @@ class EditActivity : AppCompatActivity() {
             doSave()
         }
 
-        binding.cameraRetakeImageView.setOnClickListener {
+        binding.scanMoreBtn.setOnClickListener {
             val intent = Intent(this@EditActivity, CameraActivity::class.java)
             startActivity(intent)
             deleteInternalStorageDirectoryy()
@@ -326,10 +332,26 @@ class EditActivity : AppCompatActivity() {
 
     private fun recentFileDetailsByRecentDocumentIdObserveData() {
         println("43rgty6uj:$recentDocumentId")
-        viewModel.getRecentFileDetailsByDocumentId(recentDocumentId)
-        viewModel.recentFileDetails.observe(this@EditActivity) {
-            println("343refe4:$it")
-            editPagerAdapter.submitList(it)
+        //viewModel.getRecentFileDetailsByDocumentId(recentDocumentId)
+        val getEntities = getFileEntities(this@EditActivity)
+        //viewModel.recentFileDetails.observe(this@EditActivity) {
+        println("343refe4:$getEntities")
+        editPagerAdapter.submitList(getEntities)
+        //}
+    }
+
+    fun getFileEntities(context: Context): List<FileEntity> {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val gson = Gson()
+        // Retrieve the JSON string of file entities from shared preferences
+        val fileEntitiesJson = prefs.getString(FILE_ENTITIES_KEY, null)
+        // Check if the string is null. If it's not, convert the JSON string back into a list of FileEntity objects
+        return if (fileEntitiesJson != null) {
+            // Convert the JSON string back into an Array of FileEntity objects and then to a list
+            gson.fromJson(fileEntitiesJson, Array<FileEntity>::class.java).toList()
+        } else {
+            // Return an empty list if there are no saved file entities
+            emptyList()
         }
     }
 
@@ -353,9 +375,17 @@ class EditActivity : AppCompatActivity() {
                 }
 
                 R.id.filterBtn -> {
-                    val intent = Intent(this@EditActivity, FilterEditActivity::class.java)
-                    intent.putExtra("URI", uri.toString())
-                    // deleteInternalStorageDirectoryy()
+                    // navigateToNextScreenWithImage()
+                    val currentPosition = binding.imageView2.currentItem
+                    val currentFileEntity = editPagerAdapter.currentList[currentPosition]
+                    val imageUri = currentFileEntity.fileData
+                    val fileName = currentFileEntity.name
+                    val fileId = currentFileEntity.id
+                    val intent = Intent(this, FilterEditActivity::class.java).apply {
+                        putExtra("imageUri", imageUri)
+                        putExtra("fileName", fileName)
+                        putExtra("fileId", fileId)
+                    }
                     startActivity(intent)
                 }
 
@@ -363,8 +393,42 @@ class EditActivity : AppCompatActivity() {
                     rotateImageView()
                 }
 
-
+                R.id.tickMarkImageView -> {
+                    val docEntity = getDocumentEntity(this@EditActivity)
+                    val fileEntities = getFileEntities(this@EditActivity)
+                    if (docEntity != null) {
+                        viewModel.saveDocumentDetail(docEntity)
+                        if (fileEntities != null) {
+                            viewModel.saveFilesDetails(fileEntities)
+                        }
+                    }
+                    clearAllPreferences(this@EditActivity)
+                    clearDocPreferences(this@EditActivity)
+                    startActivity(Intent(this@EditActivity, MainActivity::class.java))
+                    finishAffinity()
+                }
             }
+        }
+    }
+
+    private fun clearDocPreferences(context: Context) {
+        val prefs = context.getSharedPreferences("DocumentEntityPreference", Context.MODE_PRIVATE)
+        val editor = prefs.edit()
+        editor.clear() // Clear all data
+        editor.apply()
+    }
+
+    fun getDocumentEntity(context: Context): DocumentEntity? {
+        val sharedPreferences =
+            context.getSharedPreferences("DocumentEntityPreference", Context.MODE_PRIVATE)
+        val jsonString = sharedPreferences.getString("DocumentEntityKey", null)
+
+        // Convert JSON String back to DocumentEntity
+        return if (jsonString != null) {
+            val gson = Gson()
+            gson.fromJson(jsonString, DocumentEntity::class.java)
+        } else {
+            null
         }
     }
 
@@ -849,10 +913,17 @@ class EditActivity : AppCompatActivity() {
         }
     }
 
+    fun clearAllPreferences(context: Context) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val editor = prefs.edit()
+        editor.clear() // Clear all data
+        editor.apply() // Apply the changes
+    }
 
     override fun onBackPressed() {
         super.onBackPressed()
         // Start MainActivity
+        clearAllPreferences(this@EditActivity)
         deleteInternalStorageDirectoryy()
         val intent = Intent(this, CameraActivity::class.java)
         startActivity(intent)
@@ -862,6 +933,8 @@ class EditActivity : AppCompatActivity() {
     }
 
     companion object {
+        private const val PREFS_NAME = "MyAppPrefs"
+        private const val FILE_ENTITIES_KEY = "fileEntities"
         private const val TAG = "CameraXApp"
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
     }

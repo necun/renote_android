@@ -147,7 +147,7 @@ class CameraActivity : AppCompatActivity() {
         window.setFlags(
             WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE
         )
-
+        //clearAllPreferences(this@CameraActivity)
         // val userEmailId = intent.getStringExtra("userEmailId")
 
         // Request camera permissions
@@ -237,29 +237,79 @@ class CameraActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("SuspiciousIndentation")
     private fun saveCapturedImagesToRoomAndNavigateToEditScreen() {
        val getFileEntities = getFileEntities(this@CameraActivity)
         println("getFileEntities:$getFileEntities")
 
-        viewModel.saveFilesDetails(getFileEntities)
+       // viewModel.saveFilesDetails(getFileEntities)
 
        val currentDateAndTime=convertTimestampToDateAndTime(currentTimestamp)
         val documentEntity= DocumentEntity("document_$currentTimestamp","ReNoteAI_$currentDateAndTime",currentTimestamp,0L,"100",false,false,false,"","",0,"","","gDrive","")
-        viewModel.saveDocumentDetail(documentEntity)
+       // viewModel.saveDocumentDetail(documentEntity)
+                 saveDocumentEntity(this@CameraActivity,documentEntity)
         documentObserveData()
         }
+    fun updateDocumentIdInFileEntities(context: Context, newDocumentId: String) {
+        val fileEntities = getFileEntities(context)
 
+        // Update the document ID for each FileEntity as needed
+        val updatedFileEntities = fileEntities.map { fileEntity ->
+            if (fileEntity.documentId.isEmpty()) { // Check any condition you need
+                fileEntity.copy(documentId = newDocumentId) // Assuming FileEntity is a data class
+            } else {
+                fileEntity
+            }
+        }
 
+        // Save the updated list back to SharedPreferences
+        saveFileEntities(context, updatedFileEntities)
+    }
+
+    fun saveDocumentEntity(context: Context, documentEntity: DocumentEntity) {
+        val sharedPreferences = context.getSharedPreferences("DocumentEntityPreference", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+
+        // Convert DocumentEntity to JSON String
+        val gson = Gson()
+        val jsonString = gson.toJson(documentEntity)
+
+        editor.putString("DocumentEntityKey", jsonString)
+        editor.apply()
+    }
+    fun getDocumentEntity(context: Context): DocumentEntity? {
+        val sharedPreferences = context.getSharedPreferences("DocumentEntityPreference", Context.MODE_PRIVATE)
+        val jsonString = sharedPreferences.getString("DocumentEntityKey", null)
+
+        // Convert JSON String back to DocumentEntity
+        return if (jsonString != null) {
+            val gson = Gson()
+            gson.fromJson(jsonString, DocumentEntity::class.java)
+        } else {
+            null
+        }
+    }
+
+    fun saveFileEntities(context: Context, fileEntities: List<FileEntity>) {
+        val sharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        val gson = Gson()
+        val jsonString = gson.toJson(fileEntities)
+        editor.putString(FILE_ENTITIES_KEY, jsonString)
+        editor.apply()
+    }
     fun documentObserveData() {
 //        //  if (loginUserGoogleId != null) {
 //
-            viewModel.getRecentDocumentId()
+           // viewModel.getRecentDocumentId()
+        val documentEntity=getDocumentEntity(this@CameraActivity)
 //
 //
-       viewModel.recentDocumentId.observe(this@CameraActivity) {
-            if (it != null) {
+       //viewModel.recentDocumentId.observe(this@CameraActivity) {
+
+            if (documentEntity?.id != null) {
 //
-               println("23213324324324dsd:" + viewModel.recentDocumentId)
+               println("23213324324324dsd:" + documentEntity?.id )
 
 
                 val getFileEntities = getFileEntities(this@CameraActivity)
@@ -268,19 +318,19 @@ class CameraActivity : AppCompatActivity() {
                     println("File ID: ${fileEntity.id}")
                    println("File Name: ${fileEntity.name}")
                     println("Timestamp: ${fileEntity.createdDate}")
+                    println("file uri: ${fileEntity.fileData}")
 //                    // Add more properties as needed
 //
 //                    // Access the document ID if it's set
-                    if (fileEntity.documentId.isNotEmpty()) {
-                       //
+                    if (fileEntity.documentId.isNotEmpty()) { //
                         println("document ID associated with this file")
                     } else {
                         println("No document ID associated with this file")
-                        val recentDocumentId = it
+                        val recentDocumentId = documentEntity.id
                         println("Recent Document ID: $recentDocumentId")
-                            viewModel.updateDocumentIdInFileEntity(fileEntity.id, recentDocumentId)
+                            updateDocumentIdInFileEntities(this@CameraActivity, recentDocumentId)
 
-                        clearAllPreferences(this@CameraActivity)
+                        //clearAllPreferences(this@CameraActivity)
                         val intent =Intent(this@CameraActivity,EditActivity::class.java)
                         intent.putExtra("recentdocumentid",recentDocumentId)
                         startActivity(intent)
@@ -291,7 +341,7 @@ class CameraActivity : AppCompatActivity() {
             } else {
 //
             }
-        }
+        //}
     }
 
 

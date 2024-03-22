@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.renote.renoteai.database.tables.DocumentEntity
 import com.renote.renoteai.database.tables.FileEntity
 import com.renote.renoteai.repository.DocumentsRepository
 import com.renote.renoteai.repository.FilesRepository
@@ -27,6 +28,15 @@ class EditViewModel(private val documentsRepository: DocumentsRepository, privat
         filesRepository.getRecentFileDetailsByRecentDocumentId(recentDocumentId).collect() {
             _recentFileDetails.postValue(it)
         }
+    }
+
+    fun saveFilesDetails(file: List<FileEntity>) = viewModelScope.launch {
+        filesRepository.saveFilesDetails(file)
+    }
+
+
+    fun saveDocumentDetail(document: DocumentEntity) = viewModelScope.launch {
+        documentsRepository.saveDocumentDetail(document)
     }
 
 }

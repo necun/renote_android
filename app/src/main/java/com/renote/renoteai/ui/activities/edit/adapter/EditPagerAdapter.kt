@@ -1,10 +1,12 @@
 package com.renote.renoteai.ui.activities.edit.adapter
 
 import android.content.Context
+import android.graphics.Color
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.widget.doOnTextChanged
 import androidx.databinding.DataBindingUtil
@@ -22,6 +24,7 @@ class EditPagerAdapter(private val context: Context) :
     ListAdapter<FileEntity, EditPagerAdapter.PreviewHolder>(MediaDiffUtill) {
     lateinit var onTextChanged: OnTextChangeListener<String>
     var showEditTitle = false
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PreviewHolder {
         val binding = DataBindingUtil.inflate<EditPagerItemBinding>(
             LayoutInflater.from(parent.context),
@@ -50,7 +53,8 @@ class EditPagerAdapter(private val context: Context) :
             Glide.with(context)
                 .load(Uri.parse(media.fileData))
                 .into(binding.previewImg)
-
+            println("file id ${media.id}")
+            println("document id ${media.documentId}")
             println("loading path ${media.fileData.toUri()}")
             binding.countTxt.text = buildString {
                 append(adapterPosition+1)
@@ -58,10 +62,16 @@ class EditPagerAdapter(private val context: Context) :
                 append(itemCount)
             }
             binding.executePendingBindings()
+
+
+
             binding.fileNameEdit.doOnTextChanged { text, start, count, after ->
                 onTextChanged(adapterPosition,text.toString())
             }
+
         }
+
+
 
     }
     override fun getItemViewType(position: Int) = R.layout.edit_pager_item_layout

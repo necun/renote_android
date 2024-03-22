@@ -379,6 +379,7 @@
                         android:id="@+id/imgRight"
                         android:layout_width="65dp"
                         android:layout_height="60dp"
+                        android:onClick="@{(view) -> viewModel.onresorceClick(view.getId())}"
                         android:background="@drawable/filter_edit_two_icon"
                         android:padding="17dp"
                         android:src="@drawable/right_white_icon"

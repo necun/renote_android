@@ -55,6 +55,7 @@ import com.google.firebase.auth.auth
 import com.google.gson.reflect.TypeToken
 import com.renote.renoteai.database.source.DocumentDatabase
 import com.renote.renoteai.di.provideDocumentDatabase
+import com.renote.renoteai.ui.activities.camera.CameraActivity
 import com.renote.renoteai.ui.activities.camera.DocumentsWrapper
 import com.renote.renoteai.ui.presentation.home.workers.DocumentSyncWorker
 import kotlinx.coroutines.CoroutineScope
@@ -97,6 +98,7 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        clearAllPreferences(mContext!!)
         auth = FirebaseAuth.getInstance()
 
         val directory = File(requireContext().filesDir, "ReNoteAI")
@@ -220,7 +222,12 @@ class HomeFragment : Fragment() {
         documentsObserveData()
 
     }
-
+    fun clearAllPreferences(context: Context) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val editor = prefs.edit()
+        editor.clear() // Clear all data
+        editor.apply() // Apply the changes
+    }
     private fun syncDocuments() {
         val syncWorkRequest = OneTimeWorkRequestBuilder<DocumentSyncWorker>()
             .setInputData(Data.Builder().build())
@@ -614,7 +621,10 @@ class HomeFragment : Fragment() {
         }
     }
 
-
+    companion object {
+        private const val PREFS_NAME = "MyAppPrefs"
+        private const val FILE_ENTITIES_KEY = "fileEntities"
+    }
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
