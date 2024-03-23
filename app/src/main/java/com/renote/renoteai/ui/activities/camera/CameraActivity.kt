@@ -122,8 +122,13 @@ class CameraActivity : AppCompatActivity() {
 
     private var activeScanType = ""
 
+    private lateinit var folderId:String
+    private lateinit var folderName:String
+
     //new variables
     private var hasGrid = false
+
+    val currentTimestamp: Long = System.currentTimeMillis()
 
     private var flashMode by Delegates.observable(ImageCapture.FLASH_MODE_OFF) { _, _, new ->
         viewBinding.flashBtn.setImageResource(
@@ -158,6 +163,13 @@ class CameraActivity : AppCompatActivity() {
                 this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS
             )
         }
+
+        val sharedPreference =
+            this.getSharedPreferences("PREFERENCE_NAME", Context.MODE_PRIVATE)
+        folderId = sharedPreference.getString("folderId", "100").toString()
+        folderName = sharedPreference.getString("folderName", "ReNoteAI").toString()
+        println("folderId:$folderId")
+        println("folderName:$folderName")
 
         observeData()
 
@@ -244,8 +256,8 @@ class CameraActivity : AppCompatActivity() {
 
        // viewModel.saveFilesDetails(getFileEntities)
 
-       val currentDateAndTime=convertTimestampToDateAndTime(currentTimestamp)
-        val documentEntity= DocumentEntity("document_$currentTimestamp","ReNoteAI_$currentDateAndTime",currentTimestamp,0L,"100",false,false,false,"","",0,"","","gDrive","")
+      // val currentDateAndTime=convertTimestampToDateAndTime(currentTimestamp)
+        val documentEntity= DocumentEntity("document_$currentTimestamp","ReNoteAI_$currentTimestamp",currentTimestamp,0L,folderId,false,false,false,"","",0,"","","gDrive","")
        // viewModel.saveDocumentDetail(documentEntity)
                  saveDocumentEntity(this@CameraActivity,documentEntity)
         documentObserveData()
@@ -831,7 +843,7 @@ fun getFileEntities(context: Context): List<FileEntity> {
         // Base64 encode the SHA1 hash
         return Base64.encodeToString(sha1Digest, Base64.NO_WRAP)
     }
-    val currentTimestamp: Long = System.currentTimeMillis()
+   // val currentTimestamp: Long = System.currentTimeMillis()
     fun convertTimestampToDateAndTime(timestamp: Long): String {
         val sdf = SimpleDateFormat("yyyy_MM_dd_HH_mm_ss_SSS", Locale.getDefault())
         val date = Date(timestamp)

@@ -7,15 +7,18 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
-import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.renote.renoteai.R
 import com.renote.renoteai.database.tables.DocumentEntity
+import com.renote.renoteai.database.tables.FileEntity
 import com.renote.renoteai.databinding.DocumentsItemBinding
+import com.renote.renoteai.di.provideDocumentDatabase
+import com.renote.renoteai.ui.fragments.folders.MultipleFilesFragment
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -56,9 +59,36 @@ class DocumentsDetailsAdapter(private val context: Context) :
                 binding.executePendingBindings()
 
                 binding.docRelativeLayout.setOnClickListener {
-                    Toast.makeText(context, data.fileDriveId, Toast.LENGTH_SHORT).show()
-                    openFileFromUri(data.fileData.toUri())
+//
+                    val documentId = data.id
+                    val documentName = data.name
+
+                    val sharedPreference =
+
+                        context.getSharedPreferences("PREFERENCE_NAME", Context.MODE_PRIVATE)
+                    var editor = sharedPreference.edit()
+                    editor.putString("documentId",documentId)
+                    editor.putString("documentName",documentName)
+                    editor.apply()
+                    editor.commit()
+
+                    val database = provideDocumentDatabase(context)
+                    val fileDao = database.fileDao()
+
+                    fileDao.getFiles(data.id)
+
+                    val context = binding.root.context
+                    if (context is AppCompatActivity) {
+                        val fragmentManager = context.supportFragmentManager
+                        val fragmentTransaction = fragmentManager.beginTransaction()
+                        val fragment = MultipleFilesFragment()
+                        fragmentTransaction.replace(R.id.frameLayout, fragment)
+                        fragmentTransaction.addToBackStack(null)  // Optional: Add to back stack to enable back navigation
+                        fragmentTransaction.commit()
+                    }
+
                 }
+
             }
         }
     }

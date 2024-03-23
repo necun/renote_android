@@ -8,6 +8,7 @@ import com.renote.renoteai.ui.activities.camera.viewmodel.EmailViewModel
 import com.renote.renoteai.ui.activities.edit.viewmodel.EditViewModel
 import com.renote.renoteai.ui.activities.filteredit.FilterEditViewModel
 import com.renote.renoteai.ui.fragments.folders.viewmodel.FolderFilesViewModel
+import com.renote.renoteai.ui.fragments.folders.viewmodel.MultipleFilesViewModel
 import com.renote.renoteai.ui.presentation.home.viewmodel.HomeFragmentViewModel
 import com.renote.renoteai.ui.presentation.home.dialogs.CreateTagViewModel
 import com.renote.renoteai.ui.presentation.home.viewmodel.AddFolderViewModel
@@ -24,6 +25,7 @@ val viewModelModule = module {
     viewModel { FilterEditViewModel() }
     viewModel { CameraViewModel(get(),get()) }
     viewModel{FolderFilesViewModel(get(),get(),get())}
+    viewModel { MultipleFilesViewModel(get()) }
     viewModel{CreateTagViewModel(get(),get(),get(),get())}
     viewModel{AddFolderViewModel(get(),get(),get(),get())}
     viewModel{EditViewModel(get(),get(),get())}

@@ -41,6 +41,7 @@ class ImageViewer : AppCompatActivity() {
     private lateinit var viewBinding: ActivityImageViewerBinding
     private var original: Mat? = null
     private var pictureType: String? = ""
+    val currentTimestamp: Long = System.currentTimeMillis()
 
     @SuppressLint("WrongThread")
     @RequiresApi(Build.VERSION_CODES.P)
@@ -48,7 +49,7 @@ class ImageViewer : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityImageViewerBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
-//
+
         window.setFlags(
             WindowManager.LayoutParams.FLAG_SECURE,
             WindowManager.LayoutParams.FLAG_SECURE
@@ -183,11 +184,11 @@ class ImageViewer : AppCompatActivity() {
                 val f = File(output_path, "filter_image.jpg")
                 //val filee = File(output_path, "captured_image.jpg")
                 var fileEntities = mutableListOf<FileEntity>()
-                val currentTmStmp = convertTimestampToDateAndTime(timestamp = currentTimestamp)
+              //  val currentTmStmp = convertTimestampToDateAndTime(timestamp = currentTimestamp)
 
-                saveOriginalToStorage(this@ImageViewer,currentTmStmp)
+                saveOriginalToStorage(this@ImageViewer,currentTimestamp.toString())
 
-                val fileName = "RenoteAI_${currentTmStmp}.jpg"
+                val fileName = "RenoteAI_${currentTimestamp}.jpg"
 
                 val directory =
                     File(this.filesDir, "ReNoteAI") // Directory path within app's internal storage
@@ -388,5 +389,4 @@ class ImageViewer : AppCompatActivity() {
         return sdf.format(date)
     }
 
-    val currentTimestamp: Long = System.currentTimeMillis()
 }

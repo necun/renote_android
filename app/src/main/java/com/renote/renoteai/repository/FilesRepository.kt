@@ -12,4 +12,5 @@ class FilesRepository(private val dao: FileDao) {
         dao.saveFilesDetails(file)
     fun getRecentFileDetailsByRecentDocumentId(recentDocumentId:String) = dao.getRecentFileDetailsByRecentDocumentId(recentDocumentId)
 
+    fun getFiles(documentId: String) = dao.getFiles(documentId)
 }

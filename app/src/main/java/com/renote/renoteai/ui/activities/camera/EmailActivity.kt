@@ -21,6 +21,8 @@ import com.renote.renoteai.R
 import com.renote.renoteai.UploadResponse
 import com.renote.renoteai.api
 import com.renote.renoteai.database.tables.DocumentEntity
+import com.renote.renoteai.database.tables.FileEntity
+import com.renote.renoteai.database.tables.FolderEntity
 import com.renote.renoteai.databinding.EmailDataBinding
 import com.renote.renoteai.ui.activities.camera.viewmodel.EmailViewModel
 import com.renote.renoteai.ui.main.MainActivity
@@ -64,6 +66,7 @@ class EmailActivity : AppCompatActivity() {
     val currentTimestamp: Long = System.currentTimeMillis()
     private val viewModelHome: HomeFragmentViewModel by inject()
     val docEntities = mutableListOf<DocumentEntity>()
+    val fileEntity = mutableListOf<FileEntity>()
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -239,9 +242,10 @@ class EmailActivity : AppCompatActivity() {
             DocumentEntity(
                 id = "doc_$currentTimestamp",
                 name = fileName,
-                createdDate = currentTimestamp,
-                updatedDate = currentTimestamp,
-                fileData = fileUri.toString(),
+
+                createdDate = 10005000,
+                updatedDate = 10005000,
+                fileData = "",
                 fileDriveId = "",
                 isSynced = false,
                 isPin = false,
@@ -399,3 +403,4 @@ class EmailActivity : AppCompatActivity() {
 
     }
 }
+

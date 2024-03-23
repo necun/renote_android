@@ -223,9 +223,9 @@ class EditActivity : AppCompatActivity() {
 //    viewBinding.SaveButton.setOnClickListener {
 //      doSave()
 //    }
-        binding.tickMarkImageView.setOnClickListener {
-            doSave()
-        }
+//        binding.tickMarkImageView.setOnClickListener {
+//            doSave()
+//        }
 
         binding.scanMoreBtn.setOnClickListener {
             val intent = Intent(this@EditActivity, CameraActivity::class.java)
@@ -404,6 +404,13 @@ class EditActivity : AppCompatActivity() {
                     }
                     clearAllPreferences(this@EditActivity)
                     clearDocPreferences(this@EditActivity)
+                    val sharedPreference =
+                        this.getSharedPreferences("PREFERENCE_NAME", Context.MODE_PRIVATE)
+                    var editor = sharedPreference.edit()
+                    editor.putString("folderId", "100")
+                    editor.putString("folderName", "ReNoteAI")
+                    editor.apply()
+                    editor.commit()
                     startActivity(Intent(this@EditActivity, MainActivity::class.java))
                     finishAffinity()
                 }

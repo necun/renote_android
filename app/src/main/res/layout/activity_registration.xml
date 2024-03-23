@@ -190,6 +190,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="30dp"
                 android:src="@drawable/or"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/microsoft" />
@@ -202,6 +203,7 @@
                 android:layout_marginTop="25dp"
                 android:layout_marginEnd="32dp"
                 android:elevation="5dp"
+                android:visibility="gone"
                 android:foreground="?attr/selectableItemBackground"
                 android:onClick="@{(view) -> viewmodel.onresorceClick(view.getId())}"
                 android:padding="13dp"
@@ -233,6 +235,7 @@
             <TextView
                 android:id="@+id/txtAlreadySignIn"
                 android:layout_width="wrap_content"
+                android:visibility="gone"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="40dp"
                 android:fontFamily="@font/red_hat_display"

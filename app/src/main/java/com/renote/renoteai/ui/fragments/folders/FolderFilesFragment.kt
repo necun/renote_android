@@ -11,14 +11,12 @@ import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.navArgs
 
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.renote.renoteai.R
 import com.renote.renoteai.databinding.FolderFilesFragmentDataBinding
 import com.renote.renoteai.ui.fragments.folders.viewmodel.FolderFilesViewModel
 import com.renote.renoteai.ui.main.MainActivity
-import com.renote.renoteai.ui.presentation.home.HomeFragment
 import com.renote.renoteai.ui.presentation.home.adapters.DocumentsDetailsAdapter
 import org.koin.android.ext.android.inject
 
@@ -44,7 +42,6 @@ class FolderFilesFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
 
         val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.img_search)
         drawable?.setBounds(0, 0, 40, 40) // Set the desired width and height
@@ -90,10 +87,6 @@ class FolderFilesFragment : Fragment() {
                 // Option 1: Navigate back by popping the back stack
                 isEnabled = false
                 requireActivity().onBackPressed()
-
-                // Option 2: Directly navigate to another activity (uncomment if needed)
-                // val intent = Intent(requireActivity(), MainActivity::class.java)
-                // startActivity(intent)
             }
         })
     }
