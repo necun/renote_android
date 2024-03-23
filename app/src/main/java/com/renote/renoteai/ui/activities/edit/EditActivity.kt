@@ -12,6 +12,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
@@ -308,23 +309,7 @@ class EditActivity : AppCompatActivity() {
         editPagerAdapter.onTextChanged = { position, data ->
             //cropScanList[position].fileName = data
         }
-        binding.shareBtn.setOnClickListener{
-            println("43rgty6uj:$recentDocumentId")
-            viewModel.getRecentFileDetailsByDocumentId(recentDocumentId)
-            viewModel.recentFileDetails.observe(this@EditActivity) {
-                println("343refe4sds:$it")
-                if (binding.imageView2.currentItem in it.indices) {
-                    val uri = it[binding.imageView2.currentItem].fileData.toUri()
-                    shareFile(uri)
-                } else {
-                    // This means the currentItem index is out of bounds, handle accordingly
-                    Toast.makeText(this, "Invalid item selected.", Toast.LENGTH_SHORT).show()
-                }
-            }
-            val uri =fileEntityList[binding.imageView2.currentItem].fileData.toUri()
 
-              shareFile(Uri.parse(uri.toString()))
-        }
     }
 
     private fun recentFileDetailsByRecentDocumentIdObserveData() {
@@ -358,7 +343,23 @@ class EditActivity : AppCompatActivity() {
                     startActivity(Intent(this@EditActivity, FilterEditActivity::class.java))
                 }
 
+                R.id.shareBtn ->{
+                    println("43rgty6uj:$recentDocumentId")
+                    viewModel.getRecentFileDetailsByDocumentId(recentDocumentId)
+                    viewModel.recentFileDetails.observe(this@EditActivity) {
+                        println("343refe4sds:$it")
+                        if (binding.imageView2.currentItem in it.indices) {
+                            val uri = it[binding.imageView2.currentItem].fileData.toUri()
+                            println("uriuriuri:$uri")
+                            val filePath = uri.toString().removePrefix("file://")
+                            shareFile(filePath)
+                        } else {
+                            // This means the currentItem index is out of bounds, handle accordingly
+                            Toast.makeText(this, "Invalid item selected.", Toast.LENGTH_SHORT).show()
+                        }
+                    }
 
+                }
 
             }
         }
@@ -798,23 +799,36 @@ class EditActivity : AppCompatActivity() {
         }
     }
 
-    private fun shareFile(uri: Uri) {
-        val file = File(Uri.parse(uri.toString()).path)
-        val fileUri = FileProvider.getUriForFile(this@EditActivity, "com.renote.renoteai.provider", file)
-//        val fileUri =
-//            FileProvider.getUriForFile(this@EditActivity, "com.renote.fileprovider", File(filePath))
-        this@EditActivity.grantUriPermission(
-            "com.renote.renoteai",
-            fileUri,
-            Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION
-        )
 
-        val shareIntent = Intent(Intent.ACTION_SEND)
-        shareIntent.type = "image/jpeg"
-        shareIntent.putExtra(Intent.EXTRA_STREAM, fileUri)
-        shareIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        startActivity(Intent.createChooser(shareIntent, "Share private image"))
-    }
+        private fun shareFile(imagePath: String) {
+
+          // Create a File object from the path
+
+            try {
+                val imageFile = File(imagePath)
+                val contentUri: Uri = FileProvider.getUriForFile(
+                    this,
+                    "com.renote.renoteai.provider",
+                    imageFile
+                )
+                this@EditActivity.grantUriPermission(
+                    "com.renote.renoteai",
+                    contentUri,
+                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+                val shareIntent: Intent = Intent(Intent.ACTION_SEND).apply {
+                    type = "image/jpeg" // Specify the MIME type
+                    putExtra(Intent.EXTRA_STREAM, contentUri)
+                    addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+
+                startActivity(Intent.createChooser(shareIntent, "Share Image"))
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Toast.makeText(this, "Failed to share image", Toast.LENGTH_SHORT).show()
+            }
+        }
+
     fun clearAllPreferences(context: Context) {
         val prefs = context.getSharedPreferences(CameraActivity.PREFS_NAME, Context.MODE_PRIVATE)
         val editor = prefs.edit()

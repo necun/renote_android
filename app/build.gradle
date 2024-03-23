@@ -71,7 +71,7 @@ chaquopy {
 
        // buildPython("C:\\Users\\DELL\\AppData\\Local\\Programs\\Python\\Python39\\python.exe")
 
-        buildPython("C:\\Users\\necun\\AppData\\Local\\Programs\\Python\\Python312\\python.exe")
+        buildPython("C:\\Users\\Komal\\AppData\\Local\\Programs\\Python\\Python311\\python.exe")
 
         pip {
             install("opencv-python-headless")

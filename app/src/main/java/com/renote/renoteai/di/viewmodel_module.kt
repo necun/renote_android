@@ -4,6 +4,7 @@ package com.renote.renoteai.di
 
 import com.renote.renoteai.ui.activities.camera.viewmodel.CameraViewModel
 import com.renote.renoteai.ui.activities.camera.viewmodel.EmailViewModel
+import com.renote.renoteai.ui.activities.camera.viewmodel.ImageViewerViewModel
 import com.renote.renoteai.ui.activities.edit.viewmodel.EditViewModel
 import com.renote.renoteai.ui.fragments.folders.viewmodel.FolderFilesViewModel
 import com.renote.renoteai.ui.presentation.home.viewmodel.HomeFragmentViewModel
@@ -23,4 +24,5 @@ val viewModelModule = module {
     viewModel{CreateTagViewModel(get(),get(),get(),get())}
     viewModel{AddFolderViewModel(get(),get(),get(),get())}
     viewModel{EditViewModel(get(),get(),get())}
+    viewModel{ImageViewerViewModel(get(),get())}
 }

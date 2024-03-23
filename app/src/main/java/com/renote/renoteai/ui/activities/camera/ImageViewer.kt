@@ -16,16 +16,24 @@ import android.view.WindowManager
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.camera.core.ImageCapture
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.databinding.DataBindingUtil
 import com.chaquo.python.Python
 import com.chaquo.python.android.AndroidPlatform
 import com.google.gson.Gson
+import com.renote.renoteai.R
 import com.renote.renoteai.database.tables.FileEntity
-import com.renote.renoteai.databinding.ActivityImageViewerBinding
+
+import com.renote.renoteai.databinding.CameraDataBinding
+import com.renote.renoteai.databinding.ImageViewerDataBinding
 import com.renote.renoteai.ui.activities.camera.libs.CVLib
 import com.renote.renoteai.ui.activities.camera.libs.DocLib
 import com.renote.renoteai.ui.activities.camera.scanutil.DocumentBorders
+import com.renote.renoteai.ui.activities.camera.viewmodel.CameraViewModel
+import com.renote.renoteai.ui.activities.camera.viewmodel.ImageViewerViewModel
+import org.koin.android.ext.android.inject
 import org.opencv.android.Utils
 import org.opencv.core.Mat
 import org.opencv.imgproc.Imgproc
@@ -37,16 +45,19 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class ImageViewer : AppCompatActivity() {
-  private lateinit var viewBinding: ActivityImageViewerBinding
+  private lateinit var viewBinding: ImageViewerDataBinding
   private var original : Mat? = null
   private var pictureType : String? = ""
-
+  val viewModel: ImageViewerViewModel by inject()
   @SuppressLint("WrongThread")
   @RequiresApi(Build.VERSION_CODES.P)
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    viewBinding = ActivityImageViewerBinding.inflate(layoutInflater)
-    setContentView(viewBinding.root)
+    viewBinding = DataBindingUtil.setContentView(
+      this@ImageViewer, R.layout.activity_image_viewer
+    )
+    viewBinding.lifecycleOwner = this
+    viewBinding.viewmodel = viewModel
 //
     window.setFlags(
       WindowManager.LayoutParams.FLAG_SECURE,
@@ -54,7 +65,7 @@ class ImageViewer : AppCompatActivity() {
     )
     supportActionBar?.hide()
 //
-      viewBinding.warpButton.setOnClickListener {
+      viewBinding.wrapButton.setOnClickListener {
         deleteInternalStorageDirectoryy()
         warpImage()
       }
@@ -95,6 +106,7 @@ class ImageViewer : AppCompatActivity() {
     val result = Bitmap.createBitmap(mat.cols(), mat.rows(), Bitmap.Config.ARGB_8888)
     Utils.matToBitmap(mat, result)
     viewBinding.imageView.setImageBitmap(result)
+    observeData()
   }
 
 
@@ -176,7 +188,7 @@ class ImageViewer : AppCompatActivity() {
         //val filee = File(output_path, "captured_image.jpg")
              var fileEntities = mutableListOf<FileEntity>()
         val currentTmStmp=convertTimestampToDateAndTime(timestamp = currentTimestamp)
-        val fileName = "RenoteAI_${currentTmStmp}"
+        val fileName = "RenoteAI_${currentTmStmp}.jpg"
 
         val directory =
           File(this.filesDir, "ReNoteAI") // Directory path within app's internal storage
@@ -315,7 +327,25 @@ class ImageViewer : AppCompatActivity() {
   // Modify the part of the code where you're calling saveFileEntities
 // Instead of creating a list and passing it, you will now create a single FileEntity and pass it.
 
+  private fun observeData() {
+    viewModel.resourseClick.observe(this) { integer ->
+      when (integer) {
+        R.id.wrapButton -> {
 
+          deleteInternalStorageDirectoryy()
+          warpImage()
+        }
+
+
+        R.id.retakeButton->{
+          deleteInternalStorageDirectoryy()
+          val intent = Intent(this, CameraActivity::class.java)
+          startActivity(intent)
+        }
+
+      }
+    }
+  }
   override fun onDestroy() {
     super.onDestroy()
     deleteInternalStorageDirectoryy()
