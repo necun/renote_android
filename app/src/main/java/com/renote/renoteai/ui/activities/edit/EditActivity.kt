@@ -12,19 +12,16 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
-import android.util.DisplayMetrics
 import android.provider.MediaStore
-import android.util.Log
+import android.util.DisplayMetrics
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
-import androidx.recyclerview.widget.RecyclerView
 import com.chaquo.python.Python
 import com.chaquo.python.android.AndroidPlatform
 import com.google.gson.Gson
@@ -36,7 +33,6 @@ import com.renote.renoteai.database.tables.DocumentEntity
 import com.renote.renoteai.database.tables.FileEntity
 import com.renote.renoteai.databinding.EditActivityDataBinding
 import com.renote.renoteai.ui.activities.camera.CameraActivity
-import com.renote.renoteai.ui.activities.camera.EXTRA_PICTURE_TYPE
 import com.renote.renoteai.ui.activities.camera.EmailActivity
 import com.renote.renoteai.ui.activities.camera.OCRResultViewer
 import com.renote.renoteai.ui.activities.camera.libs.CVLib
@@ -447,54 +443,33 @@ class EditActivity : AppCompatActivity() {
         val displayMetrics = DisplayMetrics()
         windowManager.defaultDisplay.getMetrics(displayMetrics)
         val screenWidth = displayMetrics.widthPixels
+        val screenHeight = displayMetrics.heightPixels
 
-        // Set the height of the imageView to match the width of the screen
-        imageView.layoutParams.height = screenWidth
+        // Calculate the adjusted width and height
+        val isLandscape = currentRotation % 180f != 0f
+        val newWidth: Int
+        val newHeight: Int
 
-        val rotationAnimator =
-            ObjectAnimator.ofFloat(imageView, "rotation", imageView.rotation, currentRotation)
-        rotationAnimator.duration = 500 // 500 milliseconds
+        if (isLandscape) {
+            // Rotate to landscape: adjust dimensions to fit the wider aspect
+            newHeight = screenWidth // Use screenWidth for height to maintain aspect ratio
+            newWidth = (imageView.width.toFloat() / imageView.height.toFloat() * newHeight).toInt()
+        } else {
+            // Rotate back to portrait: match width to screenWidth and adjust height
+            newWidth = screenWidth
+            newHeight = (imageView.height.toFloat() / imageView.width.toFloat() * newWidth).toInt()
+        }
+
+        // Set the ImageView's layout parameters
+        imageView.layoutParams = imageView.layoutParams.apply {
+            width = newWidth
+            height = newHeight
+        }
+
+        // Animate the rotation
+        val rotationAnimator = ObjectAnimator.ofFloat(imageView, "rotation", imageView.rotation, currentRotation)
+        rotationAnimator.duration = 500 // Animation duration in milliseconds
         rotationAnimator.start()
-
-//        currentRotation += 90f
-//        if (currentRotation >= 360f) currentRotation = 0f // Reset rotation if full circle
-//
-//        val imageView = binding.imageView2
-//
-//        val displayMetrics = DisplayMetrics()
-//        windowManager.defaultDisplay.getMetrics(displayMetrics)
-//        val screenWidth = displayMetrics.widthPixels
-//        val screenHeight = displayMetrics.heightPixels
-//
-//        // Assuming the original dimensions of the imageView represent its aspect ratio
-//        val originalWidth = imageView.width
-//        val originalHeight = imageView.height
-//
-//        // Determine new dimensions based on current rotation
-//        val isLandscape = currentRotation % 180 != 0f
-//        val newWidth: Int
-//        val newHeight: Int
-//
-//        if (isLandscape) {
-//            // When the image is rotated "landscape", match screen height to imageView's height and adjust width to maintain aspect ratio
-//            newHeight = screenHeight
-//            newWidth = (originalWidth.toFloat() / originalHeight.toFloat() * newHeight).toInt()
-//        } else {
-//            // When the image is back to "portrait", match screen width to imageView's width and adjust height to maintain aspect ratio
-//            newWidth = screenWidth
-//            newHeight = (originalHeight.toFloat() / originalWidth.toFloat() * newWidth).toInt()
-//        }
-//
-//        // Adjust imageView's layoutParams
-//        val layoutParams = imageView.layoutParams
-//        layoutParams.width = newWidth
-//        layoutParams.height = newHeight
-//        imageView.layoutParams = layoutParams
-//
-//        // Rotate the imageView with animation
-//        val rotationAnimator = ObjectAnimator.ofFloat(imageView, "rotation", imageView.rotation, currentRotation)
-//        rotationAnimator.duration = 500 // 500 milliseconds
-//        rotationAnimator.start()
     }
 
     override fun onDestroy() {

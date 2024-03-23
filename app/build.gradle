@@ -69,7 +69,7 @@ chaquopy {
     defaultConfig {
         version = "3.8"
 
-        buildPython("C:\\Users\\DELL\\AppData\\Local\\Programs\\Python\\Python39\\python.exe")
+        buildPython("C:\\Users\\necun\\AppData\\Local\\Programs\\Python\\Python312\\python.exe")
 
        // buildPython("C:\\Users\\necun\\AppData\\Local\\Programs\\Python\\Python312\\python.exe")
 
