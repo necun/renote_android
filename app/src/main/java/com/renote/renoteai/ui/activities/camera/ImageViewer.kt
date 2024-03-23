@@ -16,16 +16,25 @@ import android.view.WindowManager
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.camera.core.ImageCapture
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+
+import androidx.databinding.DataBindingUtil
 import com.chaquo.python.Python
 import com.chaquo.python.android.AndroidPlatform
 import com.google.gson.Gson
+import com.renote.renoteai.R
 import com.renote.renoteai.database.tables.FileEntity
-import com.renote.renoteai.databinding.ActivityImageViewerBinding
+
+import com.renote.renoteai.databinding.CameraDataBinding
+import com.renote.renoteai.databinding.ImageViewerDataBinding
 import com.renote.renoteai.ui.activities.camera.libs.CVLib
 import com.renote.renoteai.ui.activities.camera.libs.DocLib
 import com.renote.renoteai.ui.activities.camera.scanutil.DocumentBorders
+import com.renote.renoteai.ui.activities.camera.viewmodel.CameraViewModel
+import com.renote.renoteai.ui.activities.camera.viewmodel.ImageViewerViewModel
+import org.koin.android.ext.android.inject
 import org.opencv.android.Utils
 import org.opencv.core.Mat
 import org.opencv.imgproc.Imgproc
@@ -38,36 +47,24 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class ImageViewer : AppCompatActivity() {
-    private lateinit var viewBinding: ActivityImageViewerBinding
+    private lateinit var viewBinding: ImageViewerDataBinding
     private var original: Mat? = null
     private var pictureType: String? = ""
+    val viewModel: ImageViewerViewModel by inject()
     val currentTimestamp: Long = System.currentTimeMillis()
 
-    @SuppressLint("WrongThread")
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewBinding = ActivityImageViewerBinding.inflate(layoutInflater)
-        setContentView(viewBinding.root)
-
-        window.setFlags(
-            WindowManager.LayoutParams.FLAG_SECURE,
-            WindowManager.LayoutParams.FLAG_SECURE
+        viewBinding = DataBindingUtil.setContentView(
+            this@ImageViewer, R.layout.activity_image_viewer
         )
-        supportActionBar?.hide()
-//
-        viewBinding.warpButton.setOnClickListener {
-            deleteInternalStorageDirectoryy()
-            warpImage()
-        }
-        viewBinding.retakeButton.setOnClickListener {
-            deleteInternalStorageDirectoryy()
-            val intent = Intent(this, CameraActivity::class.java)
-            startActivity(intent)
-        }
-//
+        viewBinding.lifecycleOwner = this
+        viewBinding.viewmodel = viewModel
+
         val uri = Uri.parse(intent.getStringExtra(EXTRA_PICTURE_URI))
         pictureType = intent.getStringExtra(EXTRA_PICTURE_TYPE);
+
 //
         val imageDecoder = ImageDecoder.createSource(contentResolver, uri)
         val bitmap = ImageDecoder.decodeBitmap(imageDecoder)
@@ -98,11 +95,31 @@ class ImageViewer : AppCompatActivity() {
             }
         })
 //
+
         val result = Bitmap.createBitmap(mat.cols(), mat.rows(), Bitmap.Config.ARGB_8888)
         Utils.matToBitmap(mat, result)
         viewBinding.imageView.setImageBitmap(result)
+        observeData()
     }
 
+    private fun observeData() {
+        viewModel.resourseClick.observe(this) { integer ->
+            when (integer) {
+                R.id.wrapButton -> {
+                    deleteInternalStorageDirectoryy()
+                    warpImage()
+                }
+
+
+                R.id.retakeButton -> {
+                    deleteInternalStorageDirectoryy()
+                    val intent = Intent(this, CameraActivity::class.java)
+                    startActivity(intent)
+                }
+
+            }
+        }
+    }
 
     @SuppressLint("SuspiciousIndentation")
     private fun warpImage() {
@@ -184,9 +201,9 @@ class ImageViewer : AppCompatActivity() {
                 val f = File(output_path, "filter_image.jpg")
                 //val filee = File(output_path, "captured_image.jpg")
                 var fileEntities = mutableListOf<FileEntity>()
-              //  val currentTmStmp = convertTimestampToDateAndTime(timestamp = currentTimestamp)
+                //  val currentTmStmp = convertTimestampToDateAndTime(timestamp = currentTimestamp)
 
-                saveOriginalToStorage(this@ImageViewer,currentTimestamp.toString())
+                saveOriginalToStorage(this@ImageViewer, currentTimestamp.toString())
 
                 val fileName = "RenoteAI_${currentTimestamp}.jpg"
 
@@ -266,6 +283,7 @@ class ImageViewer : AppCompatActivity() {
         } finally {
             inputChannel?.close()
             outputChannel?.close()
+
         }
 
     }
@@ -280,8 +298,6 @@ class ImageViewer : AppCompatActivity() {
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
                     .toString() + "/ReNoteAI-Image/"
             )
-
-
             val input_path = File(
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
                     .toString() + "/ReNoteAI-Image-Input/"
@@ -333,16 +349,11 @@ class ImageViewer : AppCompatActivity() {
                     Toast.makeText(this@ImageViewer, "Permission Granted", Toast.LENGTH_LONG)
                         .show()
                 } else {
-                    ActivityCompat.requestPermissions(
-                        this@ImageViewer,
-                        arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE),
-                        14
-                    )
+                    requestRuntimePermissionn()
                 }
             }
         }
     }
-
 
     fun saveFileEntities(context: Context, newFileEntity: FileEntity) {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -350,11 +361,13 @@ class ImageViewer : AppCompatActivity() {
 
         // Retrieve the existing list of file entities
         val existingFileEntitiesJson = prefs.getString(FILE_ENTITIES_KEY, null)
-        val existingFileEntities: MutableList<FileEntity> = if (existingFileEntitiesJson != null) {
-            gson.fromJson(existingFileEntitiesJson, Array<FileEntity>::class.java).toMutableList()
-        } else {
-            mutableListOf()
-        }
+        val existingFileEntities: MutableList<FileEntity> =
+            if (existingFileEntitiesJson != null) {
+                gson.fromJson(existingFileEntitiesJson, Array<FileEntity>::class.java)
+                    .toMutableList()
+            } else {
+                mutableListOf()
+            }
 
         // Add the new file entity to the list
         existingFileEntities.add(newFileEntity)
@@ -366,27 +379,18 @@ class ImageViewer : AppCompatActivity() {
         editor.apply()
     }
 
-    // Modify the part of the code where you're calling saveFileEntities
-// Instead of creating a list and passing it, you will now create a single FileEntity and pass it.
+
+                    override fun onDestroy() {
+                super.onDestroy()
+                deleteInternalStorageDirectoryy()
+            }
 
 
-    override fun onDestroy() {
-        super.onDestroy()
-        deleteInternalStorageDirectoryy()
-    }
+                    companion object {
+                private const val TAG = "ReNoteAIApp"
+                private const val FILENAME_FORMAT = "yyyy_MM_dd_HH_mm_ss_SSS"
+                private const val PREFS_NAME = "MyAppPrefs"
+                private const val FILE_ENTITIES_KEY = "fileEntities"
 
-    companion object {
-        private const val TAG = "ReNoteAIApp"
-        private const val FILENAME_FORMAT = "yyyy_MM_dd_HH_mm_ss_SSS"
-        private const val PREFS_NAME = "MyAppPrefs"
-        private const val FILE_ENTITIES_KEY = "fileEntities"
-
-    }
-
-    fun convertTimestampToDateAndTime(timestamp: Long): String {
-        val sdf = SimpleDateFormat("yyyy_MM_dd_HH_mm_ss_SSS", Locale.getDefault())
-        val date = Date(timestamp)
-        return sdf.format(date)
-    }
-
-}
+            }
+        }

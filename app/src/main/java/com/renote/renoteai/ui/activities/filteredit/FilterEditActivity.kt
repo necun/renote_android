@@ -215,7 +215,7 @@ class FilterEditActivity : AppCompatActivity() {
                 R.id.softImgBtn -> {
                     // deleteInternalStorageDirectoryy()
                     //doSaveGetSave()
-                    softFilter()
+                    //softFilter()
                     Toast.makeText(this@FilterEditActivity, "Soft Filter", Toast.LENGTH_SHORT)
                         .show()
                 }

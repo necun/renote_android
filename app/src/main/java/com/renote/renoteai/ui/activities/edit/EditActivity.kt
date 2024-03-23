@@ -23,6 +23,8 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
+import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.chaquo.python.Python
@@ -33,6 +35,7 @@ import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import com.renote.renoteai.R
 import com.renote.renoteai.database.tables.DocumentEntity
+
 import com.renote.renoteai.database.tables.FileEntity
 import com.renote.renoteai.databinding.EditActivityDataBinding
 import com.renote.renoteai.ui.activities.camera.CameraActivity
@@ -62,7 +65,7 @@ const val EXTRA_PICTURE_URI = "com.example.cameraxapp.PICTURE_URI"
 class EditActivity : AppCompatActivity() {
     private lateinit var binding: EditActivityDataBinding
     private val viewModel: EditViewModel by inject()
-    var mContext: Context? = null
+
     private var original: Mat? = null
     private var result: Mat? = null
 
@@ -79,8 +82,8 @@ class EditActivity : AppCompatActivity() {
     private lateinit var uri: Uri
 
     lateinit var editPagerAdapter: EditPagerAdapter
-    var recentDocumentId: String = ""
-
+    var recentDocumentId:String=""
+    lateinit var fileEntityList: ArrayList<FileEntity>
     @SuppressLint("WrongThread")
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -97,6 +100,7 @@ class EditActivity : AppCompatActivity() {
 //        pictureType = intent.getStringExtra(EXTRA_PICTURE_TYPE)
 
         editPagerAdapter = EditPagerAdapter(this@EditActivity)
+        fileEntityList = ArrayList()
         editPagerAdapter.showEditTitle = true
         recentDocumentId = intent.getStringExtra("recentdocumentid").toString()
         println("343refewr5:$recentDocumentId")
@@ -328,6 +332,7 @@ class EditActivity : AppCompatActivity() {
         editPagerAdapter.onTextChanged = { position, data ->
             //cropScanList[position].fileName = data
         }
+
     }
 
     private fun recentFileDetailsByRecentDocumentIdObserveData() {
@@ -369,8 +374,11 @@ class EditActivity : AppCompatActivity() {
         viewModel.resourseClick.observe(this) { integer ->
             when (integer) {
                 R.id.cropBtn -> {
+                    val currentPosition = binding.imageView2.currentItem
+                    val currentFileEntity = editPagerAdapter.currentList[currentPosition]
+                    val fileName = currentFileEntity.name
                     val intent = Intent(this@EditActivity, CropEditActivity::class.java)
-                    intent.putExtra("enhancedImageType", enhancedImageType)
+                    intent.putExtra("fileName",fileName)
                     startActivity(intent)
                 }
 
@@ -414,6 +422,28 @@ class EditActivity : AppCompatActivity() {
                     startActivity(Intent(this@EditActivity, MainActivity::class.java))
                     finishAffinity()
                 }
+
+                R.id.shareBtn ->{
+                    println("43rgty6uj:$recentDocumentId")
+//                    viewModel.getRecentFileDetailsByDocumentId(recentDocumentId)
+//                    viewModel.recentFileDetails.observe(this@EditActivity) {
+                    if(recentDocumentId != null){
+                        println("343refe4sds:$recentDocumentId")
+                        val currentPosition = binding.imageView2.currentItem
+                        val currentFileEntity = editPagerAdapter.currentList[currentPosition]
+                      if (currentFileEntity.fileData.toUri() != null) {
+                            val uri = currentFileEntity.fileData.toUri()
+                            println("uriuriuri:$uri")
+                            val filePath = uri.toString().removePrefix("file://")
+                            shareFile(filePath)
+                        } else {
+                            // This means the currentItem index is out of bounds, handle accordingly
+                            Toast.makeText(this, "please try again after sometime", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+
+                }
+
             }
         }
     }
@@ -927,11 +957,42 @@ class EditActivity : AppCompatActivity() {
         editor.apply() // Apply the changes
     }
 
+        private fun shareFile(imagePath: String) {
+
+          // Create a File object from the path
+
+            try {
+                val imageFile = File(imagePath)
+                val contentUri: Uri = FileProvider.getUriForFile(
+                    this,
+                    "com.renote.renoteai.provider",
+                    imageFile
+                )
+                this@EditActivity.grantUriPermission(
+                    "com.renote.renoteai",
+                    contentUri,
+                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+                val shareIntent: Intent = Intent(Intent.ACTION_SEND).apply {
+                    type = "image/jpeg" // Specify the MIME type
+                    putExtra(Intent.EXTRA_STREAM, contentUri)
+                    addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+
+                startActivity(Intent.createChooser(shareIntent, "Share Image"))
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Toast.makeText(this, "Failed to share image", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+
     override fun onBackPressed() {
         super.onBackPressed()
         // Start MainActivity
         clearAllPreferences(this@EditActivity)
         deleteInternalStorageDirectoryy()
+
         val intent = Intent(this, CameraActivity::class.java)
         startActivity(intent)
 
@@ -942,7 +1003,7 @@ class EditActivity : AppCompatActivity() {
     companion object {
         private const val PREFS_NAME = "MyAppPrefs"
         private const val FILE_ENTITIES_KEY = "fileEntities"
-        private const val TAG = "CameraXApp"
+        private const val TAG = "ReNoteAIApp"
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
     }
 

@@ -5,27 +5,22 @@ import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.ContentValues
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Color
-import android.graphics.ImageDecoder
 import android.graphics.ImageFormat
 import android.media.Image
-import android.graphics.Paint
-import android.graphics.Path
-import android.hardware.display.DisplayManager
 import android.net.Uri
 import android.os.Build
-import androidx.annotation.DrawableRes
 import android.os.Bundle
 import android.provider.MediaStore
+import android.provider.Settings
 import android.util.Base64
 import android.util.Log
+import android.view.View
 import android.view.WindowManager
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -35,6 +30,24 @@ import androidx.camera.video.VideoCapture
 import androidx.cardview.widget.CardView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.databinding.DataBindingUtil
+import com.bumptech.glide.Glide
+import com.google.android.material.tabs.TabLayout
+import com.google.gson.Gson
+import com.renote.renoteai.R
+import com.renote.renoteai.database.tables.DocumentEntity
+import com.renote.renoteai.database.tables.FileEntity
+import com.renote.renoteai.databinding.CameraDataBinding
+import com.renote.renoteai.ui.activities.camera.extension.circularClose
+import com.renote.renoteai.ui.activities.camera.extension.circularReveal
+import com.renote.renoteai.ui.activities.camera.extension.toggleButton
+import com.renote.renoteai.ui.activities.camera.libs.CVLib
+import com.renote.renoteai.ui.activities.camera.scanutil.DocumentBorders
+import com.renote.renoteai.ui.activities.camera.scanutil.ScanType
+import com.renote.renoteai.ui.activities.camera.viewmodel.CameraViewModel
+import com.renote.renoteai.ui.activities.edit.EditActivity
+import com.renote.renoteai.ui.main.MainActivity
+import org.koin.android.ext.android.inject
 import org.opencv.android.OpenCVLoader
 import org.opencv.android.Utils
 import org.opencv.core.CvType
@@ -43,44 +56,10 @@ import org.opencv.imgproc.Imgproc
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import android.provider.Settings
-import android.view.View
-import android.view.ViewGroup
-import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AlertDialog
-import androidx.compose.ui.graphics.Canvas
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
-import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.lifecycleScope
-import com.bumptech.glide.Glide
-import com.google.android.material.tabs.TabLayout
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import com.renote.renoteai.ui.activities.camera.libs.CVLib
-import com.renote.renoteai.ui.activities.camera.scanutil.DocumentBorders
-import org.koin.android.ext.android.inject
-import com.renote.renoteai.ui.activities.camera.extension.toggleButton
-import com.renote.renoteai.ui.main.MainActivity
-import com.renote.renoteai.R
-import com.renote.renoteai.database.tables.DocumentEntity
-import com.renote.renoteai.database.tables.FileEntity
-import com.renote.renoteai.databinding.CameraDataBinding
-import com.renote.renoteai.ui.activities.camera.extension.circularClose
-import com.renote.renoteai.ui.activities.camera.extension.circularReveal
-import com.renote.renoteai.ui.activities.camera.libs.DocLib
-import com.renote.renoteai.ui.activities.camera.scanutil.ScanType
-import com.renote.renoteai.ui.activities.camera.viewmodel.CameraViewModel
-import com.renote.renoteai.ui.activities.edit.EditActivity
-import com.renote.renoteai.ui.presentation.home.viewmodel.HomeFragmentViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import java.util.Date
 import kotlin.properties.Delegates
 
 
@@ -205,7 +184,16 @@ class CameraActivity : AppCompatActivity() {
         })
 
         cameraExecutor = Executors.newSingleThreadExecutor()
-
+        val getFileEntities = getFileEntities(this@CameraActivity)
+        println("getFileEntitiessss:$getFileEntities")
+        if(getFileEntities.isNotEmpty()){
+            viewBinding.conformScanBtn.visibility=View.VISIBLE
+            viewBinding.previewLay.visibility=View.VISIBLE
+        }
+        else{
+            viewBinding.conformScanBtn.visibility=View.GONE
+            viewBinding.previewLay.visibility=View.GONE
+        }
     }
 
     private fun observeData() {
@@ -336,7 +324,7 @@ class CameraActivity : AppCompatActivity() {
 //                    // Access the document ID if it's set
                     if (fileEntity.documentId.isNotEmpty()) { //
                         println("document ID associated with this file")
-                    } else {
+       2             } else {
                         println("No document ID associated with this file")
                         val recentDocumentId = documentEntity.id
                         println("Recent Document ID: $recentDocumentId")
@@ -590,12 +578,27 @@ fun getFileEntities(context: Context): List<FileEntity> {
     override fun onBackPressed() {
         super.onBackPressed()
         // moveTaskToBack(true)
+        clearAllPreferences(this@CameraActivity)
         val intent = Intent(this@CameraActivity, MainActivity::class.java)
         startActivity(intent)
     }
 
     override fun onResume() {
         super.onResume()
+        val getFileEntities = getFileEntities(this@CameraActivity)
+        if(getFileEntities.isNotEmpty()){
+            viewBinding.conformScanBtn.visibility=View.VISIBLE
+            viewBinding.previewLay.visibility=View.VISIBLE
+            Glide.with(this@CameraActivity)
+                .load(Uri.parse(getFileEntities[getFileEntities.size-1].fileData))
+                .into(viewBinding.previewImage)
+            viewBinding.previewCount.text = getFileEntities.size.toString()
+                    }
+
+        else{
+            viewBinding.conformScanBtn.visibility=View.GONE
+            viewBinding.previewLay.visibility=View.GONE
+        }
         if (!OpenCVLoader.initDebug()) {
             Log.d(TAG, "ERROR OpenCV library not found.")
         } else {
@@ -803,8 +806,8 @@ fun getFileEntities(context: Context): List<FileEntity> {
     }
 
     companion object {
-        private const val PREFS_NAME = "MyAppPrefs"
-        private const val FILE_ENTITIES_KEY = "fileEntities"
+        const val PREFS_NAME = "MyAppPrefs"
+         const val FILE_ENTITIES_KEY = "fileEntities"
         private const val TAG = "ReNoteAI"
         private const val FILENAME_FORMAT = "yyyy_MM_dd_HH_mm_ss_SSS"
         private const val REQUEST_CODE_PERMISSIONS = 10

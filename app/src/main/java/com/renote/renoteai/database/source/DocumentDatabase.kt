@@ -11,7 +11,7 @@ import com.renote.renoteai.database.tables.FolderEntity
 import com.renote.renoteai.database.tables.TagEntity
 import com.renote.renoteai.database.tables.FileEntity
 
-@Database(entities = [FolderEntity::class, DocumentEntity::class, TagEntity::class, FileEntity::class], version = 1, exportSchema = false)
+@Database(entities = [FolderEntity::class, DocumentEntity::class, TagEntity::class, FileEntity::class], version = 2, exportSchema = false)
 abstract class DocumentDatabase : RoomDatabase() {
     abstract fun documentDao(): DocumentDao
     abstract fun folderDao(): FolderDao

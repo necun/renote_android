@@ -1,5 +1,6 @@
 package com.renote.renoteai.ui.activities.cropedit
 
+import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
 import androidx.appcompat.app.AppCompatActivity
@@ -19,6 +20,7 @@ class CropEditActivity : AppCompatActivity() {
 
     val viewModel: CropViewModel by inject()
     var enhancedImageType: String = ""
+    private lateinit var fileName: String
     private lateinit var viewBinding: CropDataBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,7 +40,9 @@ class CropEditActivity : AppCompatActivity() {
         enhancedImageType = intent.getStringExtra("enhancedImageType").toString()
         println("enhancedImageType:$enhancedImageType")
 
-        initImageDisplay()
+        fileName = intent.getStringExtra("fileName").toString()
+
+        initImageDisplay(this@CropEditActivity,fileName)
         observeData()
     }
 
@@ -47,20 +51,21 @@ class CropEditActivity : AppCompatActivity() {
             when (integer) {
                 R.id.continueBtn -> {
                     val intent = Intent(this@CropEditActivity, EditActivity::class.java)
-                    intent.putExtra("enhancedImageType",enhancedImageType)
+                    intent.putExtra("enhancedImageType", enhancedImageType)
                     startActivity(intent)
                 }
             }
         }
     }
 
-    private fun initImageDisplay() {
-        val output_path =
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-                .toString() + "/CameraX-Image-Output/"
+    private fun initImageDisplay(context: Context, fileName: String) {
 
-        println(output_path)
-        val f = File(output_path, "$enhancedImageType.jpg")
+        val remoteAIDirectory = File(
+            context.getExternalFilesDir(Environment.DIRECTORY_PICTURES),
+            "ReNoteAI-Image-Original"
+        )
+        println(remoteAIDirectory)
+        val f = File(remoteAIDirectory, fileName)
         System.out.println("122334465=" + f)
         val b = BitmapFactory.decodeStream(FileInputStream(f))
         viewBinding.cropImage.setImageBitmap(b)
