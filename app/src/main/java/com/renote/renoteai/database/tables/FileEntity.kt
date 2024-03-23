@@ -1,7 +1,11 @@
 package com.renote.renoteai.database.tables
 
 import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
+
+
 
 @Entity(tableName = "File_table")
 data class FileEntity(

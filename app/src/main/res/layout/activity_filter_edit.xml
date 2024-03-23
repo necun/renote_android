@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data class="FilterEditActivityDataBinding">
+
+        <variable
+            name="viewModel"
+            type="com.renote.renoteai.ui.activities.filteredit.FilterEditViewModel" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#000000">
+
+        <com.jsibbold.zoomage.ZoomageView
+            android:id="@+id/imageView2"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_margin="@dimen/margin_8dp"
+            android:layout_marginBottom="8dp"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
+            app:layout_constraintBottom_toTopOf="@id/seekBar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:srcCompat="@tools:sample/avatars" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/bottomLay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardBackgroundColor="@color/black"
+        app:cardCornerRadius="@dimen/filter_card_radius"
+        app:cardElevation="@dimen/dp2"
+        app:cardPreventCornerOverlap="false"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:background="#000000">
+
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/filterLay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                app:layout_constraintBottom_toTopOf="@id/cardView"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0"
+                tools:layout_editor_absoluteX="0dp">
+
+                <LinearLayout
+                    android:id="@+id/originalImg"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/filter_img_bg"
+                    android:orientation="vertical"
+                    android:onClick="@{(view) -> viewModel.onresorceClick(view.getId())}"
+                    app:layout_constraintEnd_toStartOf="@id/magicImgBtn"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/originalImageView"
+                        android:layout_width="@dimen/height_55dp"
+                        android:layout_height="@dimen/height_55dp"
+                        android:paddingStart="@dimen/padding_5dp"
+                        android:paddingTop="@dimen/padding_5dp"
+                        android:paddingEnd="@dimen/padding_5dp"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/filter_img" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/original"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom"
+                        android:background="@drawable/filter_text_bg"
+                        android:gravity="center"
+                        android:text="@string/original"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_size_10sp" />
+
+                </LinearLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/magicImgBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/filter_img_bg"
+                    android:orientation="vertical"
+                    android:onClick="@{(view) -> viewModel.onresorceClick(view.getId())}"
+                    app:layout_constraintEnd_toStartOf="@id/softImgBtn"
+                    app:layout_constraintStart_toEndOf="@id/originalImg"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/magicImageView"
+                        android:layout_width="@dimen/height_55dp"
+                        android:layout_height="@dimen/height_55dp"
+                        android:paddingStart="@dimen/padding_5dp"
+                        android:paddingTop="@dimen/padding_5dp"
+                        android:paddingEnd="@dimen/padding_5dp"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/filter_img"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/enhanced"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="bottom"
+                        android:background="@drawable/filter_text_bg"
+                        android:gravity="center"
+                        android:text="@string/Enhanced"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_size_10sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/magicImageView" />
+
+                    <!--                <ProgressBar-->
+                    <!--                    android:id="@+id/magicProgressbar"-->
+                    <!--                    android:layout_width="@dimen/height_30dp"-->
+                    <!--                    android:layout_height="@dimen/height_30dp"-->
+                    <!--                    android:indeterminateTint="@color/colorAccent"-->
+                    <!--                    app:layout_constraintBottom_toBottomOf="@id/magicImageView"-->
+                    <!--                    app:layout_constraintEnd_toEndOf="parent"-->
+                    <!--                    app:layout_constraintStart_toStartOf="parent"-->
+                    <!--                    app:layout_constraintTop_toTopOf="@id/magicImageView" />-->
+
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/softImgBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/filter_img_bg"
+                    android:orientation="vertical"
+                    android:onClick="@{(view) -> viewModel.onresorceClick(view.getId())}"
+                    app:layout_constraintEnd_toStartOf="@id/grayImgBtn"
+                    app:layout_constraintStart_toEndOf="@id/magicImgBtn"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/softImageView"
+                        android:layout_width="@dimen/height_55dp"
+                        android:layout_height="@dimen/height_55dp"
+                        android:paddingStart="@dimen/padding_5dp"
+                        android:paddingTop="@dimen/padding_5dp"
+                        android:paddingEnd="@dimen/padding_5dp"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/filter_img"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/soft"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="bottom"
+                        android:background="@drawable/filter_text_bg"
+                        android:gravity="center"
+                        android:text="@string/soft"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_size_10sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/softImageView" />
+
+                    <!--                <ProgressBar-->
+                    <!--                    android:id="@+id/softProgressbar"-->
+                    <!--                    android:layout_width="@dimen/height_30dp"-->
+                    <!--                    android:layout_height="@dimen/height_30dp"-->
+                    <!--                    android:indeterminateTint="@color/colorAccent"-->
+                    <!--                    app:layout_constraintBottom_toBottomOf="@id/softImageView"-->
+                    <!--                    app:layout_constraintEnd_toEndOf="parent"-->
+                    <!--                    app:layout_constraintStart_toStartOf="parent"-->
+                    <!--                    app:layout_constraintTop_toTopOf="@id/softImageView" />-->
+
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/grayImgBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/filter_img_bg"
+                    android:orientation="vertical" android:onClick="@{(view) -> viewModel.onresorceClick(view.getId())}"
+                    app:layout_constraintEnd_toStartOf="@id/blackWhiteImgBtn"
+                    app:layout_constraintStart_toEndOf="@id/softImgBtn"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/grayImageView"
+                        android:layout_width="@dimen/height_55dp"
+                        android:layout_height="@dimen/height_55dp"
+                        android:paddingStart="@dimen/padding_5dp"
+                        android:paddingTop="@dimen/padding_5dp"
+                        android:paddingEnd="@dimen/padding_5dp"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/filter_img"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/grey"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="bottom"
+                        android:background="@drawable/filter_text_bg"
+                        android:gravity="center"
+                        android:text="@string/gray"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_size_10sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/grayImageView" />
+
+                    <!--                <ProgressBar-->
+                    <!--                    android:id="@+id/grayProgressbar"-->
+                    <!--                    android:layout_width="@dimen/height_30dp"-->
+                    <!--                    android:layout_height="@dimen/height_30dp"-->
+                    <!--                    android:indeterminateTint="@color/colorAccent"-->
+                    <!--                    app:layout_constraintBottom_toBottomOf="@id/grayImageView"-->
+                    <!--                    app:layout_constraintEnd_toEndOf="parent"-->
+                    <!--                    app:layout_constraintStart_toStartOf="parent"-->
+                    <!--                    app:layout_constraintTop_toTopOf="@id/grayImageView" />-->
+
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/blackWhiteImgBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/filter_img_bg"
+                    android:orientation="vertical"
+                    android:onClick="@{(view) -> viewModel.onresorceClick(view.getId())}"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/grayImgBtn"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/blackWhiteImageView"
+                        android:layout_width="@dimen/height_55dp"
+                        android:layout_height="@dimen/height_55dp"
+                        android:paddingStart="@dimen/padding_5dp"
+                        android:paddingTop="@dimen/padding_5dp"
+                        android:paddingEnd="@dimen/padding_5dp"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/filter_img"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/blackWhite"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="bottom"
+                        android:background="@drawable/filter_text_bg"
+                        android:gravity="center"
+                        android:text="@string/black_white"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_size_10sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/blackWhiteImageView" />
+
+                    <!--                <ProgressBar-->
+                    <!--                    android:id="@+id/bwProgressbar"-->
+                    <!--                    android:layout_width="@dimen/height_30dp"-->
+                    <!--                    android:layout_height="@dimen/height_30dp"-->
+                    <!--                    android:indeterminateTint="@color/colorAccent"-->
+                    <!--                    app:layout_constraintBottom_toBottomOf="@id/blackWhiteImageView"-->
+                    <!--                    app:layout_constraintEnd_toEndOf="parent"-->
+                    <!--                    app:layout_constraintStart_toStartOf="parent"-->
+                    <!--                    app:layout_constraintTop_toTopOf="@id/blackWhiteImageView" />-->
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardView"
+                style="@style/CustomCardViewStyle"
+                android:layout_width="match_parent"
+                android:layout_height="57dp"
+                android:elevation="0dp"
+                app:cardPreventCornerOverlap="false"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/bottomBar"
+
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/imgLeft"
+
+                        android:layout_width="65dp"
+                        android:layout_height="60dp"
+                        android:background="@drawable/filter_edit_one_icon"
+                        android:clipToOutline="false"
+
+
+                        android:padding="18dp"
+                        android:src="@drawable/close_white_icon"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/auto"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginBottom="-3dp"
+                        android:src="@drawable/auto_green_icon"
+                        app:layout_constraintEnd_toStartOf="@+id/switchOne"
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintHorizontal_chainStyle="spread"
+                        app:layout_constraintStart_toEndOf="@+id/imgLeft"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="1dp"
+                        android:text="Auto"
+                        android:textColor="#228B22"
+                        android:textSize="10sp"
+                        app:layout_constraintEnd_toEndOf="@+id/auto"
+                        app:layout_constraintStart_toStartOf="@+id/auto"
+                        app:layout_constraintTop_toBottomOf="@+id/auto" />
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/switchOne"
+                        android:layout_width="wrap_content"
+                        android:layout_height="25dp"
+                        android:layout_marginBottom="2dp"
+                        android:background="@null"
+                        android:gravity="bottom"
+                        android:thumb="@drawable/custom_thumbb"
+                        app:layout_constraintBottom_toBottomOf="@+id/auto"
+                        app:layout_constraintEnd_toStartOf="@+id/imgRight"
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintStart_toEndOf="@+id/auto"
+                        app:layout_constraintTop_toTopOf="@+id/auto"
+
+                        app:track="@drawable/custom_trackk" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="1dp"
+                        android:text="Apply to all pages"
+                        android:textSize="10sp"
+                        app:layout_constraintEnd_toEndOf="@+id/switchOne"
+                        app:layout_constraintStart_toStartOf="@+id/switchOne"
+                        app:layout_constraintTop_toBottomOf="@+id/switchOne" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/imgRight"
+                        android:layout_width="65dp"
+                        android:layout_height="60dp"
+                        android:onClick="@{(view) -> viewModel.onresorceClick(view.getId())}"
+                        android:background="@drawable/filter_edit_two_icon"
+                        android:padding="17dp"
+                        android:src="@drawable/right_white_icon"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+
+    <androidx.appcompat.widget.AppCompatSeekBar
+        android:id="@+id/seekBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="18dp"
+        android:layout_marginEnd="18dp"
+        android:maxHeight="7dp"
+        android:progress="14"
+        android:progressDrawable="@drawable/seekbar_progress_style"
+        android:splitTrack="false"
+        android:thumb="@drawable/seekbar_thumb_img"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/bottomLay"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

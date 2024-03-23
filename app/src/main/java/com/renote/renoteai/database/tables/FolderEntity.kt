@@ -10,7 +10,7 @@ data class FolderEntity(
     val name: String,
     val createdDate: Long,
     val updatedDate: Long,
-    val  emailOrPhone: String,
+    val emailOrPhone: String,
     val isSynced: Boolean,
     val isPin: Boolean,
     val isFavourite: Boolean,

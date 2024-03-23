@@ -1,5 +1,6 @@
 <resources>
     <string name="enter_tag_name_message">Please enter tag name</string>
+    <string name="enter_folder_name_message">Please enter folder name</string>
     <string name="take_scan">Take Scan</string>
     <string name="take_photo">Take Photo</string>
     <string name="start_capture">Start Capture</string>
@@ -68,4 +69,12 @@
     <string name="scan_more">Scan More</string>
     <string name="share">Share</string>
     <string name="save">Save</string>
+
+
+
+<string name="original">Original</string>
+    <string name="gray">Gray</string>
+    <string name="black_white">Black/White</string>
+    <string name="soft">Soft</string>
+    <string name="Enhanced">AI</string>
 </resources>

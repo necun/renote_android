@@ -18,4 +18,8 @@ class DocumentsRepository(private val dao: DocumentDao) {
     fun getUnSyncedDocuments() = dao.getAllUnsyncedDocumentIds()
     fun getDocuments(folderId: String) = dao.getDocuments(folderId)
 
+    suspend fun saveDocumentDetail(document: DocumentEntity) =
+        dao.saveDocumentDetail(document)
+
+    fun getRecentDocumentId() = dao.getRecentDocumentId()
 }

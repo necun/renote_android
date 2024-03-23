@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-
-    android:background="@color/white">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data class="RegistrationDataBinding">
 
@@ -13,12 +11,7 @@
 
     </data>
 
-    <androidx.core.widget.NestedScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
         <androidx.constraintlayout.widget.ConstraintLayout
-
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/white"
@@ -110,6 +103,7 @@
                 android:layout_marginStart="32dp"
                 android:layout_marginTop="40dp"
                 android:layout_marginEnd="32dp"
+                android:layout_marginBottom="20dp"
                 android:elevation="8dp"
                 android:foreground="?attr/selectableItemBackground"
                 app:cardCornerRadius="20dp"
@@ -190,6 +184,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="30dp"
                 android:src="@drawable/or"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/microsoft" />
@@ -202,6 +197,7 @@
                 android:layout_marginTop="25dp"
                 android:layout_marginEnd="32dp"
                 android:elevation="5dp"
+                android:visibility="gone"
                 android:foreground="?attr/selectableItemBackground"
                 android:onClick="@{(view) -> viewmodel.onresorceClick(view.getId())}"
                 android:padding="13dp"
@@ -233,6 +229,7 @@
             <TextView
                 android:id="@+id/txtAlreadySignIn"
                 android:layout_width="wrap_content"
+                android:visibility="gone"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="40dp"
                 android:fontFamily="@font/red_hat_display"
@@ -246,5 +243,4 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </androidx.core.widget.NestedScrollView>
 </layout>

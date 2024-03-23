@@ -21,6 +21,8 @@ import com.renote.renoteai.R
 import com.renote.renoteai.UploadResponse
 import com.renote.renoteai.api
 import com.renote.renoteai.database.tables.DocumentEntity
+import com.renote.renoteai.database.tables.FileEntity
+import com.renote.renoteai.database.tables.FolderEntity
 import com.renote.renoteai.databinding.EmailDataBinding
 import com.renote.renoteai.ui.activities.camera.viewmodel.EmailViewModel
 import com.renote.renoteai.ui.main.MainActivity
@@ -42,8 +44,10 @@ import org.koin.android.ext.android.inject
 import java.io.FileOutputStream
 import java.io.IOException
 import java.text.SimpleDateFormat
+import java.time.Instant
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 import java.util.Date
 import java.util.Locale
 
@@ -59,16 +63,10 @@ class EmailActivity : AppCompatActivity() {
     private lateinit var viewBinding: EmailDataBinding
     private lateinit var folderId:String
     private lateinit var folderName:String
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    val current = LocalDateTime.now()
-    @RequiresApi(Build.VERSION_CODES.O)
-    val formatter = DateTimeFormatter.ofPattern("ddHHmmss")
-    @RequiresApi(Build.VERSION_CODES.O)
-    val formattedTimestamp = current.format(formatter).toLong()
-
+    val currentTimestamp: Long = System.currentTimeMillis()
     private val viewModelHome: HomeFragmentViewModel by inject()
     val docEntities = mutableListOf<DocumentEntity>()
+    val fileEntity = mutableListOf<FileEntity>()
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -204,37 +202,7 @@ class EmailActivity : AppCompatActivity() {
                 .toString() + "/CameraX-Image-Output/"
         val file = File(output_path, "$enhancedImageType.jpg")
 
-        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-        val fileName = "file_$formattedTimestamp.jpg"
-
-
-        if (folderName != "ReNoteAI" && folderId != "100"){
-            val directory = File(this.filesDir, "ReNoteAI/$folderName") // Directory path within app's internal storage
-            if (!directory.exists()) {
-                directory.mkdirs() // Create the directory if it doesn't exist
-            }
-                val newFile = File(directory, fileName)
-                val fileUri:Uri = Uri.fromFile(newFile)
-                try {
-                    val inputStream = FileInputStream(file)
-                    val outputStream = FileOutputStream(newFile)
-                    val buffer = ByteArray(1024)
-                    var length: Int
-                    while (inputStream.read(buffer).also { length = it } > 0) {
-                        outputStream.write(buffer, 0, length)
-                    }
-                    outputStream.flush()
-                    outputStream.close()
-                    inputStream.close()
-                    // Now 'newFile' contains the copied image file in the internal storage of your app
-                    Toast.makeText(this@EmailActivity,"Image Saved",Toast.LENGTH_SHORT).show()
-                    saveToRoom(fileUri,fileName,folderId)
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                    // Handle error
-                }
-
-        } else {
+        val fileName = "file_$currentTimestamp.jpg"
             val directory =
                 File(this.filesDir, "ReNoteAI") // Directory path within app's internal storage
             if (!directory.exists()) {
@@ -261,8 +229,6 @@ class EmailActivity : AppCompatActivity() {
                 e.printStackTrace()
                 // Handle error
             }
-        }
-
     }
 
     //function to save the file details to the room database after storing it in the internal storage........
@@ -274,11 +240,12 @@ class EmailActivity : AppCompatActivity() {
        // println("")
         docEntities.add(
             DocumentEntity(
-                id = "doc_$formattedTimestamp",
+                id = "doc_$currentTimestamp",
                 name = fileName,
+
                 createdDate = 10005000,
                 updatedDate = 10005000,
-                fileData = fileUri.toString(),
+                fileData = "",
                 fileDriveId = "",
                 isSynced = false,
                 isPin = false,
@@ -436,3 +403,4 @@ class EmailActivity : AppCompatActivity() {
 
     }
 }
+

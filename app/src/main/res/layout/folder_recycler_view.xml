@@ -53,19 +53,20 @@
 
                 <ImageView
                     android:id="@+id/imgMore"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="37dp"
+                    android:layout_height="32dp"
                     android:layout_alignParentTop="true"
+                    android:layout_marginStart="2dp"
+                    android:layout_marginTop="4dp"
                     android:layout_marginEnd="2dp"
                     android:layout_toEndOf="@+id/imgPin"
-                    android:padding="14dp"
+                    android:padding="11dp"
                     android:src="@drawable/more" />
 
                 <TextView
                     android:id="@+id/folderNameTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-
                     android:layout_below="@+id/numberTextView"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="5dp"
@@ -106,7 +107,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:layout_marginStart="24dp"
+            android:layout_marginStart="15dp"
             android:elevation="10dp">
 
             <ImageView
@@ -116,12 +117,12 @@
                 android:layout_centerInParent="true"
                 android:src="@drawable/img_folder_bg" />
 
-            <ImageView
-                android:id="@+id/imgDrive"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_centerInParent="true"
-                android:src="@drawable/img_drive" />
+<!--            <ImageView-->
+<!--                android:id="@+id/imgDrive"-->
+<!--                android:layout_width="20dp"-->
+<!--                android:layout_height="20dp"-->
+<!--                android:layout_centerInParent="true"-->
+<!--                android:src="@drawable/img_drive" />-->
 
         </RelativeLayout>
 

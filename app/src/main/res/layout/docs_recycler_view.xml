@@ -11,6 +11,7 @@
         android:layout_height="wrap_content"
         android:background="@color/white"
         android:id="@+id/docRelativeLayout"
+        android:layout_marginBottom="5dp"
         android:elevation="10dp">
 
         <LinearLayout
@@ -26,9 +27,9 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1.5"
                 android:background="#E1E1E1"
-                android:padding="15dp"
+                android:padding="20dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/pdf" />
+                android:src="@drawable/asset_doc" />
 
             <RelativeLayout
 
@@ -74,6 +75,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/imgShare"
                     android:id="@+id/txtPersonal"
+                    android:visibility="gone"
                     android:layout_alignParentEnd="true"
                     android:layout_marginEnd="10dp"
                     android:fontFamily="@font/red_hat_display"
@@ -88,30 +90,29 @@
                     android:layout_marginTop="6dp"
                     android:fontFamily="@font/red_hat_display"
                     android:text="19/02/2024"
+                    android:textColor="@color/txtEmptyDoc1"
+                    android:textSize="14sp" />
 
-                    android:textColor="@color/text_color"
-                    android:textSize="16sp" />
+<!--                <ImageView-->
+<!--                    android:id="@+id/imgSavedDrive"-->
+<!--                    android:layout_width="20dp"-->
+<!--                    android:layout_height="20dp"-->
+<!--                    android:layout_below="@+id/dateAndTime"-->
+<!--                    android:layout_marginStart="8dp"-->
+<!--                    android:layout_marginTop="10dp"-->
+<!--                    android:src="@drawable/img_drive" />-->
 
-                <ImageView
-                    android:id="@+id/imgSavedDrive"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:layout_below="@+id/dateAndTime"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="10dp"
-                    android:src="@drawable/img_drive" />
-
-                <TextView
-                    android:id="@+id/txtSavedFolder"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/dateAndTime"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_toEndOf="@id/imgSavedDrive"
-                    android:fontFamily="@font/red_hat_display"
-                    android:text="Main Folder"
-                    android:textSize="16sp" />
+<!--                <TextView-->
+<!--                    android:id="@+id/txtSavedFolder"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_below="@+id/dateAndTime"-->
+<!--                    android:layout_marginStart="8dp"-->
+<!--                    android:layout_marginTop="10dp"-->
+<!--                    android:layout_toEndOf="@id/imgSavedDrive"-->
+<!--                    android:fontFamily="@font/red_hat_display"-->
+<!--                    android:text="Main Folder"-->
+<!--                    android:textSize="16sp" />-->
 
                 <ImageView
                     android:id="@+id/imgDrive"
@@ -141,11 +142,13 @@
                     android:id="@+id/txtDots"
                     android:layout_width="35dp"
                     android:layout_height="30dp"
-                    android:padding="10dp"
                     android:layout_below="@+id/txtPersonal"
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentBottom="true"
-                    android:src="@drawable/more" />
+                    android:layout_marginEnd="1dp"
+                    android:layout_marginBottom="1dp"
+                    android:padding="9dp"
+                    android:src="@drawable/more"/>
             </RelativeLayout>
 
         </LinearLayout>

@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<paths>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <files-path name="files" path="." />
+    <files-path name="images" path="ReNoteAI/" />
     <files-path name="my_files" path="images/"/>
     <files-path name="images_imports" path="imports/"/>
     <files-path name="images_imports" path="ReNoteAI/"/>
+
 </paths>

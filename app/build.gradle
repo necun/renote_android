@@ -5,6 +5,7 @@ plugins {
     id 'kotlin-kapt'
     id "com.google.gms.google-services"
     id("androidx.navigation.safeargs.kotlin")
+    id 'com.google.firebase.crashlytics'
 }
 
 android {
@@ -22,7 +23,7 @@ android {
         externalNativeBuild {
             cmake {
                 cppFlags ''
-                abiFilters  'arm64-v8a'
+                abiFilters 'arm64-v8a'
                 arguments "-DOpenCV_DIR=" + opencvsdk + "/sdk/native"
             }
         }
@@ -67,9 +68,15 @@ android {
 chaquopy {
     defaultConfig {
         version = "3.8"
-        buildPython("C:\\Users\\necun\\AppData\\Local\\Programs\\Python\\Python312\\python.exe")
-        pip{
-              install("opencv-python-headless")
+
+        buildPython("C:\\Users\\DELL\\AppData\\Local\\Programs\\Python\\Python39\\python.exe")
+
+
+       // buildPython("C:\\Users\\Komal\\AppData\\Local\\Programs\\Python\\Python311\\python.exe")
+
+
+        pip {
+            install("opencv-python-headless")
 //            install("pandas")
 //            install("pillow")
 //            install("lib-platform")
@@ -94,6 +101,16 @@ chaquopy {
 
 dependencies {
 
+//viewpager
+    implementation 'androidx.viewpager2:viewpager2:1.0.0'
+    //coil
+    implementation  'io.coil-kt:coil:2.3.0'
+    //glide dependency
+    implementation 'com.github.bumptech.glide:glide:4.12.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
+
+    implementation(platform 'com.google.firebase:firebase-bom:32.7.4')
+
     // Logging interceptor for OkHttp
     implementation 'com.squareup.okhttp3:logging-interceptor:4.9.3'
     implementation 'com.squareup.okhttp3:okhttp:4.12.0'
@@ -105,6 +122,8 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.work:work-runtime-ktx:2.9.0'
     implementation 'androidx.compose.ui:ui-graphics-android:1.6.3'
+    implementation 'com.google.firebase:firebase-analytics-ktx'
+    implementation 'com.google.firebase:firebase-config:21.6.3'
     testImplementation 'junit:junit:4.13.2'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
@@ -170,13 +189,17 @@ dependencies {
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
 
 
-
-
     implementation 'io.github.chaosleung:pinview:1.4.4'
-
 
 
     // DocumentSyncWorker Dependencies
 
     implementation "androidx.work:work-runtime-ktx:2.9.0"
+
+    //gson
+    implementation 'com.google.code.gson:gson:2.8.9'
+
+    //crashlytics dependencies...........
+    implementation 'com.google.firebase:firebase-crashlytics'
+    implementation 'com.google.firebase:firebase-analytics'
 }

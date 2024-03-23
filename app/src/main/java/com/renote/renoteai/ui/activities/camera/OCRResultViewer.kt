@@ -3,6 +3,7 @@ package com.renote.renoteai.ui.activities.camera
 import com.renote.renoteai.databinding.ActivityOcrresultViewerBinding
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.renote.renoteai.ui.activities.edit.EXTRA_OCR_TEXT
 
 class OCRResultViewer : AppCompatActivity() {
 
