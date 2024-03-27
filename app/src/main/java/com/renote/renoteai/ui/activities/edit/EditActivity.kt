@@ -14,11 +14,12 @@ import android.os.Bundle
 import android.os.Environment
 import android.util.DisplayMetrics
 import android.provider.MediaStore
-import android.util.Log
 import android.view.View
 import android.view.WindowManager
+import android.widget.Button
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
 
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -26,7 +27,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
-import androidx.recyclerview.widget.RecyclerView
 import com.chaquo.python.Python
 import com.chaquo.python.android.AndroidPlatform
 import com.google.gson.Gson
@@ -39,7 +39,6 @@ import com.renote.renoteai.database.tables.DocumentEntity
 import com.renote.renoteai.database.tables.FileEntity
 import com.renote.renoteai.databinding.EditActivityDataBinding
 import com.renote.renoteai.ui.activities.camera.CameraActivity
-import com.renote.renoteai.ui.activities.camera.EXTRA_PICTURE_TYPE
 import com.renote.renoteai.ui.activities.camera.EmailActivity
 import com.renote.renoteai.ui.activities.camera.OCRResultViewer
 import com.renote.renoteai.ui.activities.camera.libs.CVLib
@@ -47,6 +46,7 @@ import com.renote.renoteai.ui.activities.cropedit.CropEditActivity
 import com.renote.renoteai.ui.activities.edit.adapter.EditPagerAdapter
 import com.renote.renoteai.ui.activities.edit.viewmodel.EditViewModel
 import com.renote.renoteai.ui.activities.filteredit.FilterEditActivity
+import com.renote.renoteai.ui.deleteedit.DeleteEditActivity
 import com.renote.renoteai.ui.main.MainActivity
 import org.koin.android.ext.android.inject
 import org.opencv.android.Utils
@@ -79,7 +79,7 @@ class EditActivity : AppCompatActivity() {
     var enhancedImageType: String = ""
 
     private var currentRotation = 0f
-    private lateinit var uri: Uri
+
 
     lateinit var editPagerAdapter: EditPagerAdapter
     var recentDocumentId:String=""
@@ -95,9 +95,6 @@ class EditActivity : AppCompatActivity() {
         binding.viewModel = viewModel
         supportActionBar?.hide()
 
-//        uri = Uri.parse(intent.getStringExtra(EXTRA_PICTURE_URI))
-//        println("uri in EditActivity:$uri")
-//        pictureType = intent.getStringExtra(EXTRA_PICTURE_TYPE)
 
         editPagerAdapter = EditPagerAdapter(this@EditActivity)
         fileEntityList = ArrayList()
@@ -107,226 +104,19 @@ class EditActivity : AppCompatActivity() {
         binding.imageView2.apply {
             adapter = editPagerAdapter
         }
-//        val uri = Uri.parse(intent.getStringExtra(EXTRA_PICTURE_URI))
-//        pictureType = intent.getStringExtra(EXTRA_PICTURE_TYPE)
 
 
-        org = findViewById(R.id.viewOrg)
-        ai = findViewById(R.id.viewAI)
-        bw = findViewById(R.id.viewBW)
-        grey = findViewById(R.id.viewGrey)
-        soft = findViewById(R.id.viewSoft)
 
-        bw.visibility = View.VISIBLE
 
         window.setFlags(
             WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE
         )
 
-        //deleteInternalStorageDirectoryy()
-        binding.aiFilterImgBtn.setOnClickListener {
-            ai.visibility = View.VISIBLE
-
-            bw.visibility = View.GONE
-            org.visibility = View.GONE
-            grey.visibility = View.GONE
-            soft.visibility = View.GONE
-            binding.aiFilterProgressbar.visibility = View.VISIBLE
-            deleteInternalStorageDirectoryy()
 
 
-//      viewBinding.originalFilterImageView.setImageResource(R.drawable.ic_no_picture)
-//      viewBinding.blackAndWhiteFilterImageView.setImageResource(R.drawable.ic_no_picture)
-//      viewBinding.greyFilterImageView.setImageResource(R.drawable.ic_no_picture)
-//      viewBinding.softFilterImageView.setImageResource(R.drawable.ic_no_picture)
-
-            doSaveGetSave()
-            aiFilter()
-        }
-        binding.greyFilterImgBtn.setOnClickListener {
-            grey.visibility = View.VISIBLE
-
-            bw.visibility = View.GONE
-            org.visibility = View.GONE
-            ai.visibility = View.GONE
-            soft.visibility = View.GONE
-            //viewBinding.greyFilterProgressbar.visibility=View.VISIBLE
-            deleteInternalStorageDirectoryy()
-
-//      viewBinding.originalFilterImageView.setImageResource(R.drawable.ic_no_picture)
-//      viewBinding.blackAndWhiteFilterImageView.setImageResource(R.drawable.ic_no_picture)
-//      viewBinding.aiFilterImageView.setImageResource(R.drawable.ic_no_picture)
-//      viewBinding.softFilterImageView.setImageResource(R.drawable.ic_no_picture)
-            doSaveGetSave()
-            greyFilter()
-        }
-        binding.softFilterImgBtn.setOnClickListener {
-            soft.visibility = View.VISIBLE
-
-            bw.visibility = View.GONE
-            org.visibility = View.GONE
-            grey.visibility = View.GONE
-            ai.visibility = View.GONE
-            //viewBinding.softFilterProgressbar.visibility=View.VISIBLE
-            deleteInternalStorageDirectoryy()
-
-//      viewBinding.originalFilterImageView.setImageResource(R.drawable.ic_no_picture)
-//      viewBinding.blackAndWhiteFilterImageView.setImageResource(R.drawable.ic_no_picture)
-//      viewBinding.aiFilterImageView.setImageResource(R.drawable.ic_no_picture)
-//      viewBinding.greyFilterImageView.setImageResource(R.drawable.ic_no_picture)
-            doSaveGetSave()
-            softFilter()
-        }
-        binding.blackAndWhiteFilterImgBtn.setOnClickListener {
-            bw.visibility = View.VISIBLE
-
-            ai.visibility = View.GONE
-            org.visibility = View.GONE
-            grey.visibility = View.GONE
-            soft.visibility = View.GONE
-            binding.blackAndWhiteFilterProgressbar.visibility = View.VISIBLE
-            deleteInternalStorageDirectoryy()
-
-//      viewBinding.originalFilterImageView.setImageResource(R.drawable.ic_no_picture)
-//      viewBinding.aiFilterImageView.setImageResource(R.drawable.ic_no_picture)
-//      viewBinding.greyFilterImageView.setImageResource(R.drawable.ic_no_picture)
-//      viewBinding.softFilterImageView.setImageResource(R.drawable.ic_no_picture)
-            doSaveGetSave()
-            blackAndWhiteFilter()
-        }
-//    viewBinding.BWFilterButton.setOnClickListener {
-//      doBWFilter()
-//
-//    viewBinding.GrayscaleFilterButton.setOnClickListener {
-//      doGrayscaleFilter()
-//    }
-//    viewBinding.EnhanceFilterButton.setOnClickListener {
-//      deleteInternalStorageDirectoryy()
-//      doSaveGetSave()
-//      val input_path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString() + "/CameraX-Image-Input/"
-//      val output_path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString() + "/CameraX-Image-Output/"
-//      val file = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString() + "/CameraX-Image-Output/")
-//      if(!file.exists()){
-//        file.mkdirs()
-//      }
-//      val input = input_path + "cropped_image" + ".jpg"
-//      if (!Python.isStarted()) {
-//        Python.start(AndroidPlatform(this))
-//      }
-//      val py = Python.getInstance()
-//      val module = py.getModule("script")
-//
-//      val fact = module["process_and_enhance_image"]
-//      fact?.call(input,output_path)
-//      val f=File(output_path,"enhanced_image.jpg")
-//      System.out.println("122334465=")
-//      val b=BitmapFactory.decodeStream(FileInputStream(f))
-//
-//      viewBinding.imageView2.setImageBitmap(b)
-//    }
-//    viewBinding.SaveButton.setOnClickListener {
-//      doSave()
-//    }
-//        binding.tickMarkImageView.setOnClickListener {
-//            doSave()
-//        }
-
-        binding.scanMoreBtn.setOnClickListener {
-            val intent = Intent(this@EditActivity, CameraActivity::class.java)
-            startActivity(intent)
-            deleteInternalStorageDirectoryy()
-            finishAffinity()
-        }
-//    viewBinding.SoftFilterButton.setOnClickListener {
-//      doSoftFilter()
-//    }
-        binding.originalFilterImgBtn.setOnClickListener {
-            org.visibility = View.VISIBLE
-
-            bw.visibility = View.GONE
-            ai.visibility = View.GONE
-            grey.visibility = View.GONE
-            soft.visibility = View.GONE
-            // viewBinding.originalFilterProgressbar.visibility=View.VISIBLE
-            deleteInternalStorageDirectoryy()
-
-            // org.isVisible = true
-//      viewBinding.greyFilterImageView.setImageResource(R.drawable.ic_no_picture)
-//      viewBinding.blackAndWhiteFilterImageView.setImageResource(R.drawable.ic_no_picture)
-//      viewBinding.aiFilterImageView.setImageResource(R.drawable.ic_no_picture)
-//      viewBinding.softFilterImageView.setImageResource(R.drawable.ic_no_picture)
-            val original = original ?: return@setOnClickListener
-            result = original.clone()
-            val bitmap =
-                Bitmap.createBitmap(original.cols(), original.rows(), Bitmap.Config.ARGB_8888)
-            Utils.matToBitmap(original, bitmap)
-
-            val name = "no_filter_image"
-            val contentValues = ContentValues().apply {
-                put(MediaStore.MediaColumns.DISPLAY_NAME, name)
-                put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
-                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-                    put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/CameraX-Image-Output")
-                }
-            }
-
-
-            val uri = contentResolver.insert(
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues
-            ) ?: throw IOException("Could not open uri")
-//    val stream = contentResolver.openOutputStream(uri) ?: throw IOException("Could not open output stream")
-//
-//// Create a buffer to hold the bitmap's pixels
-//    val byteBuffer = ByteBuffer.allocate(bitmap.byteCount)
-//    bitmap.copyPixelsToBuffer(byteBuffer)
-//    byteBuffer.rewind()
-//
-//// Write the buffer's contents to the output stream
-//    stream.write(byteBuffer.array())
-//
-//    stream.close()
-            val stream = contentResolver.openOutputStream(uri)
-                ?: throw IOException("Could not open output stream")
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
-            stream.close()
-//val msg = "Save succeeded: ${uri.getPath()}"
-//Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
-            doNoFilter()
-
-        }
-//    viewBinding.OCRButton.setOnClickListener {
-//      doOCR()
-//    }
-
-
-        //  val uri = Uri.parse(intent.getStringExtra(EXTRA_PICTURE_URI))
-//        val imageDecoder = ImageDecoder.createSource(contentResolver, uri)
-//        val bitmap = ImageDecoder.decodeBitmap(imageDecoder)
-//        val bmp32 = bitmap.copy(Bitmap.Config.ARGB_8888, true);
-//        contentResolver.delete(uri, null, null)
-
-
-//        val mat = Mat()
-//        Utils.bitmapToMat(bmp32, mat)
-//// get current camera frame as OpenCV Mat object
-//        Imgproc.cvtColor(mat, mat, Imgproc.COLOR_RGBA2RGB)
-//        original = mat.clone()
-//        result = mat.clone()
-//        val resultBitmap = Bitmap.createBitmap(mat.cols(), mat.rows(), Bitmap.Config.ARGB_8888)
-//        Utils.matToBitmap(mat, resultBitmap)
-
-
-//        doSaveGetSave()
-//        blackAndWhiteFilter()
         observeData()
 
-        //doSaveGetSave()
-        // doNoFilter()
-        //aiFilter()
-        //blackAndWhiteFilter()
-        //greyFilter()
-        //softFilter()
-        // viewBinding.imageView2.setImageBitmap(resultBitmap)
+
         progressBarObserveData()
         recentFileDetailsByRecentDocumentIdObserveData()
         editPagerAdapter.onTextChanged = { position, data ->
@@ -359,6 +149,9 @@ class EditActivity : AppCompatActivity() {
             emptyList()
         }
     }
+
+
+
 
     private fun progressBarObserveData() {
         viewModel.showLoading.observe(this) {
@@ -399,6 +192,8 @@ class EditActivity : AppCompatActivity() {
 
                 R.id.rotateBtn -> {
                     rotateImageView()
+
+
                 }
 
                 R.id.tickMarkImageView -> {
@@ -424,25 +219,34 @@ class EditActivity : AppCompatActivity() {
                 }
 
                 R.id.shareBtn ->{
-                    println("43rgty6uj:$recentDocumentId")
-//                    viewModel.getRecentFileDetailsByDocumentId(recentDocumentId)
-//                    viewModel.recentFileDetails.observe(this@EditActivity) {
-                    if(recentDocumentId != null){
-                        println("343refe4sds:$recentDocumentId")
-                        val currentPosition = binding.imageView2.currentItem
-                        val currentFileEntity = editPagerAdapter.currentList[currentPosition]
-                      if (currentFileEntity.fileData.toUri() != null) {
-                            val uri = currentFileEntity.fileData.toUri()
-                            println("uriuriuri:$uri")
-                            val filePath = uri.toString().removePrefix("file://")
-                            shareFile(filePath)
-                        } else {
-                            // This means the currentItem index is out of bounds, handle accordingly
-                            Toast.makeText(this, "please try again after sometime", Toast.LENGTH_SHORT).show()
-                        }
+
+                                showShareCustomDialog()
+                }
+
+                R.id.deleteBtn ->{
+                    val currentPosition = binding.imageView2.currentItem
+                    val currentFileEntity = editPagerAdapter.currentList[currentPosition]
+                    val currentFileName=editPagerAdapter.currentList[currentPosition].name
+                    val currentFileId=editPagerAdapter.currentList[currentPosition].id
+                    val currentFileUri=editPagerAdapter.currentList[currentPosition].fileData
+                    val intent = Intent(this, DeleteEditActivity::class.java).apply {
+                        putExtra("fileUri", currentFileUri)
+                        putExtra("fileName", currentFileName)
+                        putExtra("fileId", currentFileId)
                     }
+                    startActivity(intent)
+                }
+                R.id.scanMoreBtn->{
+
+                        val intent = Intent(this@EditActivity, CameraActivity::class.java)
+                        startActivity(intent)
+//                        finishAffinity()
+                        deleteInternalStorageDirectoryy()
+
 
                 }
+
+
 
             }
         }
@@ -484,6 +288,7 @@ class EditActivity : AppCompatActivity() {
         val rotationAnimator =
             ObjectAnimator.ofFloat(imageView, "rotation", imageView.rotation, currentRotation)
         rotationAnimator.duration = 500 // 500 milliseconds
+
         rotationAnimator.start()
 
 //        currentRotation += 90f
@@ -986,7 +791,83 @@ class EditActivity : AppCompatActivity() {
             }
         }
 
-
+fun shareSingleFile() {
+    try{
+    println("43rgty6uj:$recentDocumentId")
+//                    viewModel.getRecentFileDetailsByDocumentId(recentDocumentId)
+//                    viewModel.recentFileDetails.observe(this@EditActivity) {
+    if (recentDocumentId != null) {
+        println("343refe4sds:$recentDocumentId")
+        val currentPosition = binding.imageView2.currentItem
+        val currentFileEntity = editPagerAdapter.currentList[currentPosition]
+        if (currentFileEntity.fileData.toUri() != null) {
+            val uri = currentFileEntity.fileData.toUri()
+            println("uriuriuri:$uri")
+            val filePath = uri.toString().removePrefix("file://")
+            shareFile(filePath)
+        } else {
+            // This means the currentItem index is out of bounds, handle accordingly
+            Toast.makeText(
+                this,
+                "No file to share",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }}
+    catch (e:Exception){
+        Toast.makeText(
+            this,
+            "Error in sharing file, please try again after some time",
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+}
+@SuppressLint("SuspiciousIndentation")
+fun showShareCustomDialog(){
+        val builder = AlertDialog.Builder(this)
+            .create()
+        val view = layoutInflater.inflate(R.layout.share_custom_dialog_layout,null)
+        val  shareSingleFileButton = view.findViewById<Button>(R.id.shareSingleFileBtn)
+    val  shareMultipleFileButton = view.findViewById<Button>(R.id.shareMultipleFileBtn)
+        builder.setView(view)
+    shareSingleFileButton.setOnClickListener {
+            shareSingleFile()
+        }
+    shareMultipleFileButton.setOnClickListener {
+        val fileUris = editPagerAdapter.currentList.mapNotNull { fileEntity ->
+            try {
+                // Assuming `fileData` is a file path starting with 'file://'
+                val file = File(Uri.parse(fileEntity.fileData).path ?: "")
+                FileProvider.getUriForFile(this@EditActivity, "com.renote.renoteai.provider", file)
+            } catch (e: Exception) {
+                null // In case of any exception, return null to exclude this file
+            }
+        }
+        shareMultipleFiles(fileUris, this@EditActivity)
+    }
+        builder.setCanceledOnTouchOutside(true)
+        builder.show()
+}
+    fun shareMultipleFiles(fileUris: List<Uri>, context: Context) {
+        try {
+            if (fileUris.isNotEmpty()) {
+                val shareIntent = Intent(Intent.ACTION_SEND_MULTIPLE).apply {
+                    type = "image/*" // or use "*/*" for mixed file types
+                    putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(fileUris))
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+                context.startActivity(Intent.createChooser(shareIntent, "Share Files"))
+            } else {
+                Toast.makeText(context, "No files to share", Toast.LENGTH_SHORT).show()
+            }
+        }catch (e:Exception){
+            Toast.makeText(
+                this,
+                "Error in sharing files, please try again after some time",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
     override fun onBackPressed() {
         super.onBackPressed()
         // Start MainActivity
@@ -997,7 +878,7 @@ class EditActivity : AppCompatActivity() {
         startActivity(intent)
 
         // Optional: if you want to finish the current activity
-        finishAffinity()
+        finish()
     }
 
     companion object {

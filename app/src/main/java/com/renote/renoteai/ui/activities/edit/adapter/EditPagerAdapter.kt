@@ -1,8 +1,10 @@
 package com.renote.renoteai.ui.activities.edit.adapter
 
+import android.app.Activity
 import android.content.Context
 import android.graphics.Color
 import android.net.Uri
+import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,7 +26,7 @@ class EditPagerAdapter(private val context: Context) :
     ListAdapter<FileEntity, EditPagerAdapter.PreviewHolder>(MediaDiffUtill) {
     lateinit var onTextChanged: OnTextChangeListener<String>
     var showEditTitle = false
-
+    var currentRotation = 0f
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PreviewHolder {
         val binding = DataBindingUtil.inflate<EditPagerItemBinding>(
             LayoutInflater.from(parent.context),
@@ -62,7 +64,7 @@ class EditPagerAdapter(private val context: Context) :
                 append(itemCount)
             }
             binding.executePendingBindings()
-
+            // Apply resizing logic after setting the image
 
 
             binding.fileNameEdit.doOnTextChanged { text, start, count, after ->

@@ -119,7 +119,11 @@ class CameraActivity : AppCompatActivity() {
         )
     }
 
-
+//    var fileUri:String? = null
+//    var fileName:String? = null
+//    var fileId:String? = null
+//    var documentId:String? = null
+//    var editActivityIntent:String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = DataBindingUtil.setContentView(
@@ -135,6 +139,11 @@ class CameraActivity : AppCompatActivity() {
         // val userEmailId = intent.getStringExtra("userEmailId")
 
         // Request camera permissions
+//         documentId = intent.getStringExtra("currentDocumentId")
+//        fileUri = intent.getStringExtra("fileUri")
+//        fileName=intent.getStringExtra("fileName")
+//        fileId = intent.getStringExtra("fileId")
+//        editActivityIntent = intent.getStringExtra("fromeditactivity")
         if (allPermissionsGranted()) {
             startCamera()
         } else {
@@ -186,7 +195,16 @@ class CameraActivity : AppCompatActivity() {
         cameraExecutor = Executors.newSingleThreadExecutor()
         val getFileEntities = getFileEntities(this@CameraActivity)
         println("getFileEntitiessss:$getFileEntities")
-        if(getFileEntities.isNotEmpty()){
+//        if(editActivityIntent != null) {
+//            viewBinding.conformScanBtn.visibility=View.GONE
+//            viewBinding.previewLay.visibility=View.GONE
+//        }
+//         else if(intent.getStringExtra("123").equals("123")){
+//            viewBinding.conformScanBtn.visibility=View.VISIBLE
+//            viewBinding.previewLay.visibility=View.VISIBLE
+//        }
+//        else
+            if(getFileEntities.isNotEmpty()){
             viewBinding.conformScanBtn.visibility=View.VISIBLE
             viewBinding.previewLay.visibility=View.VISIBLE
         }
@@ -298,6 +316,7 @@ class CameraActivity : AppCompatActivity() {
         editor.putString(FILE_ENTITIES_KEY, jsonString)
         editor.apply()
     }
+    @SuppressLint("SuspiciousIndentation")
     fun documentObserveData() {
 //        //  if (loginUserGoogleId != null) {
 //
@@ -324,7 +343,29 @@ class CameraActivity : AppCompatActivity() {
 //                    // Access the document ID if it's set
                     if (fileEntity.documentId.isNotEmpty()) { //
                         println("document ID associated with this file")
-       2             } else {
+                        val recentDocumentId = documentEntity.id
+                        println("Recent Document IDDD: $recentDocumentId")
+                        val intent =Intent(this@CameraActivity,EditActivity::class.java)
+                        intent.putExtra("recentdocumentid",recentDocumentId)
+                        startActivity(intent)
+       2             }
+//                    else if(fileEntity.documentId.isEmpty() && intent.getStringExtra("123").equals("123"))  {
+//                        println("No document ID associated with this file and edit activity intent:$editActivityIntent")
+//                                  val recentDocumentId=intent.getStringExtra("documentId")
+//                        println("Recent Document ID32ewee: $recentDocumentId")
+//                        recentDocumentId?.let{
+//                            updateDocumentIdInFileEntities(this@CameraActivity, recentDocumentId)
+//                            val intent =Intent(this@CameraActivity,EditActivity::class.java)
+//                            intent.putExtra("recentdocumentid",recentDocumentId)
+//                            intent.putExtra("fromeditActivity","fromeditactivity")
+//                            intent.putExtra("123","123")
+//                            startActivity(intent)
+//                        }
+//
+//                        //clearAllPreferences(this@CameraActivity)
+//
+//       }
+                    else{
                         println("No document ID associated with this file")
                         val recentDocumentId = documentEntity.id
                         println("Recent Document ID: $recentDocumentId")
@@ -451,9 +492,21 @@ fun getFileEntities(context: Context): List<FileEntity> {
 //            pictureType = "book"
 //        }
 
-         val intent = Intent(this, ImageViewer::class.java).apply {
-            putExtra(EXTRA_PICTURE_URI, uri.toString())
-            putExtra(EXTRA_PICTURE_TYPE, activeScanType)
+         val intent = Intent(this@CameraActivity, ImageViewer::class.java).apply {
+
+//             if(editActivityIntent != null) {
+//                 putExtra("fileId", fileId)
+//                 putExtra("fileName", fileName)
+//                 putExtra("fileUri", fileUri)
+//                 putExtra("currentDocumentId",documentId)
+//
+//                 putExtra("fromeditactivity","fromeditactivity")
+//                 putExtra(EXTRA_PICTURE_URI, uri.toString())
+//                 putExtra(EXTRA_PICTURE_TYPE, activeScanType)
+//             }else{
+                 putExtra(EXTRA_PICTURE_URI, uri.toString())
+                 putExtra(EXTRA_PICTURE_TYPE, activeScanType)
+             //}
         }
         startActivity(intent)
 
@@ -583,10 +636,26 @@ fun getFileEntities(context: Context): List<FileEntity> {
         startActivity(intent)
     }
 
+    @SuppressLint("SuspiciousIndentation")
     override fun onResume() {
         super.onResume()
         val getFileEntities = getFileEntities(this@CameraActivity)
-        if(getFileEntities.isNotEmpty()){
+//        if(editActivityIntent != null )
+//        {
+//            viewBinding.conformScanBtn.visibility=View.GONE
+//            viewBinding.previewLay.visibility=View.GONE
+//        }
+//        else if(intent.getStringExtra("123").equals("123"))
+//        {
+//            viewBinding.conformScanBtn.visibility=View.VISIBLE
+//            viewBinding.previewLay.visibility=View.VISIBLE
+////            Glide.with(this@CameraActivity)
+////                .load(Uri.parse(getFileEntities[getFileEntities.size-1].fileData))
+////                .into(viewBinding.previewImage)
+////            viewBinding.previewCount.text = getFileEntities.size.toString()
+//        }
+//        else
+                   if(getFileEntities.isNotEmpty()){
             viewBinding.conformScanBtn.visibility=View.VISIBLE
             viewBinding.previewLay.visibility=View.VISIBLE
             Glide.with(this@CameraActivity)

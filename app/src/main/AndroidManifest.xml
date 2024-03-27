@@ -29,6 +29,7 @@
     <application
         android:name=".app.MyApp"
         android:allowBackup="true"
+        android:enableOnBackInvokedCallback="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@drawable/renote_logo"
@@ -39,6 +40,9 @@
         android:theme="@style/Theme.CameraXApp"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+        <activity
+            android:name=".ui.deleteedit.DeleteEditActivity"
+            android:exported="false" />
         <activity
             android:name=".ui.activities.cropedit.CropEditActivity"
             android:exported="false" />
@@ -96,6 +100,7 @@
             android:launchMode="singleTop" />
         <activity
             android:name=".ui.activities.edit.EditActivity"
+            android:configChanges="orientation|screenSize"
             android:exported="false"
             android:launchMode="singleTop" />
         <activity
@@ -105,7 +110,7 @@
         <activity
             android:name=".ui.activities.camera.CameraActivity"
             android:exported="true"
-            android:launchMode="singleTop"></activity>
+            android:launchMode="singleTop" />
 
         <meta-data
             android:name="com.google.mlkit.vision.DEPENDENCIES"

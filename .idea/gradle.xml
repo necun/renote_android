@@ -9,7 +9,7 @@
         <option name="gradleJvm" value="jbr-17" />
         <option name="modules">
           <set>
-            <option value="$PROJECT_DIR$/../openCV/OpenCV-android-sdk/sdk" />
+            <option value="E:/opencv-4.9.0-android-sdk/OpenCV-android-sdk/sdk" />
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
           </set>

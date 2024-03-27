@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="text_color_three_bottom_sheet">#344054</color>
+    <color name="text_color_two_bottom_sheet">#667085</color>
+    <color name="text_color_one_bottom_sheet">#101828</color>
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>

@@ -35,6 +35,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_margin="@dimen/margin_8dp"
+
             android:background="@color/colorButtonGreyBg"
             app:layout_constraintBottom_toTopOf="@id/bottomLay"
             app:layout_constraintTop_toTopOf="parent" />
@@ -213,7 +214,8 @@
                         android:padding="@dimen/padding_5dp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@id/rotateBtn"
-                        app:layout_constraintTop_toTopOf="parent">
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:onClick="@{(view) -> viewModel.onresorceClick(view.getId())}">
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="@dimen/filter_icon_size"
@@ -283,6 +285,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:gravity="center"
+                            android:onClick="@{(view) -> viewModel.onresorceClick(view.getId())}"
                             android:orientation="vertical"
                             android:padding="@dimen/padding_5dp"
                             app:layout_constraintEnd_toStartOf="@id/scanMoreBtn"
@@ -312,6 +315,7 @@
                             android:gravity="center"
                             android:orientation="vertical"
                             android:padding="@dimen/padding_5dp"
+                            android:onClick="@{(view) -> viewModel.onresorceClick(view.getId())}"
                             app:layout_constraintEnd_toStartOf="@id/shareBtn"
                             app:layout_constraintStart_toEndOf="@id/cameraRetakeImageView"
                             app:layout_constraintTop_toTopOf="parent">

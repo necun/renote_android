@@ -1,4 +1,8 @@
 <resources>
+    <string name="sure_msg">Are you sure!</string>
+    <string name="delete_msg">Do you want to delete the file?</string>
+    <string name="delete_txt">Delete</string>
+    <string name="cancel_txt">Cancel</string>
     <string name="enter_tag_name_message">Please enter tag name</string>
     <string name="enter_folder_name_message">Please enter folder name</string>
     <string name="take_scan">Take Scan</string>
@@ -71,8 +75,7 @@
     <string name="save">Save</string>
 
 
-
-<string name="original">Original</string>
+    <string name="original">Original</string>
     <string name="gray">Gray</string>
     <string name="black_white">Black/White</string>
     <string name="soft">Soft</string>

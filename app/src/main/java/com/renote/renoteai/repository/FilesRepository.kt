@@ -13,4 +13,6 @@ class FilesRepository(private val dao: FileDao) {
     fun getRecentFileDetailsByRecentDocumentId(recentDocumentId:String) = dao.getRecentFileDetailsByRecentDocumentId(recentDocumentId)
 
     fun getFiles(documentId: String) = dao.getFiles(documentId)
+
+    suspend fun deleteFileByFileId(fileId:String) = dao.deleteFileByFileId(fileId)
 }

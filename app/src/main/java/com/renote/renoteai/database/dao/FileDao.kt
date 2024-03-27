@@ -23,4 +23,7 @@ interface FileDao {
 
     @Query("SELECT * FROM file_table WHERE documentId= :documentId")
     fun getFiles(documentId: String): Flow<MutableList<FileEntity>>
+
+    @Query("DELETE FROM file_table where id= :fileId")
+    suspend fun deleteFileByFileId(fileId:String)
 }

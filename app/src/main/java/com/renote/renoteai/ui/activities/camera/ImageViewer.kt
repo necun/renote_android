@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.ImageCapture
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 
 import androidx.databinding.DataBindingUtil
 import com.chaquo.python.Python
@@ -34,6 +35,7 @@ import com.renote.renoteai.ui.activities.camera.libs.DocLib
 import com.renote.renoteai.ui.activities.camera.scanutil.DocumentBorders
 import com.renote.renoteai.ui.activities.camera.viewmodel.CameraViewModel
 import com.renote.renoteai.ui.activities.camera.viewmodel.ImageViewerViewModel
+import com.renote.renoteai.ui.deleteedit.DeleteEditActivity
 import org.koin.android.ext.android.inject
 import org.opencv.android.Utils
 import org.opencv.core.Mat
@@ -52,7 +54,12 @@ class ImageViewer : AppCompatActivity() {
     private var pictureType: String? = ""
     val viewModel: ImageViewerViewModel by inject()
     val currentTimestamp: Long = System.currentTimeMillis()
-
+//            var fileUri:String? =null
+//    var fileName:String? =null
+//    var fileId:String? =null
+//    var :String? =null
+    var uri:Uri? = null
+    @SuppressLint("WrongThread")
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,17 +68,22 @@ class ImageViewer : AppCompatActivity() {
         )
         viewBinding.lifecycleOwner = this
         viewBinding.viewmodel = viewModel
+//        fileUri = intent.getStringExtra("fileUri")
+//        fileName=intent.getStringExtra("fileName")
+//        fileId = intent.getStringExtra("fileId")
+//        editIntentText=intent.getStringExtra("fromeditactivity")
+             uri = Uri.parse(intent.getStringExtra(EXTRA_PICTURE_URI))
+            println("dfdsfdfddf:$uri")
+            pictureType = intent.getStringExtra(EXTRA_PICTURE_TYPE);
 
-        val uri = Uri.parse(intent.getStringExtra(EXTRA_PICTURE_URI))
-        pictureType = intent.getStringExtra(EXTRA_PICTURE_TYPE);
 
 //
-        val imageDecoder = ImageDecoder.createSource(contentResolver, uri)
+        val imageDecoder = ImageDecoder.createSource(contentResolver, uri!!)
         val bitmap = ImageDecoder.decodeBitmap(imageDecoder)
 //
         val bmp32 = bitmap.copy(Bitmap.Config.ARGB_8888, true);
 //
-        contentResolver.delete(uri, null, null)
+        contentResolver.delete(uri!!, null, null)
 //
         val mat = Mat()
 //
@@ -114,6 +126,9 @@ class ImageViewer : AppCompatActivity() {
                 R.id.retakeButton -> {
                     deleteInternalStorageDirectoryy()
                     val intent = Intent(this, CameraActivity::class.java)
+//                    intent.putExtra("fileId",fileId)
+//                    intent.putExtra("fileName",fileName)
+//                    intent.putExtra("fileUri",fileUri)
                     startActivity(intent)
                 }
 
@@ -231,25 +246,30 @@ class ImageViewer : AppCompatActivity() {
                     // Handle error
                 }
 
+//                if(fileId != null && fileName != null && fileUri != null){
+//                   updateFileEntityUri(this@ImageViewer,fileId!!,fileUri.toString()!!)
+//                }
+//                   else {
+                    //fileEntities.add(FileEntity("file_$currentTimestamp",fileName,currentTimestamp,0L,"",false,false,false,fileUri.toString(),0,"","","gDrive","jpg"))
+                    val fileEntity = FileEntity(
+                        "file_$currentTimestamp",
+                        fileName,
+                        currentTimestamp,
+                        0L,
+                        "",
+                        false,
+                        false,
+                        false,
+                        fileUri.toString(),
+                        0,
+                        "",
+                        "",
+                        "gDrive",
+                        "jpg"
+                    )
+                    saveFileEntities(this@ImageViewer, fileEntity)
+               // }
 
-                //fileEntities.add(FileEntity("file_$currentTimestamp",fileName,currentTimestamp,0L,"",false,false,false,fileUri.toString(),0,"","","gDrive","jpg"))
-                val fileEntity = FileEntity(
-                    "file_$currentTimestamp",
-                    fileName,
-                    currentTimestamp,
-                    0L,
-                    "",
-                    false,
-                    false,
-                    false,
-                    fileUri.toString(),
-                    0,
-                    "",
-                    "",
-                    "gDrive",
-                    "jpg"
-                )
-                saveFileEntities(this@ImageViewer, fileEntity)
                 val intent = Intent(this, CameraActivity::class.java)
                 startActivity(intent)
 
@@ -384,6 +404,33 @@ class ImageViewer : AppCompatActivity() {
                 super.onDestroy()
                 deleteInternalStorageDirectoryy()
             }
+
+
+    fun updateFileEntityUri(context: Context, fileId: String, newFileUri: String) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val gson = Gson()
+        val editor = prefs.edit()
+
+        // Retrieve the current list of FileEntity objects
+        val fileEntitiesJson = prefs.getString(FILE_ENTITIES_KEY, null)
+        if (fileEntitiesJson != null) {
+            // Convert the JSON string to a mutable list of FileEntity objects
+            val fileEntities = gson.fromJson(fileEntitiesJson, Array<FileEntity>::class.java).toMutableList()
+
+            // Find the FileEntity with the given ID and update its file URI
+            val fileEntityIndex = fileEntities.indexOfFirst { it.id == fileId }
+            if (fileEntityIndex != -1) {
+                val updatedFileEntity = fileEntities[fileEntityIndex].copy(fileData = newFileUri)
+                fileEntities[fileEntityIndex] = updatedFileEntity
+            }
+
+            // Convert the updated list back to JSON
+            val updatedFileEntitiesJson = gson.toJson(fileEntities)
+
+            // Save the updated JSON string back into SharedPreferences
+            editor.putString(FILE_ENTITIES_KEY, updatedFileEntitiesJson).apply()
+        }
+    }
 
 
                     companion object {
