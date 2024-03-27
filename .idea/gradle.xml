@@ -12,6 +12,10 @@
             <option value="E:/opencv-4.9.0-android-sdk/OpenCV-android-sdk/sdk" />
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
+<<<<<<< HEAD
+=======
+            <option value="F:/openCV/OpenCV-android-sdk/sdk" />
+>>>>>>> 08def1534cc5fad30205880ac86cf4fa4db0e82c
           </set>
         </option>
         <option name="resolveExternalAnnotations" value="false" />
